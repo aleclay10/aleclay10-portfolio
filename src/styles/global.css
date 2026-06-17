@@ -1,1 +1,56 @@
 @import "tailwindcss";
+
+/* Self-hosted variable fonts (no third-party links) */
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+/* Toggle dark mode via a `.dark` class on <html> instead of OS preference alone */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic palette — flips with the .dark class. Ember accent both modes. */
+:root {
+  --bg: #fbf8f4;        /* warm paper, not pure white */
+  --surface: #f3ede3;
+  --ink: #1a1714;
+  --muted: #6b645c;
+  --line: #e7ddcf;
+  --accent: #e8590c;    /* Ember, light mode */
+  --accent-soft: #fbe7d8;
+}
+
+.dark {
+  --bg: #0c0c0d;        /* warm near-black */
+  --surface: #141414;
+  --ink: #edeae4;
+  --muted: #8a847c;
+  --line: #20201d;
+  --accent: #ff8a5b;    /* Ember, dark mode */
+  --accent-soft: #2a1a12;
+}
+
+@theme {
+  --font-serif: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  --color-canvas: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+}
+
+html {
+  background-color: var(--bg);
+  color-scheme: light dark;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

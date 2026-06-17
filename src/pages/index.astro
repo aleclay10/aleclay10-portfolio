@@ -8,26 +8,153 @@ import '../styles/global.css';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="theme-color" content="#0a0a0a" />
-		<meta name="description" content="Alec Layton — software engineer. Projects, writing, and things I'm building." />
-		<title>Alec Layton</title>
+		<meta name="description" content="Alec Layton — I build autonomous agent systems. Projects, writing, and experiments in AI infrastructure." />
+		<title>Alec Layton — Autonomous agent systems</title>
+		<!-- Set theme before paint to avoid a flash -->
+		<script is:inline>
+			(() => {
+				const stored = localStorage.getItem('theme');
+				const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				document.documentElement.classList.toggle('dark', dark);
+			})();
+		</script>
 	</head>
-	<body class="min-h-screen bg-neutral-950 text-neutral-200 font-mono antialiased">
-		<main class="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6">
-			<p class="text-sm text-neutral-500">aleclay10.dev</p>
-			<h1 class="mt-3 text-4xl font-semibold tracking-tight text-neutral-50 sm:text-5xl">
-				Alec Layton
-			</h1>
-			<p class="mt-4 max-w-prose text-base leading-relaxed text-neutral-400">
-				Software engineer. I build things on the web — products, tools, and the
-				occasional experiment. This site is self-hosted on a Mac mini in my
-				apartment, served over a Cloudflare tunnel.
-			</p>
-			<nav class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-				<a class="text-neutral-400 underline-offset-4 transition hover:text-neutral-50 hover:underline" href="https://github.com/aleclay10">GitHub</a>
-				<a class="text-neutral-400 underline-offset-4 transition hover:text-neutral-50 hover:underline" href="mailto:alec.layton100@gmail.com">Email</a>
-			</nav>
-			<p class="mt-12 text-xs text-neutral-600">More coming soon — projects, writing, and a few things I'm shipping.</p>
-		</main>
+	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
+		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
+			<!-- Top bar -->
+			<header class="flex items-center justify-between py-6">
+				<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
+					AL<span class="text-accent">.</span>
+				</a>
+				<nav class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
+					<a class="link" href="#projects">Projects</a>
+					<a class="link" href="#">Writing</a>
+					<a class="link" href="#">/now</a>
+					<a class="link" href="#">/uses</a>
+					<a class="link" href="#">About</a>
+				</nav>
+				<div class="flex items-center gap-x-3">
+					<button id="cmdk" type="button" aria-label="Open command palette"
+						class="hidden items-center gap-x-2 rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink sm:flex">
+						<span>Search</span>
+						<kbd class="rounded border border-line px-1 py-0.5 text-[10px]">⌘K</kbd>
+					</button>
+					<button id="theme-toggle" type="button" aria-label="Toggle theme"
+						class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink">
+						<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+						<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+					</button>
+				</div>
+			</header>
+
+			<!-- Hero -->
+			<main class="flex flex-1 flex-col justify-center py-16">
+				<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
+					<div class="reveal">
+						<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">
+							Software engineer · AI agent systems
+						</p>
+						<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-7xl"
+							style="font-optical-sizing: auto;">
+							I build<br />autonomous<br /><span class="italic text-accent">agent systems.</span>
+						</h1>
+						<p class="mt-7 max-w-md text-[17px] leading-relaxed text-muted">
+							I design and ship AI tooling and the infrastructure under it — including
+							Kowalski, an autonomous agent that runs my day. This site is self-hosted
+							on a Mac mini in my apartment, served over a Cloudflare tunnel.
+						</p>
+						<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
+							<a href="#projects" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
+								View projects
+							</a>
+							<a href="https://github.com/aleclay10" class="link px-2 py-2.5">GitHub ↗</a>
+							<a href="mailto:alec.layton100@gmail.com" class="link px-2 py-2.5">Email ↗</a>
+						</div>
+					</div>
+
+					<!-- Portrait. Drop a real photo at public/alec.jpg to replace the placeholder. -->
+					<div class="reveal reveal-2 justify-self-center sm:justify-self-end">
+						<div class="relative aspect-[4/5] w-56 overflow-hidden rounded-2xl border border-line bg-surface sm:w-64">
+							<div class="flex h-full w-full items-center justify-center">
+								<span class="font-serif text-6xl italic text-muted/40">AL</span>
+							</div>
+							<div class="absolute inset-x-0 bottom-0 flex items-center gap-x-2 border-t border-line bg-canvas/70 px-3 py-2 font-mono text-[11px] text-muted backdrop-blur">
+								<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+								Currently building · agents + infra
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<!-- Projects teaser strip -->
+			<section id="projects" class="border-t border-line py-10">
+				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Selected work</p>
+				<ul class="mt-6 divide-y divide-line">
+					{[
+						{ n: '01', name: 'Kowalski', desc: 'Autonomous personal-ops agent — calendar, mail, vault, code.', tag: 'AI agents' },
+						{ n: '02', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel — git push to live, zero open ports.', tag: 'Infra' },
+						{ n: '03', name: 'Agent experiments', desc: 'LLM tooling, prompt orchestration, in-browser demos.', tag: 'Lab' },
+					].map((p) => (
+						<li class="group flex items-baseline gap-x-5 py-4 transition">
+							<span class="font-mono text-[12px] text-muted">{p.n}</span>
+							<div class="flex-1">
+								<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">{p.name}</h3>
+								<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-muted">{p.desc}</p>
+							</div>
+							<span class="hidden font-mono text-[11px] uppercase tracking-wider text-muted sm:block">{p.tag}</span>
+						</li>
+					))}
+				</ul>
+			</section>
+
+			<!-- Footer -->
+			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
+				<span>© 2026 Alec Layton</span>
+				<span class="flex items-center gap-x-2">
+					<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+					Self-hosted · aleclay10.dev
+				</span>
+			</footer>
+		</div>
+
+		<script is:inline>
+			document.getElementById('theme-toggle')?.addEventListener('click', () => {
+				const dark = document.documentElement.classList.toggle('dark');
+				localStorage.setItem('theme', dark ? 'dark' : 'light');
+			});
+		</script>
+
+		<style>
+			.link {
+				color: var(--muted);
+				text-decoration: none;
+				transition: color 0.18s ease;
+			}
+			.link:hover {
+				color: var(--accent);
+			}
+			.reveal {
+				opacity: 0;
+				transform: translateY(12px);
+				animation: reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+			}
+			.reveal-2 {
+				animation-delay: 0.12s;
+			}
+			@keyframes reveal {
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			@media (prefers-reduced-motion: reduce) {
+				.reveal {
+					opacity: 1;
+					transform: none;
+					animation: none;
+				}
+			}
+		</style>
 	</body>
 </html>

@@ -54,3 +54,36 @@ html {
     scroll-behavior: smooth;
   }
 }
+
+/* Shared classes used by both the layout and page content — a scoped
+   <style> in the layout would not reach slotted page markup. */
+.link {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.link:hover {
+  color: var(--accent);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.reveal-2 {
+  animation-delay: 0.12s;
+}
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

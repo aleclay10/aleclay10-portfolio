@@ -1,0 +1,103 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og.png', Astro.site).href;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<meta name="author" content="Alec Layton" />
+		<link rel="canonical" href={canonical} />
+		<title>{title}</title>
+
+		<!-- Open Graph / social cards -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Alec Layton" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="Alec Layton — I build autonomous agent systems" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+
+		<!-- Browser chrome color -->
+		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8f4" />
+		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0c0d" />
+		<!-- Set theme before paint to avoid a flash -->
+		<script is:inline>
+			(() => {
+				const stored = localStorage.getItem('theme');
+				const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+				document.documentElement.classList.toggle('dark', dark);
+			})();
+		</script>
+	</head>
+	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
+		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
+			<!-- Top bar -->
+			<header class="flex items-center justify-between py-6">
+				<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
+					AL<span class="text-accent">.</span>
+				</a>
+				<nav class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
+					<a class="link" href="/#projects">Projects</a>
+					<a class="link" href="#">Writing</a>
+					<a class="link" href="#">/now</a>
+					<a class="link" href="#">/uses</a>
+					<a class="link" href="#">About</a>
+				</nav>
+				<div class="flex items-center gap-x-3">
+					<button id="cmdk" type="button" aria-label="Open command palette"
+						class="hidden items-center gap-x-2 rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink sm:flex">
+						<span>Search</span>
+						<kbd class="rounded border border-line px-1 py-0.5 text-[10px]">⌘K</kbd>
+					</button>
+					<button id="theme-toggle" type="button" aria-label="Toggle theme"
+						class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink">
+						<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+						<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+					</button>
+				</div>
+			</header>
+
+			<slot />
+
+			<!-- Footer -->
+			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
+				<span>© 2026 Alec Layton</span>
+				<span class="flex items-center gap-x-2">
+					<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+					Self-hosted · aleclay10.dev
+				</span>
+			</footer>
+		</div>
+
+		<script is:inline>
+			document.getElementById('theme-toggle')?.addEventListener('click', () => {
+				const dark = document.documentElement.classList.toggle('dark');
+				localStorage.setItem('theme', dark ? 'dark' : 'light');
+			});
+		</script>
+	</body>
+</html>

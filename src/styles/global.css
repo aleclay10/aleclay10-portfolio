@@ -95,3 +95,10 @@ html {
     animation: none;
   }
 }
+
+/* Search-result highlights (Pagefind excerpts in the ⌘K palette) */
+mark {
+  background: var(--accent-soft);
+  color: inherit;
+  border-radius: 2px;
+}

@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+
+const title = '/now — what I’m doing';
+const description = 'What Alec Layton is focused on right now: shipping AI Gaming Assistant, building Kowalski, and payroll systems at Paycom.';
+
+const updated = 'July 14, 2026';
+
+const focus = [
+	{
+		title: 'Shipping AI Gaming Assistant',
+		desc: 'Pushing the desktop companion toward early access — installers, release pipeline, and the first wave of the waitlist.',
+		href: '/gaming-assistant',
+	},
+	{
+		title: 'Building Kowalski in public',
+		desc: 'My autonomous agent keeps gaining capabilities — it runs my calendar, mail, security scans, and ships this site.',
+		href: '/kowalski',
+	},
+	{
+		title: 'Payroll systems at Paycom',
+		desc: 'The day job: compliance-critical software moving hundreds of millions a year, where "mostly correct" is not a category.',
+	},
+	{
+		title: 'Running this site off a Mac mini',
+		desc: 'Self-hosted everything — the infrastructure is the hobby.',
+		href: '/stack',
+	},
+];
+---
+
+<Base title={title} description={description}>
+	<main data-pagefind-body class="flex flex-1 flex-col py-16">
+		<div class="reveal max-w-2xl">
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Now</p>
+			<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
+				style="font-optical-sizing: auto;">
+				What I'm <span class="italic text-accent">on right now.</span>
+			</h1>
+			<p class="mt-7 font-mono text-[13px] text-muted">Updated {updated} · the <a href="https://nownownow.com/about" class="link underline decoration-line underline-offset-4">/now page</a> convention</p>
+		</div>
+
+		<section class="reveal reveal-2 mt-14">
+			<ul class="max-w-2xl divide-y divide-line">
+				{focus.map((f) => (
+					<li class="py-5">
+						<h2 class="font-serif text-xl text-ink">
+							{f.href ? <a href={f.href} class="transition hover:text-accent">{f.title} →</a> : f.title}
+						</h2>
+						<p class="mt-1.5 max-w-lg text-[14px] leading-relaxed text-muted">{f.desc}</p>
+					</li>
+				))}
+			</ul>
+		</section>
+	</main>
+</Base>

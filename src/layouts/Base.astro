@@ -60,10 +60,9 @@ const ogImage = new URL('/og.png', Astro.site).href;
 					<a class="link" href="/#timeline">Timeline</a>
 					<a class="link" href="/#projects">Projects</a>
 					<a class="link" href="/gaming-assistant">Gaming Assistant</a>
-					<a class="link" href="#">Writing</a>
-					<a class="link" href="#">/now</a>
-					<a class="link" href="#">/uses</a>
-					<a class="link" href="#">About</a>
+					<a class="link" href="/stack">/stack</a>
+					<a class="link" href="/now">/now</a>
+					<a class="link" href="/uses">/uses</a>
 				</nav>
 				<div class="flex items-center gap-x-3">
 					<button id="cmdk" type="button" aria-label="Open command palette"
@@ -91,10 +90,127 @@ const ogImage = new URL('/og.png', Astro.site).href;
 			</footer>
 		</div>
 
+		<!-- ⌘K command palette -->
+		<div id="palette" hidden role="dialog" aria-modal="true" aria-label="Search"
+			class="fixed inset-0 z-50 bg-canvas/60 backdrop-blur-sm">
+			<div class="mx-auto mt-24 w-[calc(100%-2rem)] max-w-lg overflow-hidden rounded-xl border border-line bg-canvas shadow-xl">
+				<input id="palette-input" type="text" placeholder="Search pages…" autocomplete="off" spellcheck="false"
+					class="w-full border-b border-line bg-transparent px-4 py-3.5 font-mono text-[14px] text-ink placeholder:text-muted focus:outline-none" />
+				<ul id="palette-results" class="max-h-80 divide-y divide-line overflow-y-auto"></ul>
+			</div>
+		</div>
+
 		<script>
 			document.getElementById('theme-toggle')?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
 				localStorage.setItem('theme', dark ? 'dark' : 'light');
+			});
+		</script>
+		<!-- Bundled (not is:inline): the production CSP blocks inline scripts.
+		     Pagefind's JS/index only exist after a production build (`npm run build`)
+		     — in `astro dev` the palette opens but reports search as unavailable. -->
+		<script>
+			type Result = { url: string; excerpt: string; meta?: { title?: string } };
+
+			const palette = document.getElementById('palette') as HTMLElement | null;
+			const input = document.getElementById('palette-input') as HTMLInputElement | null;
+			const results = document.getElementById('palette-results') as HTMLElement | null;
+			let pagefind: any = null;
+			let pagefindFailed = false;
+			let items: Result[] = [];
+			let active = -1;
+
+			function close() {
+				if (palette) palette.hidden = true;
+			}
+
+			async function open() {
+				if (!palette || !input) return;
+				palette.hidden = false;
+				input.value = '';
+				renderMessage('Type to search…');
+				input.focus();
+				if (!pagefind && !pagefindFailed) {
+					try {
+						// Opaque specifier: the index only exists in production builds, so
+						// keep TS/Rollup from trying to resolve it at build time.
+						const pagefindUrl = '/pagefind/pagefind.js';
+						pagefind = await import(/* @vite-ignore */ pagefindUrl);
+						await pagefind.init();
+					} catch {
+						pagefindFailed = true;
+						renderMessage('Search index unavailable — production builds only.');
+					}
+				}
+			}
+
+			function renderMessage(msg: string) {
+				if (!results) return;
+				items = [];
+				active = -1;
+				results.innerHTML = '';
+				const li = document.createElement('li');
+				li.className = 'px-4 py-3 font-mono text-[12px] text-muted';
+				li.textContent = msg;
+				results.append(li);
+			}
+
+			function render() {
+				if (!results) return;
+				results.innerHTML = '';
+				if (!items.length) {
+					renderMessage('No results.');
+					return;
+				}
+				items.forEach((d, i) => {
+					const li = document.createElement('li');
+					const a = document.createElement('a');
+					a.href = d.url;
+					a.className = 'block px-4 py-3 transition hover:bg-surface' + (i === active ? ' bg-surface' : '');
+					const t = document.createElement('p');
+					t.className = 'font-serif text-[15px] text-ink';
+					t.textContent = d.meta?.title ?? d.url;
+					const e = document.createElement('p');
+					e.className = 'mt-0.5 text-[12px] leading-relaxed text-muted';
+					e.innerHTML = d.excerpt; // our own indexed content
+					a.append(t, e);
+					li.append(a);
+					results.append(li);
+				});
+			}
+
+			input?.addEventListener('input', async () => {
+				const q = input.value.trim();
+				if (!pagefind || !q) {
+					renderMessage(q ? 'Search index unavailable — production builds only.' : 'Type to search…');
+					return;
+				}
+				const search = await pagefind.debouncedSearch(q);
+				if (!search) return; // superseded by newer keystroke
+				items = await Promise.all(search.results.slice(0, 8).map((r: any) => r.data()));
+				active = items.length ? 0 : -1;
+				render();
+			});
+
+			document.getElementById('cmdk')?.addEventListener('click', open);
+			document.addEventListener('keydown', (e) => {
+				if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+					e.preventDefault();
+					palette?.hidden ? open() : close();
+				} else if (e.key === 'Escape') {
+					close();
+				} else if (palette && !palette.hidden && items.length) {
+					if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+						e.preventDefault();
+						active = (active + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length;
+						render();
+					} else if (e.key === 'Enter' && active >= 0) {
+						window.location.href = items[active].url;
+					}
+				}
+			});
+			palette?.addEventListener('click', (e) => {
+				if (e.target === palette) close();
 			});
 		</script>
 	</body>

@@ -44,14 +44,10 @@ const ogImage = new URL('/og.png', Astro.site).href;
 		<!-- Browser chrome color -->
 		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8f4" />
 		<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0c0d" />
-		<!-- Set theme before paint to avoid a flash -->
-		<script is:inline>
-			(() => {
-				const stored = localStorage.getItem('theme');
-				const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-				document.documentElement.classList.toggle('dark', dark);
-			})();
-		</script>
+		<!-- Set theme before paint to avoid a flash. External + blocking on purpose:
+		     the production CSP (default-src 'self', no unsafe-inline for scripts)
+		     silently kills inline scripts — do not switch these back to is:inline. -->
+		<script is:inline src="/theme-init.js"></script>
 	</head>
 	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
 		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
@@ -61,8 +57,8 @@ const ogImage = new URL('/og.png', Astro.site).href;
 					AL<span class="text-accent">.</span>
 				</a>
 				<nav class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
-					<a class="link" href="/#projects">Projects</a>
 					<a class="link" href="/#timeline">Timeline</a>
+					<a class="link" href="/#projects">Projects</a>
 					<a class="link" href="#">Writing</a>
 					<a class="link" href="#">/now</a>
 					<a class="link" href="#">/uses</a>
@@ -94,7 +90,7 @@ const ogImage = new URL('/og.png', Astro.site).href;
 			</footer>
 		</div>
 
-		<script is:inline>
+		<script>
 			document.getElementById('theme-toggle')?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
 				localStorage.setItem('theme', dark ? 'dark' : 'light');

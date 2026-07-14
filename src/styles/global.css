@@ -55,6 +55,14 @@ html {
   }
 }
 
+/* Hide the scrollbar on snap rails (timeline carousel) without killing scroll */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Shared classes used by both the layout and page content — a scoped
    <style> in the layout would not reach slotted page markup. */
 .link {

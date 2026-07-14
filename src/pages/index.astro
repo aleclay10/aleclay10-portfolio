@@ -5,7 +5,7 @@ const title = 'Alec Layton — Autonomous agent systems';
 const description =
 	'Alec Layton — I build autonomous agent systems. Projects, writing, and experiments in AI infrastructure.';
 
-const eras: { years: string; title: string; org: string; desc: string; tag: string; current?: boolean; href?: string }[] = [
+const eras: { years: string; title: string; org: string; desc: string; tag: string; current?: boolean; href?: string; linkText?: string }[] = [
 	{
 		years: '2021',
 		title: 'Enterprise Architect Developer',
@@ -33,7 +33,9 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		title: 'AI Gaming Assistant',
 		org: 'Independent',
 		desc: 'Full-stack desktop companion — React/TypeScript on a Rust (Tauri) core with FastAPI, Postgres, and Redis — routing AI inference to cloud or local models.',
-		tag: 'Lab',
+		tag: 'Product',
+		href: '/gaming-assistant',
+		linkText: 'See the product →',
 	},
 	{
 		years: '2026',
@@ -43,13 +45,14 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		tag: 'AI agents',
 		current: true,
 		href: '/kowalski',
+		linkText: 'Meet Kowalski →',
 	},
 ];
 
 const projects: { n: string; name: string; desc: string; tag: string; href?: string }[] = [
-	{ n: '01', name: 'Kowalski', desc: 'Autonomous personal-ops agent — calendar, mail, vault, code.', tag: 'AI agents', href: '/kowalski' },
-	{ n: '02', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel — git push to live, zero open ports.', tag: 'Infra' },
-	{ n: '03', name: 'Agent experiments', desc: 'LLM tooling, prompt orchestration, in-browser demos.', tag: 'Lab' },
+	{ n: '01', name: 'AI Gaming Assistant', desc: 'Desktop gaming companion — AI chat, play tracking, Discord in-game. Early access.', tag: 'Product', href: '/gaming-assistant' },
+	{ n: '02', name: 'Kowalski', desc: 'Autonomous personal-ops agent — calendar, mail, vault, code.', tag: 'AI agents', href: '/kowalski' },
+	{ n: '03', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel — git push to live, zero open ports.', tag: 'Infra' },
 ];
 ---
 
@@ -125,7 +128,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 						<p class="mt-0.5 font-mono text-[12px] text-muted">{e.org}</p>
 						<p class="mt-3 text-[14px] leading-relaxed text-muted">{e.desc}</p>
 						{e.href && (
-							<a href={e.href} class="link mt-4 inline-block font-mono text-[13px]">Meet Kowalski →</a>
+							<a href={e.href} class="link mt-4 inline-block font-mono text-[13px]">{e.linkText ?? 'More →'}</a>
 						)}
 					</div>
 				</li>

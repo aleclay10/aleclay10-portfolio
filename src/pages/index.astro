@@ -95,32 +95,6 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 		</div>
 	</main>
 
-	<!-- Projects teaser strip -->
-	<section id="projects" class="border-t border-line py-10">
-		<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Selected work</p>
-		<ul class="mt-6 divide-y divide-line">
-			{projects.map((p) => (
-				<li class="group relative flex items-baseline gap-x-5 py-4 transition">
-					<span class="font-mono text-[12px] text-muted">{p.n}</span>
-					<div class="flex-1">
-						<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">
-							{p.href ? (
-								<a href={p.href} class="after:absolute after:inset-0">
-									{p.name}
-									<span aria-hidden="true" class="ml-1 inline-block font-mono text-[14px] text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>
-								</a>
-							) : (
-								p.name
-							)}
-						</h3>
-						<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-muted">{p.desc}</p>
-					</div>
-					<span class="hidden font-mono text-[11px] uppercase tracking-wider text-muted sm:block">{p.tag}</span>
-				</li>
-			))}
-		</ul>
-	</section>
-
 	<!-- Timeline carousel -->
 	<section id="timeline" class="border-t border-line py-10">
 		<div class="flex items-center justify-between">
@@ -157,7 +131,8 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 				</li>
 			))}
 		</ul>
-		<script is:inline>
+		<!-- Bundled (not is:inline) on purpose: the production CSP blocks inline scripts. -->
+		<script>
 			(() => {
 				const rail = document.getElementById('tl-rail');
 				if (!rail) return;
@@ -167,5 +142,31 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 				document.getElementById('tl-next')?.addEventListener('click', () => rail.scrollBy({ left: step(), behavior }));
 			})();
 		</script>
+	</section>
+
+	<!-- Projects teaser strip -->
+	<section id="projects" class="border-t border-line py-10">
+		<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Selected work</p>
+		<ul class="mt-6 divide-y divide-line">
+			{projects.map((p) => (
+				<li class="group relative flex items-baseline gap-x-5 py-4 transition">
+					<span class="font-mono text-[12px] text-muted">{p.n}</span>
+					<div class="flex-1">
+						<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">
+							{p.href ? (
+								<a href={p.href} class="after:absolute after:inset-0">
+									{p.name}
+									<span aria-hidden="true" class="ml-1 inline-block font-mono text-[14px] text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>
+								</a>
+							) : (
+								p.name
+							)}
+						</h3>
+						<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-muted">{p.desc}</p>
+					</div>
+					<span class="hidden font-mono text-[11px] uppercase tracking-wider text-muted sm:block">{p.tag}</span>
+				</li>
+			))}
+		</ul>
 	</section>
 </Base>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import UptimeChip from '../components/UptimeChip.astro';
 
 interface Props {
 	title: string;
@@ -83,10 +84,7 @@ const ogImage = new URL('/og.png', Astro.site).href;
 			<!-- Footer -->
 			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
 				<span>© 2026 Alec Layton</span>
-				<span class="flex items-center gap-x-2">
-					<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-					Self-hosted · aleclay10.dev
-				</span>
+				<UptimeChip />
 			</footer>
 		</div>
 

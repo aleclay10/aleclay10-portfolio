@@ -35,6 +35,10 @@
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
 
+  /* Slow pulse for the footer's live status dot. Deliberately gentler than
+     Tailwind's built-in `animate-pulse`; applied via `motion-safe:` only. */
+  --animate-breathe: breathe 3.5s ease-in-out infinite;
+
   --color-canvas: var(--bg);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
@@ -93,6 +97,16 @@ html {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
   }
 }
 

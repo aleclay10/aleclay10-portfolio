@@ -1,0 +1,80 @@
+---
+// Live uptime chip for the footer.
+//
+// Reads /status.json, which is NOT a build artifact: health-check.sh on the host
+// rewrites it every 5 minutes and deploy.sh's rsync excludes it so a deploy does
+// not wipe it. Shape:
+//   { "status": "up" | "down", "checked": ISO8601,
+//     "uptime": { "7d": number, "30d": number }, "since": ISO8601 | null }
+//
+// Progressive enhancement on purpose: the markup below renders the same footer
+// line the site shipped before this chip existed, and the script only appends the
+// live figure once it resolves. No JS, stale file, or failed fetch degrades to
+// plain "Self-hosted · aleclay10.dev" rather than a broken or empty chip.
+//
+// #status-uptime starts `hidden` rather than empty: an empty flex child would still
+// take the parent's gap-x-2 and nudge the footer for no-JS visitors.
+---
+
+<span class="flex items-center gap-x-2">
+	<span
+		id="status-dot"
+		class="h-1.5 w-1.5 shrink-0 rounded-full bg-accent motion-safe:animate-breathe"
+		aria-hidden="true"></span>
+	<span>Self-hosted · aleclay10.dev</span>
+	<span id="status-uptime" class="text-muted" hidden></span>
+</span>
+
+<script>
+	type Status = {
+		status?: 'up' | 'down';
+		checked?: string;
+		uptime?: { '7d'?: number; '30d'?: number };
+		since?: string | null;
+	};
+
+	const dot = document.getElementById('status-dot');
+	const label = document.getElementById('status-uptime');
+
+	// Guard against a status file that stopped being written (host asleep, launchd
+	// job unloaded). Anything older than 30 min is treated as unknown rather than
+	// reported as fact — a stale "up" is worse than no chip at all.
+	const MAX_AGE_MS = 30 * 60 * 1000;
+
+	function fmt(pct: number) {
+		// One decimal, but drop a trailing ".0" so a clean 100% reads as "100%".
+		return `${pct.toFixed(1).replace(/\.0$/, '')}%`;
+	}
+
+	async function render() {
+		if (!dot || !label) return;
+		try {
+			const res = await fetch('/status.json', { cache: 'no-store' });
+			if (!res.ok) return;
+			const data: Status = await res.json();
+
+			const checked = data.checked ? Date.parse(data.checked) : NaN;
+			if (!Number.isFinite(checked) || Date.now() - checked > MAX_AGE_MS) return;
+
+			const week = data.uptime?.['7d'];
+			const month = data.uptime?.['30d'];
+			if (typeof week !== 'number') return;
+
+			if (data.status === 'down') {
+				dot.classList.remove('bg-accent', 'motion-safe:animate-breathe');
+				dot.classList.add('bg-muted');
+			}
+
+			const parts = [`${fmt(week)} uptime over 7 days`];
+			if (typeof month === 'number') parts.push(`${fmt(month)} over 30 days`);
+			parts.push(`last checked ${new Date(checked).toLocaleTimeString()}`);
+			label.title = parts.join(' · ');
+			label.textContent = `· ${fmt(week)} / 7d`;
+			label.hidden = false;
+		} catch {
+			// Offline, blocked, or malformed JSON — leave the static footer untouched.
+		}
+	}
+
+	render();
+</script>

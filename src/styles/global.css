@@ -110,6 +110,144 @@ html {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Print / PDF.
+   public/resume.pdf is generated from the live /resume page by
+   scripts/build-resume-pdf.sh, so this block IS the PDF's stylesheet. Keep it
+   deterministic — no dark-mode leakage, no animation, no site chrome.
+   --------------------------------------------------------------------------- */
+@media print {
+  /* Force the light palette even if the visitor is in dark mode: printing a
+     near-black page wastes ink, and the generated PDF must not depend on the
+     theme that happened to be active. Ink/muted/accent are darkened slightly
+     for contrast on paper. */
+  :root,
+  .dark {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --ink: #14120f;
+    --muted: #3f3a34;
+    --line: #d5cfc5;
+    --accent: #c2410c;
+    --accent-soft: #f5e6da;
+  }
+
+  @page {
+    margin: 13mm 14mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* Site chrome has no business in a printed résumé. */
+  header,
+  footer,
+  #palette,
+  .no-print {
+    display: none !important;
+  }
+
+  /* The on-screen container's max-width and padding fight @page margins. */
+  body > div {
+    max-width: none;
+    min-height: 0;
+    padding: 0;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Compress for paper. The on-screen scale is deliberately generous and runs to
+     three pages when printed, the last of them nearly empty. These overrides pull
+     it to a clean two pages; sizes are in px to override Tailwind's arbitrary
+     values, which do not scale with a root font-size change. */
+  .resume > section {
+    margin-top: 0.9rem !important;
+    padding-top: 0.75rem !important;
+  }
+
+  .resume h1 {
+    font-size: 2rem !important;
+    margin-top: 0.6rem !important;
+  }
+
+  .resume h2 {
+    font-size: 15px !important;
+  }
+
+  .resume p,
+  .resume li,
+  .resume dd,
+  .resume dt {
+    font-size: 11.5px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Section eyebrows ("EXPERIENCE", "PROJECTS") stay small but keep their tracking.
+     break-after: avoid stops a label being stranded at the foot of a page with its
+     content starting the next one. */
+  .resume > section > p:first-child {
+    font-size: 10px !important;
+    break-after: avoid;
+  }
+
+  /* Same for a role/project title and the org line directly under it. */
+  .resume h2 {
+    break-after: avoid;
+  }
+
+  /* space-y-* sets margin-top on siblings; reclaim it between roles and bullets. */
+  .resume article + article,
+  .resume .space-y-9 > * + * {
+    margin-top: 0.85rem !important;
+  }
+
+  .resume ul > li + li {
+    margin-top: 0.28rem !important;
+  }
+
+  .resume ul,
+  .resume dl {
+    margin-top: 0.5rem !important;
+  }
+
+  .resume dl > div {
+    padding-top: 0.3rem !important;
+    padding-bottom: 0.3rem !important;
+  }
+
+  /* Keep the skills table from splitting mid-list across a page boundary. */
+  .resume dl {
+    break-inside: avoid;
+  }
+
+  /* Reveal animations start at opacity 0 — that would print a blank page. */
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  /* Keep a role or project from splitting across a page boundary. */
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
 /* Search-result highlights (Pagefind excerpts in the ⌘K palette) */
 mark {
   background: var(--accent-soft);

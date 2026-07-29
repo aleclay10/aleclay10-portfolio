@@ -83,7 +83,10 @@ const ogImage = new URL('/og.png', Astro.site).href;
 
 			<!-- Footer -->
 			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
-				<span>© 2026 Alec Layton</span>
+				<span class="flex items-center gap-x-4">
+					<span>© 2026 Alec Layton</span>
+					<a class="link" href="/resume">Résumé</a>
+				</span>
 				<UptimeChip />
 			</footer>
 		</div>

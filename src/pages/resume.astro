@@ -1,0 +1,245 @@
+---
+import Base from '../layouts/Base.astro';
+
+const title = 'Résumé — Alec Layton';
+const description =
+	'Résumé for Alec Layton — software engineer building backend systems, automation, and AI agent tooling. Paycom, Valero, UTSA.';
+
+// Content mirrors the master résumé in Drive (Alec_Layton_Resume_Goldman) with two
+// deliberate differences for the public web version:
+//   1. No phone number — this page is crawlable, and the site has kept contact
+//      details off since the Timeline shipped (2026-07-13).
+//   2. Employer-neutral summary and tagline. The master is aimed at one company;
+//      a published résumé should not read as targeted at someone else.
+// Keep this file as the single source of truth: public/resume.pdf is generated FROM
+// this page by scripts/build-resume-pdf.sh, so the two can never drift.
+
+const contact: { label: string; href?: string }[] = [
+	{ label: 'Dallas, TX' },
+	{ label: 'alec.layton100@gmail.com', href: 'mailto:alec.layton100@gmail.com' },
+	{ label: 'linkedin.com/in/alec4', href: 'https://linkedin.com/in/alec4' },
+	{ label: 'github.com/aleclay10', href: 'https://github.com/aleclay10' },
+	{ label: 'aleclay10.dev', href: '/' },
+];
+
+const summary =
+	'Software engineer with 3+ years building and owning mission-critical software across the full development lifecycle, with a focus on automation, data pipelines, and microservices. Ships systems that process hundreds of millions of dollars in transactions, including ETL automation that eliminates 100+ hours of manual work per quarter while holding error rates under 1%. Increasingly focused on AI agent tooling — least-privilege automation with human-in-the-loop approval on anything outward-facing. Thrives in fast-moving, high-ownership environments.';
+
+const skills: { label: string; value: string }[] = [
+	{ label: 'Languages', value: 'Python, C, C++, C#, JavaScript, SQL, Rust, PHP, ABAP' },
+	{ label: 'Backend & APIs', value: '.NET, Node.js, FastAPI, RESTful APIs' },
+	{ label: 'Frontend', value: 'React, TypeScript SPAs, Tailwind CSS' },
+	{ label: 'Databases', value: 'PostgreSQL, SQLite, MySQL, query optimization, data pipeline development' },
+	{ label: 'DevOps & Cloud', value: 'Git, Docker, AWS EC2, Linux/UNIX' },
+	{ label: 'Practices', value: 'Agile/Scrum, TDD, code reviews, system design, production monitoring' },
+];
+
+const experience: { role: string; org: string; location: string; dates: string; bullets: string[] }[] = [
+	{
+		role: 'Software Engineer',
+		org: 'Paycom',
+		location: 'Irving, TX',
+		dates: 'December 2022 – Present',
+		bullets: [
+			'Architected and implemented an internationalization framework for an enterprise-scale tax API using C# and .NET, enabling automated multi-country payroll controls processing across 5 countries with high compliance accuracy.',
+			'Led end-to-end design and delivery of mission-critical regulatory compliance controls for domestic garnishment, tax withholding, and earnings regulations within the core payroll engine — processing hundreds of millions of dollars in annual transactions while maintaining 100% audit compliance.',
+			'Independently architected and deployed a full-SDLC automated ETL pipeline to parse, validate, and transform 50+ state-specific SUTA tax rate files into controlled system updates, eliminating 100+ hours of manual processing per quarter and reducing error rates to under 1%.',
+			'Proactively monitor production systems, triage incidents, and implement reliability improvements — reducing downtime and increasing application availability for enterprise-scale payroll infrastructure.',
+			'Collaborate cross-functionally with product, QA, and engineering teams to gather requirements, design system architecture, and conduct code reviews that uphold reliability and security standards.',
+		],
+	},
+	{
+		role: 'Enterprise Architect Developer — Internship',
+		org: 'Valero Energy Corporation',
+		location: 'San Antonio, TX',
+		dates: 'May 2021 – December 2021',
+		bullets: [
+			'Developed a mission-critical SAP GUI application in ABAP for the Accounts Payable team, supporting processing for 90% of all U.S. financial transactions with high reliability and accuracy.',
+			'Engineered enterprise-grade software within a Fortune 500 environment, translating complex operational requirements into scalable, production-ready systems.',
+			'Documented software components, integration flows, and technical specifications for cross-team knowledge transfer.',
+		],
+	},
+];
+
+const projects: { name: string; kind: string; href?: string; bullets: string[] }[] = [
+	{
+		name: 'Kowalski',
+		kind: 'Personal AI Agent System',
+		href: '/kowalski',
+		bullets: [
+			'Architected a multi-tool AI agent (built on Claude Code) integrating 15+ MCP servers spanning Google Workspace, GitHub, Obsidian, and voice synthesis, with persistent structured memory and automated cross-system documentation.',
+			'Designed least-privilege automation workflows including scheduled cron-based routines, security audit protocols, and human-in-the-loop approval gates for external-facing actions such as email, calendar, and code deploys.',
+		],
+	},
+	{
+		name: 'AI Gaming Assistant',
+		kind: 'Full-Stack Desktop Application',
+		href: '/gaming-assistant',
+		bullets: [
+			'Built a cross-platform desktop gaming companion (Tauri 2 + Rust, React/TypeScript; FastAPI backend on Supabase + Upstash Redis) with streaming AI chat, automatic session tracking across 80+ games, Discord integration, and a content feed.',
+			'Engineered a dual-mode AI inference router with failover across cloud providers (Groq, Together AI) and local models (Ollama); shipped Stripe subscription billing and a game-aware notification engine, backed by 238 automated tests across Python, TypeScript, and Rust.',
+		],
+	},
+];
+
+const additional = [
+	'ACM ICPC member — strengthened algorithmic problem-solving through team-based competitive programming.',
+	'Experienced public speaker with strong written and verbal communication skills.',
+	'Bias toward full ownership and rapid iteration in high-intensity, mission-driven environments.',
+];
+---
+
+<Base title={title} description={description}>
+	<main data-pagefind-body class="resume flex flex-1 flex-col py-16">
+		<!-- Masthead -->
+		<div class="reveal max-w-3xl">
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Résumé</p>
+			<h1
+				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
+				style="font-optical-sizing: auto;">
+				Alec <span class="italic text-accent">Layton.</span>
+			</h1>
+			<p class="mt-5 font-mono text-[13px] text-muted">
+				Software Engineer · Backend Systems · Automation · AI Agent Tooling
+			</p>
+			<ul class="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[12px] text-muted">
+				{
+					contact.map((c) => (
+						<li>
+							{c.href ? (
+								<a
+									href={c.href}
+									class="underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">
+									{c.label}
+								</a>
+							) : (
+								c.label
+							)}
+						</li>
+					))
+				}
+			</ul>
+
+			<p class="mt-7 max-w-2xl text-[16px] leading-relaxed text-muted">{summary}</p>
+
+			<!-- Print/download affordance. `download` keeps the PDF out of the print view
+			     itself via the no-print class below. -->
+			<div class="no-print mt-8 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
+				<a
+					href="/resume.pdf"
+					download
+					class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
+					Download PDF
+				</a>
+				<a href="mailto:alec.layton100@gmail.com" class="link px-2 py-2.5">Email ↗</a>
+			</div>
+		</div>
+
+		<!-- Experience -->
+		<section class="mt-12 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Experience</p>
+			<div class="mt-6 max-w-3xl space-y-9">
+				{
+					experience.map((job) => (
+						<article class="break-inside-avoid">
+							<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+								<h2 class="font-serif text-[21px] font-medium text-ink">{job.role}</h2>
+								<p class="font-mono text-[12px] text-muted">{job.dates}</p>
+							</div>
+							<p class="mt-1 font-mono text-[13px] text-accent">
+								{job.org} <span class="text-muted">· {job.location}</span>
+							</p>
+							<ul class="mt-4 space-y-2.5">
+								{job.bullets.map((b) => (
+									<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
+										<span>{b}</span>
+									</li>
+								))}
+							</ul>
+						</article>
+					))
+				}
+			</div>
+		</section>
+
+		<!-- Projects -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Projects</p>
+			<div class="mt-6 max-w-3xl space-y-9">
+				{
+					projects.map((p) => (
+						<article class="break-inside-avoid">
+							<div class="flex flex-wrap items-baseline gap-x-3">
+								<h2 class="font-serif text-[21px] font-medium text-ink">{p.name}</h2>
+								<p class="font-mono text-[12px] text-muted">{p.kind}</p>
+								{p.href && (
+									<a
+										href={p.href}
+										class="no-print font-mono text-[12px] text-accent underline decoration-line underline-offset-4 transition hover:decoration-accent">
+										Read more →
+									</a>
+								)}
+							</div>
+							<ul class="mt-4 space-y-2.5">
+								{p.bullets.map((b) => (
+									<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
+										<span>{b}</span>
+									</li>
+								))}
+							</ul>
+						</article>
+					))
+				}
+			</div>
+		</section>
+
+		<!-- Skills -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Technical skills</p>
+			<dl class="mt-6 max-w-3xl divide-y divide-line">
+				{
+					skills.map((s) => (
+						<div class="grid gap-x-6 py-3.5 sm:grid-cols-[9rem_1fr]">
+							<dt class="font-mono text-[12px] uppercase tracking-wider text-muted">{s.label}</dt>
+							<dd class="mt-1 text-[14px] leading-relaxed text-ink sm:mt-0">{s.value}</dd>
+						</div>
+					))
+				}
+			</dl>
+		</section>
+
+		<!-- Education -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Education</p>
+			<div class="mt-6 max-w-3xl break-inside-avoid">
+				<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+					<h2 class="font-serif text-[21px] font-medium text-ink">B.S. Computer Science</h2>
+					<p class="font-mono text-[12px] text-muted">Graduated December 2022</p>
+				</div>
+				<p class="mt-1 font-mono text-[13px] text-accent">
+					The University of Texas at San Antonio
+				</p>
+				<p class="mt-3 text-[14px] leading-relaxed text-muted">
+					Concentrations in Software Engineering &amp; Data Science.
+				</p>
+			</div>
+		</section>
+
+		<!-- Additional -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Additional</p>
+			<ul class="mt-6 max-w-3xl space-y-2.5">
+				{
+					additional.map((a) => (
+						<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+							<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
+							<span>{a}</span>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+	</main>
+</Base>

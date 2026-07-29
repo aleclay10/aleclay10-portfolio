@@ -8,6 +8,7 @@ Personal portfolio for Alec Layton (`aleclay10.dev`). Astro static site, self-ho
 - `npm run build` — production build to `dist/` (`astro build`, static output)
 - `npm run preview` — serve the built `dist/` locally
 - `npx astro check` — TypeScript + Astro diagnostics; run this before committing UI changes
+- `npm run resume:pdf` — regenerate `public/resume.pdf` from the `/resume` page via headless Chrome. Run after any résumé or print-style change, then commit the PDF. Deliberately **not** part of `npm run build` — the unattended deploy must not depend on Chrome.
 
 Use `npm ci` (not `npm install`) when installing — the deploy pipeline does, and the lockfile is committed.
 
@@ -32,9 +33,14 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 Currently minimal — a single page. Respect these locations as the site grows:
 
 - `src/pages/` — routes (`.astro`). One page today: `index.astro`.
-- `src/styles/global.css` — Tailwind entry + theme config.
+- `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
 - `public/` — static assets served as-is (e.g. `favicon.svg`).
+- `scripts/` — repo tooling not part of the build (e.g. `build-resume-pdf.sh`).
 - `astro.config.mjs`, `tsconfig.json` — config.
+
+### Résumé
+
+`src/pages/resume.astro` is the single source of truth; `public/resume.pdf` is **generated from it** by `npm run resume:pdf`, so never hand-edit the PDF. Two deliberate differences from the master résumé in Drive: no phone number (the page is crawlable, and the site has kept contact details off since the Timeline shipped), and an employer-neutral summary/tagline. The `@media print` block in `global.css` is what shapes the PDF — changing it changes the PDF, so regenerate and eyeball the page count (target: 2).
 
 When adding structure, follow Astro conventions: shared markup → `src/layouts/`, reusable UI → `src/components/`.
 

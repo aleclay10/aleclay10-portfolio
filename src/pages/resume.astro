@@ -5,7 +5,7 @@ const title = 'Résumé — Alec Layton';
 const description =
 	'Résumé for Alec Layton — software engineer building backend systems, automation, and AI agent tooling. Paycom, Valero, UTSA.';
 
-// Content mirrors the master résumé in Drive (Alec_Layton_Resume_Goldman) with two
+// Content mirrors the master résumé in Drive (Alec_Layton_Resume_Recent) with two
 // deliberate differences for the public web version:
 //   1. No phone number — this page is crawlable, and the site has kept contact
 //      details off since the Timeline shipped (2026-07-13).
@@ -67,8 +67,8 @@ const projects: { name: string; kind: string; href?: string; bullets: string[] }
 		kind: 'Personal AI Agent System',
 		href: '/kowalski',
 		bullets: [
-			'Architected a multi-tool AI agent (built on Claude Code) integrating 15+ MCP servers spanning Google Workspace, GitHub, Obsidian, and voice synthesis, with persistent structured memory and automated cross-system documentation.',
-			'Designed least-privilege automation workflows including scheduled cron-based routines, security audit protocols, and human-in-the-loop approval gates for external-facing actions such as email, calendar, and code deploys.',
+			'Stood up a “Second Brain” long-term memory system in Obsidian, semantically organized across people, projects, security, and finance, so the agent retains decision history and context across sessions instead of starting cold each time — paired with a 15+ tool integration layer (Gmail, Calendar, Drive, GitHub, voice synthesis) for end-to-end task handling.',
+			'Extended the agent into a financial decision-support tool that tracks portfolio positions, maintains investment-thesis notes, and summarizes account activity from email — while keeping trade execution and approval strictly manual to preserve financial-control discipline.',
 		],
 	},
 	{

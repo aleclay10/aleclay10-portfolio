@@ -106,6 +106,26 @@ export const holdings: Holding[] = [
 	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.07, kind: 'crypto' },
 ];
 
+// Watch-only names: tracked, no position. Seeded empty — the watchlist currently
+// shows the held book, which is where Alec asked to start. Add entries here as
+// genuine watch-only ideas appear and they will render alongside the held names
+// with a "watching" marker instead of "held". Anything added here must ALSO be
+// listed in the `watchlist` array of ~/portfolio/holdings.json so the price job
+// fetches a quote for it.
+export const watching: { ticker: string; name: string; why?: string }[] = [];
+
+/**
+ * Everything on the radar — held positions plus watch-only names.
+ * Rendered as a compact price grid, deliberately distinct from the positions
+ * table (which carries weights, vectors and reasoning).
+ */
+export function watchlist(): { ticker: string; name: string; held: boolean; why?: string }[] {
+	return [
+		...holdings.map((h) => ({ ticker: h.ticker, name: h.name, held: true })),
+		...watching.map((w) => ({ ...w, held: false })),
+	];
+}
+
 /** Vector totals from the per-asset baseline — one source of truth. */
 export function vectorWeights(source: { ticker: string; weight: number }[] = holdings) {
 	return vectors.map((v) => ({

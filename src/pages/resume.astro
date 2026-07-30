@@ -14,12 +14,15 @@ const description =
 // Keep this file as the single source of truth: public/resume.pdf is generated FROM
 // this page by scripts/build-resume-pdf.sh, so the two can never drift.
 
+// Contact links must be ABSOLUTE. build-resume-pdf.sh prints this page from a local
+// preview server, so a relative href resolves against localhost in the PDF — which
+// both breaks the link for anyone who clicks it and leaks the generation setup.
 const contact: { label: string; href?: string }[] = [
 	{ label: 'Dallas, TX' },
 	{ label: 'alec.layton100@gmail.com', href: 'mailto:alec.layton100@gmail.com' },
 	{ label: 'linkedin.com/in/alec4', href: 'https://linkedin.com/in/alec4' },
 	{ label: 'github.com/aleclay10', href: 'https://github.com/aleclay10' },
-	{ label: 'aleclay10.dev', href: '/' },
+	{ label: 'aleclay10.dev', href: new URL('/', Astro.site).href },
 ];
 
 const summary =

@@ -1,0 +1,295 @@
+---
+import Base from '../layouts/Base.astro';
+import AllocationDonut from '../components/AllocationDonut.astro';
+import { vectors, holdings, principles } from '../data/portfolio';
+
+const title = '/investing — how and why I invest';
+const description =
+	'The thesis behind my brokerage and crypto book: allocation by conviction vector, live prices, and the rules that govern every add and exit. Percentages only — no values, no share counts.';
+
+// Baseline "as of" for the server-rendered weights. Live prices override the
+// numbers client-side; this date describes the fallback, not the live feed.
+const asOf = 'July 29, 2026';
+
+const byVector = vectors.map((v) => ({
+	...v,
+	holdings: holdings.filter((h) => h.vector === v.id).sort((a, b) => b.weight - a.weight),
+	weight: holdings.filter((h) => h.vector === v.id).reduce((s, h) => s + h.weight, 0),
+}));
+
+const sorted = [...holdings].sort((a, b) => b.weight - a.weight);
+const slotOf = (id: string) => vectors.find((v) => v.id === id)?.slot ?? 1;
+const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
+---
+
+<Base title={title} description={description}>
+	<main data-pagefind-body class="viz-root flex flex-1 flex-col py-16">
+		<!-- Hero -->
+		<div class="reveal max-w-2xl">
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>
+			<h1
+				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
+				style="font-optical-sizing: auto;">
+				Concentration, <span class="italic text-accent">on purpose.</span>
+			</h1>
+			<p class="mt-7 text-[17px] leading-relaxed text-muted">
+				This is my taxable brokerage book and crypto — the aggressive half of a barbell,
+				where the other half is a fully indexed retirement account I never touch. Every
+				position maps to a thesis vector or it is marked for exit. Percentages and prices
+				only: no dollar values, no share counts, no advice.
+			</p>
+		</div>
+
+		<!-- Day performance — a stat tile, not a chart. Status colour always ships
+		     with an explicit sign so it never depends on hue alone. -->
+		<section class="reveal reveal-2 mt-12 border-t border-line pt-10">
+			<div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+				<div>
+					<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+						Book performance today
+					</p>
+					<!-- Empty state is deliberately faint: a full-weight em-dash at this size
+					     reads as a redaction bar rather than "no data yet". JS sets the real
+					     value and colour once /prices.json resolves. -->
+					<p class="mt-4 flex items-baseline gap-x-3">
+						<span
+							id="day-change"
+							class="font-sans text-5xl font-medium tabular-nums leading-none text-muted/30"
+							>—</span
+						>
+						<span id="day-change-label" class="font-mono text-[13px] text-muted"
+							>awaiting live prices</span
+						>
+					</p>
+					<p class="mt-3 max-w-md font-mono text-[12px] leading-relaxed text-muted">
+						Allocation-weighted move across every position below. A percentage of the
+						book, not a dollar figure.
+					</p>
+				</div>
+				<p id="price-asof" class="font-mono text-[11px] text-muted">
+					Allocation as of {asOf}
+				</p>
+			</div>
+		</section>
+
+		<!-- Allocation -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+				Allocation by thesis vector
+			</p>
+			<p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">
+				Nineteen positions grouped into six vectors. Grouped rather than sliced per-ticker
+				because nineteen slices is an unreadable chart — the exact per-asset percentages are
+				in the table below.
+			</p>
+			<div class="mt-8 max-w-2xl">
+				<AllocationDonut />
+			</div>
+		</section>
+
+		<!-- The thesis behind each vector — the actual point of the page -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The theses</p>
+			<div class="mt-6 grid max-w-4xl gap-x-10 gap-y-7 sm:grid-cols-2">
+				{
+					byVector.map((v) => (
+						<article>
+							<div class="flex items-baseline gap-x-2.5">
+								<span
+									class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-sm"
+									style={`background: var(--series-${v.slot})`}
+									aria-hidden="true"
+								/>
+								<h2 class="font-serif text-[19px] font-medium text-ink">{v.label}</h2>
+								<span class="font-mono text-[12px] tabular-nums text-muted">
+									{v.weight.toFixed(1)}%
+								</span>
+							</div>
+							<p class="mt-2 text-[14px] leading-relaxed text-muted">{v.thesis}</p>
+							<p class="mt-2 font-mono text-[11px] text-muted/70">
+								{v.holdings.map((h) => h.ticker).join(' · ')}
+							</p>
+						</article>
+					))
+				}
+			</div>
+		</section>
+
+		<!-- Holdings table. This is also the contrast-relief channel the palette
+		     validator requires, and the place the per-asset percentages live. -->
+		<section class="mt-10 border-t border-line pt-10">
+			<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+					Positions · live prices
+				</p>
+				<p class="font-mono text-[11px] text-muted">
+					Allocation, price and daily move only — never values or share counts
+				</p>
+			</div>
+
+			<div class="mt-6 overflow-x-auto">
+				<table class="w-full min-w-[36rem] border-collapse text-left">
+					<thead>
+						<tr class="border-b border-line font-mono text-[11px] uppercase tracking-wider text-muted">
+							<th scope="col" class="py-2.5 pr-4 font-medium">Asset</th>
+							<th scope="col" class="py-2.5 pr-4 font-medium">Vector</th>
+							<th scope="col" class="py-2.5 pr-4 text-right font-medium">Weight</th>
+							<th scope="col" class="py-2.5 pr-4 text-right font-medium">Price</th>
+							<th scope="col" class="py-2.5 text-right font-medium">Today</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-line">
+						{
+							sorted.map((h) => (
+								<tr data-row={h.ticker} class="align-top">
+									<td class="py-3 pr-4">
+										<span class="font-mono text-[13px] font-medium text-ink">{h.ticker}</span>
+										<span class="ml-2 text-[13px] text-muted">{h.name}</span>
+										{h.note && (
+											<p class="mt-1 max-w-sm text-[12px] leading-relaxed text-muted/80">
+												{h.note}
+											</p>
+										)}
+									</td>
+									<td class="py-3 pr-4 whitespace-nowrap">
+										<span class="flex items-center gap-x-2">
+											<span
+												class="h-2 w-2 shrink-0 rounded-sm"
+												style={`background: var(--series-${slotOf(h.vector)})`}
+												aria-hidden="true"
+											/>
+											<span class="font-mono text-[12px] text-muted">{labelOf(h.vector)}</span>
+										</span>
+									</td>
+									<td
+										data-weight={h.ticker}
+										class="py-3 pr-4 text-right font-mono text-[13px] tabular-nums text-ink">
+										{h.weight.toFixed(2)}%
+									</td>
+									<td
+										data-price={h.ticker}
+										class="py-3 pr-4 text-right font-mono text-[13px] tabular-nums text-muted">
+										—
+									</td>
+									<td
+										data-change={h.ticker}
+										class="py-3 text-right font-mono text-[13px] tabular-nums text-muted">
+										—
+									</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+			<p id="price-note" class="mt-4 font-mono text-[11px] leading-relaxed text-muted">
+				Prices refresh on the Mac mini that serves this page and are published same-origin —
+				no third-party script runs in your browser.
+			</p>
+		</section>
+
+		<!-- Principles -->
+		<section class="mt-10 border-t border-line pt-10">
+			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The rules</p>
+			<ol class="mt-6 max-w-2xl divide-y divide-line">
+				{
+					principles.map((p, i) => (
+						<li class="grid gap-x-5 py-4 sm:grid-cols-[2rem_1fr]">
+							<span class="font-mono text-[12px] tabular-nums text-accent">
+								{String(i + 1).padStart(2, '0')}
+							</span>
+							<div>
+								<p class="font-serif text-[17px] font-medium text-ink">{p.rule}</p>
+								<p class="mt-1.5 text-[14px] leading-relaxed text-muted">{p.detail}</p>
+							</div>
+						</li>
+					))
+				}
+			</ol>
+		</section>
+
+		<p class="mt-12 max-w-2xl border-t border-line pt-6 font-mono text-[11px] leading-relaxed text-muted">
+			Not financial advice, and not a recommendation to buy or sell anything. This page
+			documents my own reasoning on my own money, including the parts of it that are not
+			working. Positions change; this page may lag them.
+		</p>
+	</main>
+</Base>
+
+<script>
+	// Live prices from /prices.json — same-origin, written by a scheduled job on the
+	// host. Progressive enhancement: without it the table shows em-dashes and the
+	// server-rendered baseline weights, which is a coherent page on its own.
+	type Quote = { price?: number; changePct?: number; weight?: number };
+	type Prices = {
+		generated?: string;
+		marketState?: string;
+		portfolio?: { dayChangePct?: number };
+		quotes?: Record<string, Quote>;
+	};
+
+	const MAX_AGE_MS = 6 * 60 * 60 * 1000;
+
+	const nf = (n: number, dp = 2) =>
+		n.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
+	const signed = (n: number) => `${n >= 0 ? '+' : '−'}${nf(Math.abs(n))}%`;
+
+	function paint(el: HTMLElement | null, n: number) {
+		if (!el) return;
+		el.textContent = signed(n);
+		// Sign is in the text, so colour is reinforcement rather than the only cue.
+		el.style.color = n >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
+	}
+
+	async function load() {
+		try {
+			const res = await fetch('/prices.json', { cache: 'no-store' });
+			if (!res.ok) return;
+			const data: Prices = await res.json();
+
+			const gen = data.generated ? Date.parse(data.generated) : NaN;
+			if (!Number.isFinite(gen) || Date.now() - gen > MAX_AGE_MS) return;
+
+			// Headline: allocation-weighted move for the whole book.
+			const day = data.portfolio?.dayChangePct;
+			if (typeof day === 'number') {
+				const el = document.getElementById('day-change');
+				if (el) {
+					el.textContent = signed(day);
+					// Drop the faint empty-state class before applying the status colour.
+					el.classList.remove('text-muted/30');
+					el.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
+				}
+				const lab = document.getElementById('day-change-label');
+				if (lab) lab.textContent = day >= 0 ? '▲ up today' : '▼ down today';
+			}
+
+			// Per-position price, daily move, and live weight.
+			for (const [ticker, q] of Object.entries(data.quotes ?? {})) {
+				if (typeof q.price === 'number') {
+					const el = document.querySelector<HTMLElement>(`[data-price="${ticker}"]`);
+					// Sub-dollar assets (DOGE) need more precision than equities.
+					if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
+				}
+				if (typeof q.changePct === 'number') {
+					paint(document.querySelector<HTMLElement>(`[data-change="${ticker}"]`), q.changePct);
+				}
+				if (typeof q.weight === 'number') {
+					const el = document.querySelector<HTMLElement>(`[data-weight="${ticker}"]`);
+					if (el) el.textContent = `${nf(q.weight)}%`;
+				}
+			}
+
+			const asof = document.getElementById('price-asof');
+			if (asof) {
+				const t = new Date(gen);
+				const state = data.marketState ? ` · ${data.marketState}` : '';
+				asof.textContent = `Live as of ${t.toLocaleTimeString()}${state}`;
+			}
+		} catch {
+			// Leave the server-rendered baseline in place.
+		}
+	}
+
+	load();
+</script>

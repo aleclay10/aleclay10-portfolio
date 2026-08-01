@@ -248,6 +248,40 @@ html {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Chart tokens (/investing).
+   Categorical slots 1–6 in FIXED slot order from the validated default dataviz
+   palette — the ordering is the colour-blindness safety mechanism, not cosmetic,
+   so do not reorder to taste. Validated with scripts/validate_palette.js against
+   THIS site's surfaces (#fbf8f4 light / #0c0c0d dark), both modes, all hard gates
+   passing. Light mode reports slots 3/4/5 under 3:1 contrast, which obligates a
+   relief channel — the legend's visible % labels and the holdings table are it.
+   Status colours are reserved and always ship with a sign or glyph, never hue alone.
+   --------------------------------------------------------------------------- */
+.viz-root {
+  --series-1: #2a78d6; /* blue    */
+  --series-2: #eb6834; /* orange  */
+  --series-3: #1baf7a; /* aqua    */
+  --series-4: #eda100; /* yellow  */
+  --series-5: #e87ba4; /* magenta */
+  --series-6: #008300; /* green   */
+  --viz-track: #efe8dc;
+  --viz-good: #006300;
+  --viz-bad: #c0342f;
+}
+
+.dark .viz-root {
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --viz-track: #1b1b1a;
+  --viz-good: #0ca30c;
+  --viz-bad: #e66767;
+}
+
 /* Search-result highlights (Pagefind excerpts in the ⌘K palette) */
 mark {
   background: var(--accent-soft);

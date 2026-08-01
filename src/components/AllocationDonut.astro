@@ -1,0 +1,166 @@
+---
+// Allocation donut for /investing.
+//
+// Server-rendered from the baseline weights in src/data/portfolio.ts, then updated
+// in place from /prices.json when that file is fresh. One implementation, data
+// swapped — no second chart for the no-JS path.
+//
+// Form choice: a donut is only legible at ~6 slices, so the 19 individual holdings
+// are grouped by thesis vector and the per-asset percentages live in the table
+// below. That follows the "more than ~7 meaningful classes belongs in a table"
+// rule rather than inventing 19 distinguishable hues, which is not possible.
+//
+// Colour: categorical (each vector is an identity, not a magnitude), 6 slots from
+// the validated default palette in fixed slot order. Validated against THIS site's
+// surfaces (#fbf8f4 / #0c0c0d) in both modes — all hard gates pass. Light mode
+// reports 3 slots under 3:1 contrast, which obligates a relief channel; the direct
+// % labels in the legend and the full table below are that relief.
+//
+// Geometry: `pathLength="100"` normalises every ring to 100 units, so a segment's
+// dash length IS its percentage. That keeps the arc maths out of the markup and
+// makes the live update a one-line dasharray write.
+import { vectors, holdings, type VectorId } from '../data/portfolio';
+
+const R = 82;
+const CX = 105;
+const CY = 105;
+const STROKE = 30;
+// Gap between adjacent fills, in pathLength units (~2.6px of arc at this radius).
+const GAP = 0.6;
+
+const totals: { id: VectorId; label: string; slot: number; weight: number; thesis: string }[] =
+	vectors.map((v) => ({
+		id: v.id,
+		label: v.label,
+		slot: v.slot,
+		thesis: v.thesis,
+		weight: holdings.filter((h) => h.vector === v.id).reduce((s, h) => s + h.weight, 0),
+	}));
+
+// Cumulative start offsets, in the same 0–100 units.
+let acc = 0;
+const segments = totals.map((t) => {
+	const seg = { ...t, offset: acc };
+	acc += t.weight;
+	return seg;
+});
+
+const fmt = (n: number) => `${n.toFixed(1)}%`;
+---
+
+<figure class="viz-root m-0" data-donut>
+	<div class="flex flex-col items-center gap-8 sm:flex-row sm:items-center sm:gap-10">
+		<svg
+			viewBox="0 0 210 210"
+			width="210"
+			height="210"
+			role="img"
+			aria-labelledby="donut-title donut-desc"
+			class="shrink-0">
+			<title id="donut-title">Portfolio allocation by thesis vector</title>
+			<desc id="donut-desc">
+				{segments.map((s) => `${s.label} ${fmt(s.weight)}`).join('. ')}
+			</desc>
+
+			<!-- Recessive track so the ring reads as a whole even while data loads. -->
+			<circle cx={CX} cy={CY} r={R} fill="none" stroke="var(--viz-track)" stroke-width={STROKE} />
+
+			<g transform={`rotate(-90 ${CX} ${CY})`}>
+				{
+					segments.map((s) => (
+						<circle
+							data-seg={s.id}
+							cx={CX}
+							cy={CY}
+							r={R}
+							fill="none"
+							stroke={`var(--series-${s.slot})`}
+							stroke-width={STROKE}
+							pathLength="100"
+							stroke-dasharray={`${Math.max(0, s.weight - GAP)} ${100 - Math.max(0, s.weight - GAP)}`}
+							stroke-dashoffset={-s.offset}>
+							<title>{`${s.label} — ${fmt(s.weight)}`}</title>
+						</circle>
+					))
+				}
+			</g>
+		</svg>
+
+		<!-- Legend doubles as the direct-label channel: identity is never colour-alone,
+		     and the visible % values are the contrast relief the validator requires. -->
+		<ul class="w-full min-w-0 space-y-2.5">
+			{
+				segments.map((s) => (
+					<li class="flex items-baseline gap-x-3">
+						<span
+							class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-sm"
+							style={`background: var(--series-${s.slot})`}
+							aria-hidden="true"
+						/>
+						<span class="min-w-0 flex-1">
+							<span class="font-mono text-[13px] text-ink">{s.label}</span>
+						</span>
+						<span
+							data-seg-value={s.id}
+							class="shrink-0 font-mono text-[13px] tabular-nums text-muted">
+							{fmt(s.weight)}
+						</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</figure>
+
+<script>
+	// Recompute the ring from live weights when /prices.json is fresh. Falls back
+	// silently to the server-rendered baseline on any failure — same contract as
+	// the footer uptime chip.
+	type Prices = {
+		generated?: string;
+		vectors?: Record<string, number>;
+	};
+
+	const MAX_AGE_MS = 6 * 60 * 60 * 1000; // prices go stale outside market hours; 6h is generous
+	const GAP = 0.6;
+
+	async function refresh() {
+		const root = document.querySelector('[data-donut]');
+		if (!root) return;
+		try {
+			const res = await fetch('/prices.json', { cache: 'no-store' });
+			if (!res.ok) return;
+			const data: Prices = await res.json();
+
+			const gen = data.generated ? Date.parse(data.generated) : NaN;
+			if (!Number.isFinite(gen) || Date.now() - gen > MAX_AGE_MS) return;
+			if (!data.vectors) return;
+
+			// Only redraw if every rendered segment has a live weight — a partial
+			// update would produce a ring that does not sum to 100.
+			const segs = [...root.querySelectorAll<SVGCircleElement>('[data-seg]')];
+			const ids = segs.map((s) => s.dataset.seg!);
+			if (!ids.every((id) => typeof data.vectors![id] === 'number')) return;
+
+			let acc = 0;
+			for (const seg of segs) {
+				const w = data.vectors[seg.dataset.seg!];
+				const len = Math.max(0, w - GAP);
+				seg.setAttribute('stroke-dasharray', `${len} ${100 - len}`);
+				seg.setAttribute('stroke-dashoffset', String(-acc));
+				const t = seg.querySelector('title');
+				const label = t?.textContent?.split(' — ')[0] ?? '';
+				if (t) t.textContent = `${label} — ${w.toFixed(1)}%`;
+				acc += w;
+			}
+			for (const el of root.querySelectorAll<HTMLElement>('[data-seg-value]')) {
+				const w = data.vectors[el.dataset.segValue!];
+				el.textContent = `${w.toFixed(1)}%`;
+			}
+		} catch {
+			// Offline, blocked, or malformed — keep the server-rendered baseline.
+		}
+	}
+
+	refresh();
+</script>

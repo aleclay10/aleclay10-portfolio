@@ -14,7 +14,11 @@ Use `npm ci` (not `npm install`) when installing — the deploy pipeline does, a
 
 ## Tech stack
 
-- **Astro 6**, static output, **no SSR adapter** — keep it that way; this is a static site.
+- **Astro 7**, static output, **no SSR adapter** — keep it that way; this is a static site.
+  - Requires **Node ≥ 22.12**. `deploy.sh` picks the highest installed nvm version; if that ever resolves below 22.12 the deploy breaks.
+  - Astro 7 ships **Vite 8** and the Rust compiler is now mandatory, so unclosed or semantically invalid HTML is a build **error** rather than being silently auto-corrected.
+  - `compressHTML` now defaults to `'jsx'` rather than `true` (JSX whitespace rules, not HTML).
+  - `vite.build.assetsInlineLimit: 0` still works under Vite 8 and is still load-bearing — it is what keeps scripts external so the production CSP does not kill them. Verify `0 inline <script> bodies` in `dist/` after any upgrade.
 - **TypeScript**, `strict` (extends `astro/tsconfigs/strict`). Prefer `import type` for type-only imports.
 - **Tailwind CSS v4**, wired as a Vite plugin. See the Tailwind rules below — they are the easiest thing to get wrong.
 

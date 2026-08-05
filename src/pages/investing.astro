@@ -45,8 +45,10 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 		<section class="reveal reveal-2 mt-12 border-t border-line pt-10">
 			<div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
 				<div>
-					<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
-						Book performance today
+					<!-- Deliberately not "today": outside market hours the figure is the last
+					     session's close, and the label beside the number says which. -->
+					<p id="perf-heading" class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+						Book performance
 					</p>
 					<!-- Empty state is deliberately faint: a full-weight em-dash at this size
 					     reads as a redaction bar rather than "no data yet". JS sets the real
@@ -62,8 +64,8 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 						>
 					</p>
 					<p class="mt-3 max-w-md font-mono text-[12px] leading-relaxed text-muted">
-						Allocation-weighted move across every position below. A percentage of the
-						book, not a dollar figure.
+						Allocation-weighted move across every position below, measured against the
+						previous close. A percentage of the book, not a dollar figure.
 					</p>
 				</div>
 				<p id="price-asof" class="font-mono text-[11px] text-muted">
@@ -302,8 +304,14 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 					el.classList.remove('text-muted/30');
 					el.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
 				}
+				// "today" is only true while the market is open; once it closes the figure
+				// is the last completed session, and on a weekend that is days old.
 				const lab = document.getElementById('day-change-label');
-				if (lab) lab.textContent = day >= 0 ? '▲ up today' : '▼ down today';
+				if (lab) {
+					const open = data.marketState === 'market open';
+					const dir = day >= 0 ? '▲ up' : '▼ down';
+					lab.textContent = open ? `${dir} today` : `${dir} · last close`;
+				}
 			}
 
 			// Per-position price, daily move, and live weight.
@@ -333,8 +341,12 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 			const asof = document.getElementById('price-asof');
 			if (asof) {
 				const t = new Date(gen);
-				const state = data.marketState ? ` · ${data.marketState}` : '';
-				asof.textContent = `Live as of ${t.toLocaleTimeString()}${state}`;
+				// Say "checked" rather than "live" when the market is shut — the prices are
+				// real but they are the last close, not a live tick.
+				asof.textContent =
+					data.marketState === 'market open'
+						? `Live · updated ${t.toLocaleTimeString()}`
+						: `Market closed · last close, checked ${t.toLocaleTimeString()}`;
 			}
 		} catch {
 			// Leave the server-rendered baseline in place.

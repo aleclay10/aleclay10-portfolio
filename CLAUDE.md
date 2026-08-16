@@ -68,4 +68,25 @@ When adding structure, follow Astro conventions: shared markup → `src/layouts/
 
 ## Deploy
 
-Pushing to `main` is a deploy: the host pulls, runs `npm ci` → `astro build`, and serves the static `dist/`. Keep the build green and the output static — a broken build or an accidental SSR adapter takes the live site down. Run `npm run build` (and `npx astro check`) before pushing.
+**Merging to `main` does NOT deploy.** Since 2026-08-16 the host deploys only a **signed git tag** whose signature verifies against an allow-list on the machine (audit finding F-1: the old "whatever lands on `main` runs within 60s" model meant GitHub account compromise equalled code execution inside Alec's home network).
+
+The release step is **Alec's alone** — the signing key is passphrase-protected and the agent does not hold the passphrase. Kowalski opens PRs; Alec merges and tags.
+
+```bash
+# Alec, to publish:
+cd ~/portfolio/dev && git checkout main && git pull
+git -c user.name="Alec Layton" -c user.email="alec.layton100@gmail.com" \
+    tag -s vX.Y.Z -m "what changed"
+git push origin vX.Y.Z          # poller picks it up within 60s
+```
+
+What the host does on a verified tag: detached-checkout of the tagged commit → `npm ci` → `astro build` → `rsync` into the web root → reload Caddy → purge the edge cache.
+
+- **Fails closed.** No verified tag, or a missing allow-list, means nothing deploys and the live site is left exactly as it is. A stale site beats a compromised one.
+- Unsigned tags and tags signed by unknown keys are **ignored**, not merely warned about — verified by attack simulation.
+- Rolling back to an *older* tag requires `ALLOW_ROLLBACK=1` (downgrade guard).
+- `main` is branch-protected: PR required, force-push and deletion blocked, admins included.
+
+Keep the build green and the output static — a broken build or an accidental SSR adapter takes the live site down at the next release. Run `npm run build` and `npx astro check` before pushing.
+
+**Do not verify a deploy by diffing page hashes fetched from `https://aleclay10.dev`.** Cloudflare injects a bot-challenge script with a unique ray ID per request, so any two edge fetches differ and everything looks changed. Diff against the origin (`http://127.0.0.1:8080`) or a local build.

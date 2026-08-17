@@ -2,6 +2,8 @@
 
 Personal portfolio for Alec Layton (`aleclay10.dev`). Astro static site, self-hosted on a Mac mini behind a Cloudflare Tunnel. The bar is design-engineer polish (minimal, fast, ships ~0 JS) with substance — projects and writing.
 
+> **Merging a PR does not put anything on the live site.** A release is a **signed tag**, pushed by Alec — nobody else can cut one. If a merged change isn't showing up at `aleclay10.dev`, the tag is the first thing to check: compare `git describe --tags origin/main` against the newest tag. See [Deploy](#deploy) for the release command and why it works this way.
+
 ## Commands
 
 - `npm run dev` — local dev server (`astro dev`)

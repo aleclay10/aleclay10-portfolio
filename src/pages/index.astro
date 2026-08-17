@@ -86,12 +86,12 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 				</div>
 			</div>
 
-			<!-- Portrait. Drop a real photo at public/alec.jpg to replace the placeholder. -->
+			<!-- Portrait. public/alec.webp is 512x640 (2x the 256px slot), metadata stripped. -->
 			<div class="reveal reveal-2 justify-self-center sm:justify-self-end">
 				<div class="relative aspect-[4/5] w-56 overflow-hidden rounded-2xl border border-line bg-surface sm:w-64">
-					<div class="flex h-full w-full items-center justify-center">
-						<span class="font-serif text-6xl italic text-muted/40">AL</span>
-					</div>
+					<img src="/alec.webp" alt="Alec Layton" width="512" height="640"
+						decoding="async" fetchpriority="high"
+						class="h-full w-full object-cover" />
 					<div class="absolute inset-x-0 bottom-0 flex items-center gap-x-2 border-t border-line bg-canvas/70 px-3 py-2 font-mono text-[11px] text-muted backdrop-blur">
 						<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
 						Currently building · agents + infra

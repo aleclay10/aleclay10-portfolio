@@ -18,6 +18,7 @@ Use `npm ci` (not `npm install`) when installing — the deploy pipeline does, a
   - Requires **Node ≥ 22.12**. `deploy.sh` picks the highest installed nvm version; if that ever resolves below 22.12 the deploy breaks.
   - Astro 7 ships **Vite 8** and the Rust compiler is now mandatory, so unclosed or semantically invalid HTML is a build **error** rather than being silently auto-corrected.
   - `compressHTML` now defaults to `'jsx'` rather than `true` (JSX whitespace rules, not HTML).
+    - **This eats the space around inline links.** Under JSX rules a whitespace-only run containing a newline is dropped entirely, so a paragraph that ends a line on a word and starts the next line with `<a>` renders as `includingKowalski`. Write an explicit `{' '}` at the line break, or keep the link on the same line as the text. It does **not** reproduce under `astro dev` (no compression) — only in a production build, so after touching prose, scan `dist/` for `text<a` and `</a>text` rather than trusting the dev server.
   - `vite.build.assetsInlineLimit: 0` still works under Vite 8 and is still load-bearing — it is what keeps scripts external so the production CSP does not kill them. Verify `0 inline <script> bodies` in `dist/` after any upgrade.
 - **TypeScript**, `strict` (extends `astro/tsconfigs/strict`). Prefer `import type` for type-only imports.
 - **Tailwind CSS v4**, wired as a Vite plugin. See the Tailwind rules below — they are the easiest thing to get wrong.
@@ -30,15 +31,16 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 - **DON'T** add `@astrojs/tailwind` — that integration is v3-only and breaks v4.
 - **DON'T** create `tailwind.config.js`/`.mjs`. There is no JS config.
 - Config lives in `src/styles/global.css`, which starts with `@import "tailwindcss";`. Add design tokens via `@theme { }` (CSS custom properties), plugins via `@plugin`, custom utilities via `@utility`.
-- `global.css` is imported once (currently from `src/pages/index.astro`); when a shared layout exists, import it there instead.
+- `global.css` is imported once, from `src/layouts/Base.astro`. Don't re-import it in individual pages.
 
 ## Repository layout
 
-Currently minimal — a single page. Respect these locations as the site grows:
-
-- `src/pages/` — routes (`.astro`). One page today: `index.astro`.
+- `src/pages/` — routes (`.astro`). Eight today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`.
+- `src/layouts/Base.astro` — the shared shell every page renders through (head, nav, footer, theme init, `global.css` import).
+- `src/components/` — reusable UI (`AllocationDonut.astro`, `UptimeChip.astro`).
+- `src/data/portfolio.ts` — holdings/watchlist data behind `/investing`.
 - `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
-- `public/` — static assets served as-is (e.g. `favicon.svg`).
+- `public/` — static assets served as-is (e.g. `favicon.svg`, `theme-init.js`). Note `/status.json` is **not** here and **not** a build artifact — `health-check.sh` writes it on the host, so it 404s in dev and `UptimeChip` degrades quietly. That 404 is expected, not a bug.
 - `scripts/` — repo tooling not part of the build (e.g. `build-resume-pdf.sh`).
 - `astro.config.mjs`, `tsconfig.json` — config.
 

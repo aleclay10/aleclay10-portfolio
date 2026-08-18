@@ -18,7 +18,12 @@
 if (new URLSearchParams(location.search).has('q')) void import('./search-highlight');
 
 const palette = document.getElementById('palette');
-const trigger = document.getElementById('cmdk');
+// Two triggers: the desktop header button, and the item inside the mobile
+// disclosure nav (the header button is `sm:flex`, so below `sm` that panel is the
+// only way in — there is no keyboard to press ⌘K on).
+const triggers = ['cmdk', 'cmdk-mobile']
+	.map((id) => document.getElementById(id))
+	.filter((el): el is HTMLElement => el !== null);
 
 let engine: Promise<typeof import('./search-palette')> | null = null;
 
@@ -41,9 +46,11 @@ function isTyping(target: EventTarget | null): boolean {
 	);
 }
 
-trigger?.addEventListener('pointerenter', () => void load());
-trigger?.addEventListener('focus', () => void load());
-trigger?.addEventListener('click', openPalette);
+for (const trigger of triggers) {
+	trigger.addEventListener('pointerenter', () => void load());
+	trigger.addEventListener('focus', () => void load());
+	trigger.addEventListener('click', openPalette);
+}
 
 document.addEventListener('keydown', (e) => {
 	// Only opening lives here. Once the palette is open the engine's own handler has

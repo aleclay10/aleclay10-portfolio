@@ -8,6 +8,17 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+// One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
+const nav = [
+	{ href: '/#timeline', label: 'Timeline' },
+	{ href: '/#projects', label: 'Projects' },
+	{ href: '/gaming-assistant', label: 'Gaming Assistant' },
+	{ href: '/investing', label: '/investing' },
+	{ href: '/stack', label: '/stack' },
+	{ href: '/now', label: '/now' },
+	{ href: '/uses', label: '/uses' },
+];
+
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL('/og.png', Astro.site).href;
 ---
@@ -53,32 +64,43 @@ const ogImage = new URL('/og.png', Astro.site).href;
 	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
 		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
 			<!-- Top bar -->
-			<header class="flex items-center justify-between py-6">
-				<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
-					AL<span class="text-accent">.</span>
-				</a>
-				<nav class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
-					<a class="link" href="/#timeline">Timeline</a>
-					<a class="link" href="/#projects">Projects</a>
-					<a class="link" href="/gaming-assistant">Gaming Assistant</a>
-					<a class="link" href="/investing">/investing</a>
-					<a class="link" href="/stack">/stack</a>
-					<a class="link" href="/now">/now</a>
-					<a class="link" href="/uses">/uses</a>
-				</nav>
-				<div class="flex items-center gap-x-3">
-					<!-- Visible at every width: the palette is the only way to search, and
-					     hiding the trigger below `sm` left phones with no way in at all. -->
-					<button id="cmdk" type="button" aria-label="Search"
-						class="flex items-center rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink">
-						<span>Search</span>
-					</button>
-					<button id="theme-toggle" type="button" aria-label="Toggle theme"
-						class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink">
-						<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-						<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-					</button>
+			<header class="py-6">
+				<div class="flex items-center justify-between">
+					<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
+						AL<span class="text-accent">.</span>
+					</a>
+					<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
+						{nav.map((n) => <a class="link" href={n.href}>{n.label}</a>)}
+					</nav>
+					<div class="flex items-center gap-x-3">
+						<button id="cmdk" type="button" aria-label="Search"
+							class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink sm:flex">
+							<span>Search</span>
+						</button>
+						<button id="theme-toggle" type="button" aria-label="Toggle theme"
+							class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink">
+							<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+							<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+						</button>
+						<!-- Mobile only: the bar above collapses below sm, so without this the
+						     nav and search are both unreachable on a phone (no keyboard, no Cmd-K). -->
+						<button id="nav-toggle" type="button" aria-label="Open menu"
+							aria-expanded="false" aria-controls="mobile-nav"
+							class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink sm:hidden">
+							<svg id="nav-icon-open" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+							<svg id="nav-icon-close" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+						</button>
+					</div>
 				</div>
+
+				<nav id="mobile-nav" hidden aria-label="Site"
+					class="mt-4 flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface/40 font-mono text-[13px] sm:hidden">
+					{nav.map((n) => (
+						<a class="px-4 py-3 text-muted transition hover:bg-surface hover:text-accent" href={n.href}>{n.label}</a>
+					))}
+					<button id="cmdk-mobile" type="button"
+						class="px-4 py-3 text-left text-muted transition hover:bg-surface hover:text-accent">Search</button>
+				</nav>
 			</header>
 
 			<slot />
@@ -112,6 +134,38 @@ const ogImage = new URL('/og.png', Astro.site).href;
 			document.getElementById('theme-toggle')?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
 				localStorage.setItem('theme', dark ? 'dark' : 'light');
+			});
+
+			// Mobile disclosure nav. Bundled (not is:inline) — the production CSP blocks inline scripts.
+			const navToggle = document.getElementById('nav-toggle');
+			const mobileNav = document.getElementById('mobile-nav') as HTMLElement | null;
+			const navIconOpen = document.getElementById('nav-icon-open');
+			const navIconClose = document.getElementById('nav-icon-close');
+
+			function setNav(open: boolean) {
+				if (!mobileNav || !navToggle) return;
+				mobileNav.hidden = !open;
+				navToggle.setAttribute('aria-expanded', String(open));
+				navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+				navIconOpen?.classList.toggle('hidden', open);
+				navIconClose?.classList.toggle('hidden', !open);
+			}
+
+			navToggle?.addEventListener('click', () => setNav(mobileNav?.hidden !== false));
+
+			// Same-page anchors (/#timeline) do not reload, so the panel has to close itself.
+			mobileNav?.addEventListener('click', (e) => {
+				if ((e.target as HTMLElement).closest('a, button')) setNav(false);
+			});
+
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape') setNav(false);
+			});
+
+			// Rotating to landscape can cross the sm breakpoint, which would hide the panel
+			// via CSS while it is still logically open and the button still says "Close".
+			matchMedia('(min-width: 640px)').addEventListener('change', (e) => {
+				if (e.matches) setNav(false);
 			});
 		</script>
 		<!-- Bundled (not is:inline): the production CSP blocks inline scripts.

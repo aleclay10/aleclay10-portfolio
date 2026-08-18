@@ -416,7 +416,17 @@ function close() {
 	palette.hidden = true;
 	document.body.style.overflow = '';
 	input?.removeAttribute('aria-activedescendant');
-	if (lastFocus instanceof HTMLElement) lastFocus.focus();
+	if (lastFocus instanceof HTMLElement) {
+		lastFocus.focus();
+		// Opening from the mobile nav closes that panel, so the element we came from
+		// can be display:none by now and silently refuse focus — which would drop the
+		// user at the top of the document. Fall back to whichever trigger is visible.
+		if (document.activeElement !== lastFocus) {
+			[...document.querySelectorAll<HTMLElement>('#cmdk, #nav-toggle')]
+				.find((el) => el.offsetParent !== null)
+				?.focus();
+		}
+	}
 	lastFocus = null;
 }
 

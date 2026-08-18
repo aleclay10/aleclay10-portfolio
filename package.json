@@ -7,11 +7,12 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
-    "resume:pdf": "bash scripts/build-resume-pdf.sh"
+    "resume:pdf": "bash scripts/build-resume-pdf.sh",
+    "preview:csp": "node scripts/preview-csp.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -24,7 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "pagefind": "^1.5.2",
+    "linkedom": "^0.18.12",
     "typescript": "^6.0.3"
   }
 }

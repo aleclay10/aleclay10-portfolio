@@ -23,7 +23,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 ---
 
 <Base title={title} description={description}>
-	<main data-pagefind-body class="viz-root flex flex-1 flex-col py-16">
+	<main class="viz-root flex flex-1 flex-col py-16">
 		<!-- Hero -->
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>
@@ -145,7 +145,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 							sorted.map((h) => (
 								<tr data-row={h.ticker} class="align-top">
 									<td class="py-3 pr-4">
-										<span class="font-mono text-[13px] font-medium text-ink">{h.ticker}</span>
+										<span class="font-mono text-[13px] font-medium text-ink">{h.ticker}</span>{' '}
 										<span class="ml-2 text-[13px] text-muted">{h.name}</span>
 										{h.note && (
 											<p class="mt-1 max-w-sm text-[12px] leading-relaxed text-muted/80">

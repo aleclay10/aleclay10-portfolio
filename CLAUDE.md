@@ -7,8 +7,9 @@ Personal portfolio for Alec Layton (`aleclay10.dev`). Astro static site, self-ho
 ## Commands
 
 - `npm run dev` — local dev server (`astro dev`)
-- `npm run build` — production build to `dist/` (`astro build`, static output)
+- `npm run build` — production build to `dist/` (`astro build`, static output). Also writes `dist/search-index.json`; see [Search](#search).
 - `npm run preview` — serve the built `dist/` locally
+- `npm run preview:csp` — serve the built `dist/` on `:4321` **with the production CSP**. Run this, with the console open, before shipping anything that adds or moves a script. `astro dev` and `astro preview` set no CSP and the Caddyfile lives outside the repo, so this is the only thing in the toolchain that would have caught the search outage described under [Search](#search).
 - `npx astro check` — TypeScript + Astro diagnostics; run this before committing UI changes
 - `npm run resume:pdf` — regenerate `public/resume.pdf` from the `/resume` page via headless Chrome. Run after any résumé or print-style change, then commit the PDF. Deliberately **not** part of `npm run build` — the unattended deploy must not depend on Chrome.
 
@@ -59,6 +60,27 @@ When adding structure, follow Astro conventions: shared markup → `src/layouts/
 - **Styling:** use Tailwind utilities and `@theme` tokens rather than raw hex values or one-off inline `<style>`. Keep class lists readable.
 - **Self-host assets** (fonts included) rather than adding third-party `<link>` tags — it's better for the performance bar and the "fully self-hosted" goal.
 
+## Search
+
+Find-in-files across the whole site: every occurrence of the query, with context, grouped by page — not one ranked excerpt per page. Four files:
+
+| File | Role |
+|---|---|
+| `src/lib/search-core.js` | **The correctness hinge.** One DOM walker, shared by all three consumers below. |
+| `scripts/search-index-integration.mjs` | `astro:build:done` integration → `dist/search-index.json` (~9 KB gzipped). |
+| `src/scripts/search-boot.ts` | The only piece that loads on every page (~1 KB). Lazily imports the other two. |
+| `src/scripts/search-palette.ts` / `search-highlight.ts` | The ⌘K palette; the `?q=&i=` arrival highlighter. |
+
+Rules that are load-bearing rather than stylistic:
+
+- **`search-core.js` is plain ESM with `// @ts-check`, not TypeScript**, because the indexer is a `.mjs` file that must import it under whatever Node the host's nvm resolves highest. `npx astro check` type-checks it through JSDoc.
+- **The indexer and the highlighter must agree on block order and block text**, because the indexer assigns each occurrence an ordinal and the highlighter recomputes it from the live DOM. That is why there is one walker, why `linkedom` (real `matches()`/`closest()`) parses the built HTML, and why block dropping, dedupe and synthetic word-boundary spaces all live inside `extractBlocks`/`blockTextMap` rather than in either caller. A rule applied on one side only silently turns every deep link into a coin flip.
+- **Scope is `<main>`**, so chrome exclusion is structural and a new page needs no opt-in attribute. `[data-search-section]` labels a section with no eyebrow; `[data-search-skip]` excludes content.
+- **The build warns and does not fail** on an unlabelled section or a lost word boundary. `SEARCH_STRICT=1` turns warnings into an error — use it locally, never on the host: a build abort on a prose nit would freeze the live site at the next tag.
+- **Ceiling: roughly 50k words / 150 KB raw.** The whole index is one download. Past that, switch to per-page shards or an inverted index. The corpus is ~2.9k words today.
+
+The search this replaced was Pagefind, and it was dead in production for weeks while looking perfectly healthy: indexing succeeded, the assets served 200, the browser downloaded the WASM — and then `default-src 'self'` with no `wasm-unsafe-eval` blocked *compiling* it. A bare `catch` reported that as "Search index unavailable — production builds only." Hence two standing rules here: failure states are never merged into one message, and `npm run preview:csp` exists.
+
 ## Design bar
 
 "Engineered, with a signature" — a true 50/50 of *competent systems engineer* and *creative*. The brand promise is "I have my shit together, but I also am creative," so keep the discipline (restraint, performance, tight grid) but always carry one expressive signal.
@@ -84,7 +106,9 @@ git -c user.name="Alec Layton" -c user.email="alec.layton100@gmail.com" \
 git push origin vX.Y.Z          # poller picks it up within 60s
 ```
 
-What the host does on a verified tag: detached-checkout of the tagged commit → `npm ci` → `astro build` → `rsync` into the web root → reload Caddy → purge the edge cache.
+What the host does on a verified tag: detached-checkout of the tagged commit → `npm ci` → **`npm run build`** → `rsync` into the web root → reload Caddy → purge the edge cache.
+
+> The host runs `npm run build`, not `astro build` directly (`deploy-signed.sh:143`). This file said otherwise until 2026-08-18. It matters: anything that has to happen at build time must not depend on which of the two you invoke. That is why the search indexer is an Astro **integration** rather than a step appended to the `build` script.
 
 - **Fails closed.** No verified tag, or a missing allow-list, means nothing deploys and the live site is left exactly as it is. A stale site beats a compromised one.
 - Unsigned tags and tags signed by unknown keys are **ignored**, not merely warned about — verified by attack simulation.

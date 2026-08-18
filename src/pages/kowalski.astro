@@ -51,7 +51,7 @@ const stack = [
 ---
 
 <Base title={title} description={description}>
-	<main data-pagefind-body class="flex flex-1 flex-col py-16">
+	<main class="flex flex-1 flex-col py-16">
 		<!-- Intro -->
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">
@@ -89,7 +89,7 @@ const stack = [
 				<ul class="mt-6 space-y-3.5">
 					{rules.map((r, i) => (
 						<li class="flex items-baseline gap-x-4">
-							<span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>
+							<span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>{' '}
 							<span class="font-serif text-lg text-ink">{r}</span>
 						</li>
 					))}

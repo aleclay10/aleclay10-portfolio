@@ -282,9 +282,29 @@ html {
   --viz-bad: #e66767;
 }
 
-/* Search-result highlights (Pagefind excerpts in the ⌘K palette) */
+/* Search highlights — used by both the ⌘K palette's context rows and the on-page
+   highlighter that runs on a ?q= arrival. Contrast against --accent-soft is ~13:1
+   in light mode and ~12:1 in dark. */
 mark {
   background: var(--accent-soft);
   color: inherit;
   border-radius: 2px;
+}
+
+/* The occurrence a deep link actually pointed at, distinguished from the other
+   matches on the same page. An outline rather than a different fill so it reads as
+   "this one" without introducing a second background colour to validate. */
+mark[data-search-hit='current'] {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media print {
+  /* A visitor who arrives from a search result and hits Cmd+P should get the page,
+     not their query. Neutralised rather than hidden — the text must still print. */
+  mark,
+  mark[data-search-hit='current'] {
+    background: transparent !important;
+    outline: none !important;
+  }
 }

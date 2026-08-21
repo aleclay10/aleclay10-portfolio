@@ -63,8 +63,9 @@ const ogImage = new URL('/og.png', Astro.site).href;
 	</head>
 	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
 		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
-			<!-- Top bar -->
-			<header class="py-6">
+			<!-- Top bar. data-vt-header is the view-transition hook (global.css) —
+			     it holds the header steady instead of cross-fading it with itself. -->
+			<header data-vt-header class="py-6">
 				<div class="flex items-center justify-between">
 					<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
 						AL<span class="text-accent">.</span>

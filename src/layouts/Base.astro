@@ -8,9 +8,12 @@ import UptimeChip from '../components/UptimeChip.astro';
 interface Props {
 	title: string;
 	description: string;
+	/** Keep a page out of search engines. For utility pages (form confirmations and
+	 *  the like) that are real routes but have no business ranking for anything. */
+	noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 // One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
 const nav = [
 	{ href: '/#timeline', label: 'Timeline' },
@@ -75,6 +78,8 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
+
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
 
 		<!-- Browser chrome color -->
 		<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8f4" />

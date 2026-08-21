@@ -12,7 +12,13 @@ export default defineConfig({
   // searchIndex() runs on astro:build:done rather than as an npm script, so it
   // cannot be bypassed by invoking `astro build` directly the way the host docs
   // describe. See the header comment in scripts/search-index-integration.mjs.
-  integrations: [sitemap(), searchIndex()],
+  integrations: [
+    // /gaming-assistant/thanks is a form-confirmation route reached only by a 303
+    // from the waitlist Worker. It is a real page, but it should not rank for
+    // anything — see the noindex prop on Base.astro.
+    sitemap({ filter: (page) => !page.includes('/gaming-assistant/thanks') }),
+    searchIndex()
+  ],
   vite: {
     plugins: [tailwindcss()],
     build: {

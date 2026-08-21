@@ -1,0 +1,27 @@
+# Waitlist API for aleclay10.dev.
+#
+# NOTE: no `account_id` here on purpose — this repo is public. Pass it via the
+# CLOUDFLARE_ACCOUNT_ID env var at deploy time. The D1 `database_id` below is an
+# opaque identifier that is useless without an API token, so it is fine committed.
+#
+# This Worker deploys via `wrangler deploy`, which is a SEPARATE pipeline from the
+# signed-tag release that ships the static site. See ../CLAUDE.md → Deploy.
+
+name = "aleclay10-waitlist"
+main = "src/index.ts"
+compatibility_date = "2026-08-21"
+
+# Matches at the Cloudflare edge, so the request never reaches the tunnel or the
+# Mac mini. Same-origin with the site, which is what keeps the production CSP
+# (`default-src 'self'`) satisfied with no `connect-src` amendment.
+# Both hostnames, because www.aleclay10.dev serves the site rather than redirecting
+# to the apex. A route on the apex alone would leave the form 404ing on www.
+routes = [
+  { pattern = "aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" },
+  { pattern = "www.aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aleclay10-waitlist"
+database_id = "PLACEHOLDER_SET_BY_WRANGLER_D1_CREATE"

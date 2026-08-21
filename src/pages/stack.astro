@@ -19,7 +19,7 @@ const stack = [
 	{ label: 'Framework', value: 'Astro 7, static output, ~0 JS shipped by default' },
 	{ label: 'Styling', value: 'Tailwind CSS v4, CSS-first config, semantic tokens for the dual theme' },
 	{ label: 'Type', value: 'Fraunces · Inter · JetBrains Mono — all self-hosted, no third-party requests' },
-	{ label: 'Search', value: 'A ~9 KB JSON index built at deploy time — find-in-files across every page, no WASM, no third-party script' },
+	{ label: 'Search', value: 'A ~9 KB JSON index built at build time — find-in-files across every page, no WASM, no third-party script' },
 	{ label: 'Hardware', value: 'Apple M4 Mac mini, 16 GB, in my apartment — wildly overqualified' },
 	{ label: 'Server', value: 'Caddy on loopback only; hardened headers, hidden dotfiles' },
 	{ label: 'Network', value: 'Cloudflare Tunnel + DNS + TLS; home IP never exposed' },
@@ -28,7 +28,7 @@ const stack = [
 ---
 
 <Base title={title} description={description}>
-	<main class="flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16">
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Colophon</p>
 			<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
@@ -38,14 +38,14 @@ const stack = [
 			<p class="mt-7 text-[17px] leading-relaxed text-muted">
 				No Vercel, no Netlify, no cloud hosting bill. This site is built, served, and
 				operated end-to-end on hardware I own — and most of its pages were shipped by{' '}
-				<a href="/kowalski" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
+				<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
 				my AI agent, through pull requests I review.
 			</p>
 		</div>
 
 		<!-- Deploy pipeline -->
 		<section class="reveal reveal-2 mt-16 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The pipeline</p>
+			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The pipeline</h2>
 			<ol class="mt-6 max-w-2xl">
 				{pipeline.map((p, i) => (
 					<li class="flex gap-x-4">
@@ -64,7 +64,7 @@ const stack = [
 
 		<!-- Stack table -->
 		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The parts</p>
+			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The parts</h2>
 			<dl class="mt-6 max-w-2xl divide-y divide-line">
 				{stack.map((s) => (
 					<div class="grid gap-x-6 py-3.5 sm:grid-cols-[8rem_1fr]">
@@ -77,7 +77,7 @@ const stack = [
 
 		<!-- Security -->
 		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Security posture</p>
+			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Security posture</h2>
 			<div class="mt-6 max-w-2xl space-y-4 text-[15px] leading-relaxed text-muted">
 				<p>
 					Zero inbound ports — the tunnel dials out, nothing dials in. The web server
@@ -95,10 +95,10 @@ const stack = [
 
 		<!-- The agent -->
 		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The unusual part</p>
+			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The unusual part</h2>
 			<p class="mt-6 max-w-2xl text-[15px] leading-relaxed text-muted">
 				The pages on this site are largely written, verified, and pushed by{' '}
-				<a href="/kowalski" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">an autonomous agent</a>{' '}
+				<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">an autonomous agent</a>{' '}
 				running on the same Mac mini that serves them. It opens branches, runs the
 				checks, and hands me a pull request — merging is the only button I press.
 			</p>

@@ -3,12 +3,13 @@ import Base from '../layouts/Base.astro';
 
 const title = '/stack — how this site works';
 const description =
-	'The full stack behind aleclay10.dev: Astro on a Mac mini in an apartment, zero open ports, git-push deploys, and an AI agent that ships the pages.';
+	'The full stack behind aleclay10.dev: Astro on a Mac mini in an apartment, zero open ports, signature-gated deploys, and an AI agent that ships the pages.';
 
 const pipeline = [
-	{ step: 'git push', note: 'to main — that’s the whole deploy ceremony' },
-	{ step: 'launchd poller', note: 'checks origin every 60s from the Mac mini' },
-	{ step: 'npm ci · astro build', note: 'reproducible build, static output only' },
+	{ step: 'git tag -s', note: 'a signed tag is the release — merging to main publishes nothing' },
+	{ step: 'launchd poller', note: 'every 60s, looks for the newest tag whose signature verifies against an allow-list on the machine' },
+	{ step: 'detached checkout', note: 'at the exact tagged commit — never at whatever a branch happens to point to' },
+	{ step: 'npm ci · npm run build', note: 'reproducible build, static output only' },
 	{ step: 'rsync → Caddy', note: 'atomic swap into the web root, loopback-only server' },
 	{ step: 'Cloudflare Tunnel', note: 'outbound-only connection — zero open inbound ports' },
 	{ step: 'edge cache purge', note: 'scoped API token, purge-only, auto after deploy' },
@@ -87,6 +88,18 @@ const stack = [
 					executable is now an external, same-origin file. Lesson kept.
 				</p>
 				<p>
+					Publishing is gated on a signature. The server ignores branches entirely —
+					it will only build a git tag whose signature verifies against an allow-list
+					held on the machine, and an unsigned tag or one signed by an unknown key is
+					ignored rather than merely warned about. If nothing verifies, nothing
+					deploys. A stale site beats a compromised one.
+				</p>
+				<p>
+					That gate exists because the agent below has commit access and I don't want
+					a compromised token to equal code execution inside my apartment. The signing
+					key is passphrase-protected and the agent has never held it.
+				</p>
+				<p>
 					A scheduled agent audits the machine daily against a security baseline —
 					drift gets flagged to a human, never auto-accepted.
 				</p>
@@ -100,7 +113,9 @@ const stack = [
 				The pages on this site are largely written, verified, and pushed by{' '}
 				<a href="/kowalski" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">an autonomous agent</a>{' '}
 				running on the same Mac mini that serves them. It opens branches, runs the
-				checks, and hands me a pull request — merging is the only button I press.
+				checks, and hands me a pull request. I review and merge — and even then nothing
+				ships, because publishing takes a tag I sign myself with a key the agent has
+				never had. It writes almost everything; it cannot release any of it.
 			</p>
 		</section>
 	</main>

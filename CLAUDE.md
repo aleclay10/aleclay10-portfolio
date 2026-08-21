@@ -12,6 +12,7 @@ Personal portfolio for Alec Layton (`aleclay10.dev`). Astro static site, self-ho
 - `npm run preview:csp` — serve the built `dist/` on `:4321` **with the production CSP**. Run this, with the console open, before shipping anything that adds or moves a script. `astro dev` and `astro preview` set no CSP and the Caddyfile lives outside the repo, so this is the only thing in the toolchain that would have caught the search outage described under [Search](#search).
 - `npx astro check` — TypeScript + Astro diagnostics; run this before committing UI changes
 - `npm run resume:pdf` — regenerate `public/resume.pdf` from the `/resume` page via headless Chrome. Run after any résumé or print-style change, then commit the PDF. Deliberately **not** part of `npm run build` — the unattended deploy must not depend on Chrome.
+- `npm run ship-log` — refresh the committed ship-log snapshot at `src/data/ship-log.json`, then commit it. That file is only a useful fallback if it doesn't rot; run it when prepping a release. See [Ship log](#ship-log).
 
 Use `npm ci` (not `npm install`) when installing — the deploy pipeline does, and the lockfile is committed.
 
@@ -80,6 +81,17 @@ Rules that are load-bearing rather than stylistic:
 - **Ceiling: roughly 50k words / 150 KB raw.** The whole index is one download. Past that, switch to per-page shards or an inverted index. The corpus is ~2.9k words today.
 
 The search this replaced was Pagefind, and it was dead in production for weeks while looking perfectly healthy: indexing succeeded, the assets served 200, the browser downloaded the WASM — and then `default-src 'self'` with no `wasm-unsafe-eval` blocked *compiling* it. A bare `catch` reported that as "Search index unavailable — production builds only." Hence two standing rules here: failure states are never merged into one message, and `npm run preview:csp` exists.
+
+## Ship log
+
+The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows release velocity on this repo — merged PRs, signed releases, and the four most recent PR titles.
+
+- **This replaced the roadmap's "GitHub activity strip",** which was scoped as a contribution calendar. That was measured before building and rejected on the data: the account shows **70 contributions across 20 active days in 365**, because the professional work isn't on this account and Kowalski isn't on GitHub. As green squares that reads "barely writes code" — the opposite of the intent. The unauthenticated events API is also thinner than it looks: 99 events, one page, ~24 days, one repo, and pagination past page 1 is refused outright.
+- **Fetched at build time, unauthenticated**, with `src/data/ship-log.json` as the fallback. The host builds with no GitHub credential and should stay that way.
+- **It can never fail the build.** GitHub unreachable, or the 60/hr per-IP limit exhausted by a run of local builds, logs a *named* reason and falls back to the snapshot. A bare catch is what kept the Pagefind outage invisible; don't reintroduce one.
+- **This makes the build non-deterministic in one page.** `/stack` can differ between two builds if a PR merges in between. Figures are deliberately coarse (month, not "9 weeks ago") to keep that to a minimum, but a byte-exact local-vs-host diff is no longer guaranteed for that page.
+- **Ceiling: one page of PRs.** `per_page` caps at 100; past ~100 closed PRs the count silently under-reports and `fetchShipLog()` needs paging.
+- The `{' '}` separators between the PR number, title and date in the row markup are **load-bearing** — without them those collapse into one token for the search indexer and for screen readers. The build warns if they go missing.
 
 ## Design bar
 

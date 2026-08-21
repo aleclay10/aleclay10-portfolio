@@ -1,0 +1,89 @@
+---
+import cached from '../data/ship-log.json';
+import { fetchShipLog, REPO } from '../lib/ship-log.mjs';
+
+/**
+ * Release velocity on this repo, fetched at build time with the committed
+ * snapshot as a fallback.
+ *
+ * Never fails the build. GitHub being unreachable — or the unauthenticated
+ * 60/hr limit being exhausted by a run of local builds — degrades to slightly
+ * stale numbers, which is strictly better than blocking a release. Refresh the
+ * fallback with `npm run ship-log`.
+ */
+
+let log = cached;
+let stale = true;
+
+try {
+	log = await fetchShipLog();
+	stale = false;
+} catch (err) {
+	// Named, not swallowed: a bare catch is what kept the Pagefind outage
+	// invisible for weeks. The build log should say which failure happened.
+	console.warn(`[ship-log] live fetch failed (${err instanceof Error ? err.message : err}) — using committed snapshot from ${cached.refreshed}`);
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** `2026-06-17` → `Jun 2026`. Deliberately coarse: a "9 weeks ago" style figure
+ *  would change every week and make consecutive builds differ for no reason. */
+function monthYear(iso: string) {
+	const [y, m] = iso.split('-');
+	return `${MONTHS[Number(m) - 1]} ${y}`;
+}
+
+/** `2026-08-18` → `Aug 18`. */
+function dayMonth(iso: string) {
+	const [, m, d] = iso.split('-');
+	return `${MONTHS[Number(m) - 1]} ${Number(d)}`;
+}
+
+const stats = [
+	{ value: String(log.mergedPrs), label: 'merged PRs' },
+	{ value: String(log.releases), label: 'signed releases' },
+	{ value: monthYear(log.since), label: 'first ship' },
+];
+---
+
+<section class="mt-10 border-t border-line pt-10">
+	<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Ship log</p>
+
+	<div class="mt-6 max-w-2xl">
+		<dl class="flex flex-wrap gap-x-12 gap-y-6">
+			{stats.map((s) => (
+				<div>
+					<dd class="font-serif text-4xl font-medium leading-none tracking-tight text-ink" style="font-optical-sizing: auto;">{s.value}</dd>
+					<dt class="mt-2 font-mono text-[12px] uppercase tracking-wider text-muted">{s.label}</dt>
+				</div>
+			))}
+		</dl>
+
+		<p class="mt-7 text-[14px] leading-relaxed text-muted">
+			Read off the public repo at build time. Every row links to the pull request that shipped it.
+		</p>
+
+		<ul class="mt-6 divide-y divide-line border-t border-line">
+			{/* The explicit {' '} separators below are load-bearing: the number, title
+			    and date are adjacent inline elements, so without them they collapse
+			    into one unbroken token for both the search indexer and a screen reader
+			    ("#25Replace the broken searchAug 18"). Flex ignores whitespace between
+			    items, so the layout is unaffected. */}
+			{log.recent.map((pr) => (
+				<li class="flex items-baseline gap-x-4 py-3">
+					<a href={`https://github.com/${REPO}/pull/${pr.number}`}
+						class="shrink-0 font-mono text-[12px] text-accent transition hover:underline"
+						rel="noopener">#{pr.number}</a>{' '}
+					<span class="flex-1 text-[14px] leading-snug text-ink">{pr.title}</span>{' '}
+					<span class="shrink-0 font-mono text-[12px] text-muted">{dayMonth(pr.mergedAt)}</span>
+				</li>
+			))}
+		</ul>
+
+		{stale && (
+			<p class="mt-4 font-mono text-[11px] text-muted" data-search-skip>
+				Snapshot from {monthYear(cached.refreshed)} — GitHub was unreachable at build time.
+			</p>
+		)}
+	</div>
+</section>

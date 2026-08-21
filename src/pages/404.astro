@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+
+const title = '404 — page not found';
+const description = "The page you're looking for doesn't exist on aleclay10.dev.";
+
+const links = [
+	{ href: '/', label: 'Home' },
+	{ href: '/investing/', label: '/investing' },
+	{ href: '/stack/', label: '/stack' },
+	{ href: '/now/', label: '/now' },
+	{ href: '/uses/', label: '/uses' },
+];
+---
+
+<Base title={title} description={description}>
+	<main class="flex flex-1 flex-col justify-center py-16">
+		<div class="reveal max-w-2xl">
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">404</p>
+			<h1
+				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
+				style="font-optical-sizing: auto;">
+				Nothing <span class="italic text-accent">here.</span>
+			</h1>
+			<p class="mt-7 text-[17px] leading-relaxed text-muted">
+				That page doesn't exist — moved, renamed, or never here to begin with. Try one
+				of these, or use search in the top bar.
+			</p>
+		</div>
+
+		<nav aria-label="Suggested pages" class="reveal reveal-2 mt-12 border-t border-line pt-10">
+			<ul class="flex flex-wrap gap-x-8 gap-y-3 font-mono text-[14px]">
+				{
+					links.map((l) => (
+						<li>
+							<a href={l.href} class="link">
+								{l.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</main>
+</Base>

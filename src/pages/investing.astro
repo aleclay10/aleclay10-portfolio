@@ -103,7 +103,9 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 									aria-hidden="true"
 								/>
 								<h2 class="font-serif text-[19px] font-medium text-ink">{v.label}</h2>
-								<span class="font-mono text-[12px] tabular-nums text-muted">
+								<span
+									data-thesis-weight={v.id}
+									class="font-mono text-[12px] tabular-nums text-muted">
 									{v.weight.toFixed(1)}%
 								</span>
 							</div>
@@ -270,6 +272,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 		marketState?: string;
 		portfolio?: { dayChangePct?: number };
 		quotes?: Record<string, Quote>;
+		vectors?: Record<string, number>;
 	};
 
 	const MAX_AGE_MS = 6 * 60 * 60 * 1000;
@@ -336,6 +339,14 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				if (typeof q.changePct === 'number') {
 					paint(document.querySelector<HTMLElement>(`[data-watch-change="${ticker}"]`), q.changePct);
 				}
+			}
+
+			// The theses cards show the same per-vector weight as the donut legend —
+			// keep them on the same live number rather than the static baseline, so
+			// the two never disagree on screen (2026-08-21 QA report, B1).
+			for (const [id, weight] of Object.entries(data.vectors ?? {})) {
+				const el = document.querySelector<HTMLElement>(`[data-thesis-weight="${id}"]`);
+				if (el) el.textContent = `${nf(weight, 1)}%`;
 			}
 
 			const asof = document.getElementById('price-asof');

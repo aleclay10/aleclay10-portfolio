@@ -98,7 +98,7 @@ export const holdings: Holding[] = [
 	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.15, kind: 'stock', note: 'Re-underwriting the Iridium acquisition — a capital-allocation question, not a price one.' },
 	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.47, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
 	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 2.63, kind: 'stock', note: 'Neoclouds — compute capacity as a rentable utility.' },
-	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.54, kind: 'stock', note: 'Best call in the book by percentage. Also still a one-share position — which the framework calls dabbling.' },
+	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.54, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position — which the framework calls dabbling.' },
 	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 1.99, kind: 'stock', note: 'Integrated model, silicon, and distribution.' },
 	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 1.41, kind: 'etf' },
 	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 0.94, kind: 'stock', note: 'Flagged for exit for ten weeks. Worst performer in the book.' },

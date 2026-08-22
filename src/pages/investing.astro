@@ -201,7 +201,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Watchlist</p>
 				<p class="font-mono text-[11px] text-muted">
 					{watchlist().filter((w) => !w.held).length === 0
-						? 'Everything I hold, tracked in one place — watch-only names to come'
+						? 'Everything I hold, tracked in one place'
 						: 'Held and watch-only, tracked together'}
 				</p>
 			</div>

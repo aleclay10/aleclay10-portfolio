@@ -1,16 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const title = 'Alec Layton — Autonomous agent systems';
+const title = 'Alec Layton · Autonomous agent systems';
 const description =
-	'Alec Layton — I build autonomous agent systems. Projects, writing, and experiments in AI infrastructure.';
+	'Alec Layton: I build autonomous agent systems. Projects, writing, and experiments in AI infrastructure.';
 
 const eras: { years: string; title: string; org: string; desc: string; tag: string; current?: boolean; href?: string; linkText?: string }[] = [
 	{
 		years: '2021',
 		title: 'Enterprise Architect Developer',
 		org: 'Valero Energy · San Antonio, TX',
-		desc: 'Fortune 500 internship in the SAP machine room — built the ABAP app that carried Accounts Payable for 90% of U.S. transactions.',
+		desc: 'Fortune 500 internship in the SAP machine room. Built the ABAP app that carried Accounts Payable for 90% of U.S. transactions.',
 		tag: 'Energy',
 	},
 	{
@@ -24,7 +24,7 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		years: 'Dec 2022 →',
 		title: 'Software Engineer',
 		org: 'Paycom · Irving, TX',
-		desc: 'Compliance-critical payroll systems moving hundreds of millions a year — multi-country tax API internationalization, and ETL automation that erased 100+ manual hours a quarter.',
+		desc: 'Compliance-critical payroll systems moving hundreds of millions a year: multi-country tax API internationalization, and ETL automation that erased 100+ manual hours a quarter.',
 		tag: 'FinTech',
 		current: true,
 	},
@@ -32,7 +32,7 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		years: '2025',
 		title: 'AI Gaming Assistant',
 		org: 'Independent',
-		desc: 'Full-stack desktop companion — React/TypeScript on a Rust (Tauri) core with FastAPI, Postgres, and Redis — routing AI inference to cloud or local models.',
+		desc: 'Full-stack desktop companion: React/TypeScript on a Rust (Tauri) core with FastAPI, Postgres, and Redis, routing AI inference to cloud or local models.',
 		tag: 'Product',
 		href: '/gaming-assistant/',
 		linkText: 'See the product →',
@@ -41,7 +41,7 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		years: '2026',
 		title: 'The agents era',
 		org: 'Kowalski · this site',
-		desc: 'Built an autonomous agent to run my day, then handed it the keys to this Mac mini. It ships pages here now — including its own.',
+		desc: 'Built an autonomous agent to run my day, then handed it the keys to this Mac mini. It ships pages here now, including its own.',
 		tag: 'AI agents',
 		current: true,
 		href: '/kowalski/',
@@ -50,9 +50,9 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 ];
 
 const projects: { n: string; name: string; desc: string; tag: string; href?: string }[] = [
-	{ n: '01', name: 'AI Gaming Assistant', desc: 'Desktop gaming companion — AI chat, play tracking, Discord in-game. Early access.', tag: 'Product', href: '/gaming-assistant/' },
-	{ n: '02', name: 'Kowalski', desc: 'Autonomous personal-ops agent — calendar, mail, vault, code.', tag: 'AI agents', href: '/kowalski/' },
-	{ n: '03', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel — signature-gated releases, zero open ports.', tag: 'Infra' },
+	{ n: '01', name: 'AI Gaming Assistant', desc: 'Desktop gaming companion: AI chat, play tracking, Discord in-game. Early access.', tag: 'Product', href: '/gaming-assistant/' },
+	{ n: '02', name: 'Kowalski', desc: 'Autonomous personal-ops agent: calendar, mail, vault, code.', tag: 'AI agents', href: '/kowalski/' },
+	{ n: '03', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel: signature-gated releases, zero open ports.', tag: 'Infra' },
 ];
 ---
 
@@ -75,7 +75,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 						I build<br />autonomous<br /><span class="italic text-accent">agent systems.</span>
 					</h1>
 					<p class="mt-7 max-w-md text-[17px] leading-relaxed text-muted">
-						I design and ship AI tooling and the infrastructure under it — including{' '}
+						I design and ship AI tooling and the infrastructure under it, including{' '}
 						<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
 						an autonomous agent that runs my day. This site is self-hosted
 						on a Mac mini in my apartment, served over a Cloudflare tunnel.

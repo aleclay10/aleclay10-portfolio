@@ -31,7 +31,7 @@ export const vectors: Vector[] = [
 		label: 'Compute',
 		slot: 1,
 		thesis:
-			'Compute scaling drives the next decade. Own the silicon, the power that feeds it, the infrastructure it runs on, and the defence software built atop it — not just one layer.',
+			'Compute scaling drives the next decade. Own the silicon, the power that feeds it, the infrastructure it runs on, and the defence software built atop it, not just one layer.',
 	},
 	{
 		id: 'robotics',
@@ -45,7 +45,7 @@ export const vectors: Vector[] = [
 		label: 'Index core',
 		slot: 3,
 		thesis:
-			'Broad-market and dividend index exposure. Deliberately boring — it is the counterweight that lets the rest of the book be concentrated.',
+			'Broad-market and dividend index exposure. Deliberately boring: it is the counterweight that lets the rest of the book be concentrated.',
 	},
 	{
 		id: 'space',
@@ -66,7 +66,7 @@ export const vectors: Vector[] = [
 		label: 'Off-thesis · exiting',
 		slot: 6,
 		thesis:
-			'Positions that map to no vector. Flagged for exit by the framework and still held — the gap between analysis and execution, left visible on purpose.',
+			'Positions that map to no vector. Flagged for exit by the framework and still held: the gap between analysis and execution, left visible on purpose.',
 	},
 ];
 
@@ -86,19 +86,19 @@ export type Holding = {
 // is explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
 	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 15.88, kind: 'stock', note: 'The compute layer itself. Largest position.' },
-	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 14.15, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026 — under review, not sold.' },
-	{ ticker: 'CRM', name: 'Salesforce', vector: 'offthesis', weight: 11.09, kind: 'stock', note: 'Exit decided. Correlated with my salary and RSUs — the same seat-based SaaS bet three times.' },
+	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 14.15, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
+	{ ticker: 'CRM', name: 'Salesforce', vector: 'offthesis', weight: 11.09, kind: 'stock', note: 'Exit decided. Correlated with my salary and RSUs: the same seat-based SaaS bet three times.' },
 	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 8.61, kind: 'etf' },
 	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 7.38, kind: 'stock', note: 'Bought post-IPO on launch cadence. Down hard; thesis unchanged.' },
 	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 6.16, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
-	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.25, kind: 'stock', note: 'Optical interconnect — the plumbing between accelerators.' },
+	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.25, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
 	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 5.08, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
 	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 4.43, kind: 'etf' },
 	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 4.37, kind: 'crypto' },
-	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.15, kind: 'stock', note: 'Re-underwriting the Iridium acquisition — a capital-allocation question, not a price one.' },
+	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.15, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
 	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.47, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
-	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 2.63, kind: 'stock', note: 'Neoclouds — compute capacity as a rentable utility.' },
-	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.54, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position — which the framework calls dabbling.' },
+	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 2.63, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
+	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.54, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
 	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 1.99, kind: 'stock', note: 'Integrated model, silicon, and distribution.' },
 	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 1.41, kind: 'etf' },
 	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 0.94, kind: 'stock', note: 'Flagged for exit for ten weeks. Worst performer in the book.' },
@@ -146,12 +146,12 @@ export const principles: { rule: string; detail: string }[] = [
 	{
 		rule: 'Concentration is the strategy, not an accident',
 		detail:
-			'The indexed retirement account is the safety bucket. That is what earns this book the right to be concentrated — it is one half of a barbell, not an unbalanced portfolio.',
+			'The indexed retirement account is the safety bucket. That is what earns this book the right to be concentrated: it is one half of a barbell, not an unbalanced portfolio.',
 	},
 	{
 		rule: 'Sell on a broken thesis, never on a red number',
 		detail:
-			'Price moves are not information. A missed shipping checkpoint, a change in capital allocation, or a correlation I did not notice — those are information.',
+			'Price moves are not information. A missed shipping checkpoint, a change in capital allocation, or a correlation I did not notice: those are information.',
 	},
 	{
 		rule: 'Ten years, and I mean it',
@@ -161,7 +161,7 @@ export const principles: { rule: string; detail: string }[] = [
 	{
 		rule: 'Watch what kills the thesis, not the ticker',
 		detail:
-			'Structural risks — capex pauses, GPU oversupply, regulatory hits to defence AI — get tracked. Daily volatility does not.',
+			'Structural risks (capex pauses, GPU oversupply, regulatory hits to defence AI) get tracked. Daily volatility does not.',
 	},
 	{
 		rule: 'Correlation hides in your paycheque',

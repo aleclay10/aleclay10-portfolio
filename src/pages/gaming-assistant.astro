@@ -1,9 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const title = 'AI Gaming Assistant — early access';
+const title = 'AI Gaming Assistant · early access';
 const description =
-	'A lightweight desktop companion for gamers — AI chat with play-history context, session tracking, and Discord without alt-tabbing. Early access.';
+	'A lightweight desktop companion for gamers: AI chat with play-history context, session tracking, and Discord without alt-tabbing. Early access.';
 
 // Waitlist form endpoint (Buttondown/Formspree). Empty = fall back to a mailto
 // CTA so the page never ships a dead form. Set once Alec creates the account.
@@ -12,7 +12,7 @@ const WAITLIST_ACTION = '';
 const features = [
 	{
 		label: 'AI chat that knows your games',
-		desc: 'Streamed answers with your play history as context — builds, strats, lore, whatever the session calls for.',
+		desc: 'Streamed answers with your play history as context: builds, strats, lore, whatever the session calls for.',
 	},
 	{
 		label: 'Session tracking',
@@ -20,7 +20,7 @@ const features = [
 	},
 	{
 		label: 'Discord, without alt-tab',
-		desc: 'Read and answer DMs from inside the companion — no more dropping out of a match to check your phone.',
+		desc: 'Read and answer DMs from inside the companion. No more dropping out of a match to check your phone.',
 	},
 	{
 		label: 'Content briefings',
@@ -37,7 +37,7 @@ const features = [
 ];
 
 const engineering = [
-	'Tauri 2 + Rust core — megabytes on disk, not an Electron heavyweight',
+	'Tauri 2 + Rust core: megabytes on disk, not an Electron heavyweight',
 	'Local-first SQLite; cloud sync is opt-in, with retry and token refresh',
 	'Inference chain: Groq → Together AI → your local Ollama, your choice',
 	'238 automated tests across Rust, Python, and TypeScript',
@@ -74,7 +74,7 @@ const tiers = [
 				</h1>
 				<p class="mt-7 text-[17px] leading-relaxed text-muted">
 					AI Gaming Assistant is a lightweight desktop companion that lives alongside
-					your games — it learns what you play, keeps you connected, and handles
+					your games. It learns what you play, keeps you connected, and handles
 					everything you'd otherwise reach for your phone to do mid-session.
 				</p>
 				<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
@@ -134,7 +134,7 @@ const tiers = [
 			<div>
 				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Built like it means it</p>
 				<p class="mt-4 max-w-xs text-[14px] leading-relaxed text-muted">
-					The same engineering bar as everything else on this site — small,
+					The same engineering bar as everything else on this site: small,
 					fast, local-first, and tested.
 				</p>
 			</div>
@@ -171,7 +171,7 @@ const tiers = [
 					</div>
 				))}
 			</div>
-			<p class="mt-4 font-mono text-[12px] text-muted">Billing will run in-app through Stripe at launch — no card needed for early access now.</p>
+			<p class="mt-4 font-mono text-[12px] text-muted">Billing will run in-app through Stripe at launch; no card needed for early access now.</p>
 		</section>
 
 		<!-- Privacy -->
@@ -180,10 +180,10 @@ const tiers = [
 			<p class="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted">
 				Local-first by design: your play history lives on your machine and syncs only
 				if you opt in. On the default cloud inference tiers, whatever you send the AI
-				chat — including play history used as context — passes through that
+				chat (including play history used as context) passes through that
 				provider (Groq or Together AI) to generate a response; switch to the local
 				Ollama option to keep inference fully on-device. Anything the app collects is
-				consent-based and spelled out at onboarding — no dark patterns, no selling
+				consent-based and spelled out at onboarding: no dark patterns, no selling
 				data.
 			</p>
 		</section>
@@ -195,8 +195,8 @@ const tiers = [
 			<p class="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
 				Windows and macOS builds land soon.{' '}
 				{WAITLIST_ACTION
-					? "Join the list and you'll hear the moment the doors open — nothing else, no spam."
-					: "Email me and I'll hear from you the moment the doors open — no spam, no list."}
+					? "Join the list and you'll hear the moment the doors open. Nothing else, no spam."
+					: "Email me and I'll hear from you the moment the doors open. No spam, no list."}
 			</p>
 			{WAITLIST_ACTION ? (
 				<form method="post" action={WAITLIST_ACTION} class="mt-6 flex max-w-md flex-wrap gap-3">

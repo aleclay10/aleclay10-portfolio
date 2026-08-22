@@ -43,7 +43,7 @@ if (!hasCard) {
 const ogImage = new URL(hasCard ? `/og/${slug}.png` : '/og.png', Astro.site).href;
 // The old value was hardcoded to the homepage tagline and so was wrong on seven
 // of eight pages — an accessibility string that described the wrong image.
-const ogImageAlt = hasCard ? title : 'Alec Layton — I build autonomous agent systems';
+const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent systems';
 ---
 
 <html lang="en">

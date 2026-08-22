@@ -30,7 +30,7 @@ import {
 type Segment = { node: Text; start: number; end: number };
 
 /**
- * A match may span several text nodes — `— including ` followed by
+ * A match may span several text nodes — `, including ` followed by
  * `<a>Kowalski</a>` is one phrase across two. A single `Range.surroundContents()`
  * over that would throw, and `extractContents()` would tear the `<a>` in half, so
  * each contiguous run inside one text node gets its own `<mark>` and they are tied

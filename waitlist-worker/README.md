@@ -44,9 +44,19 @@ result. Do not add anything that breaks the bare `<form>` POST.
 - **Duplicate submissions upsert.** `ON CONFLICT(email)` refreshes name and notes; the
   response is byte-identical whether or not the address was already present, because a
   different answer for a known address is an email-enumeration oracle.
+- **Notes can be replaced but never cleared via the form.** `COALESCE` keeps the stored
+  notes when a resubmission leaves the field blank, because a plain form cannot tell
+  "left blank" apart from "wants it erased", and wiping notes on a casual resubmit is
+  the worse failure. Clearing someone's notes is a manual `UPDATE`.
 - **`created_at`, `status` and `unsubscribe_token` are never touched on conflict** — so
   resubmitting the form cannot silently re-opt-in someone who unsubscribed.
-- **Honeypot** (`company`): filled ⇒ report success, write nothing.
+- **Honeypot** (`gamer_tag`): filled ⇒ report success, write nothing, `console.warn` a
+  PII-free line so `wrangler tail` can measure trap frequency. Renamed from `company`,
+  which is in Chrome's autofill heuristics; the Worker still accepts `company` as a
+  honeypot until the site release after the rename is live, then that name gets dropped.
+- **No-JS failures redirect by class**: `?e=invalid`, `?e=rate` or `?e=server`, each with
+  a matching `#w-err-*` fragment that the page reveals via CSS `:target`. Never merge
+  these into one message.
 - **`country` is stored, not the IP.** Enough to spot abuse, without a PII-grade
   identifier per visitor.
 - **`unsubscribe_token` is minted at insert**, so every row is unsubscribable before a

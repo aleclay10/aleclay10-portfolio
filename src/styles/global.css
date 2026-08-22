@@ -59,6 +59,47 @@ html {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Cross-document view transitions.
+
+   Native CSS, deliberately NOT Astro's <ClientRouter />. The router turns every
+   navigation into a DOM swap, which would cost ~7 KB of JS and break three
+   things that currently work by parsing once: the theme toggle and mobile-nav
+   listeners (Base.astro), search-boot, and the anti-FOUC .dark class that
+   public/theme-init.js sets in <head> — the last of those is the known
+   flash-on-navigate bug, and fixing it means re-applying on astro:after-swap.
+   None of that is worth a cross-fade on a static site whose bar is ~0 JS.
+
+   This rule is the entire feature. Chrome/Edge and Safari 18+ animate;
+   Firefox ignores it and navigates exactly as it does today. No CSP surface,
+   because there is no script.
+
+   Only real page-to-page moves transition — the /#timeline and /#projects nav
+   links are same-document and are unaffected.
+   --------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+/* Opt out wholesale rather than zeroing the pseudo-element animations: setting
+   `animation: none` on ::view-transition-old/new leaves both snapshots stacked
+   and painting. `navigation: none` skips the transition altogether. */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* The header is identical on every page, so letting it ride the root snapshot
+   makes it cross-fade with itself — a faint flicker on an element that should
+   read as fixed chrome. Naming it lifts it out of the root transition and holds
+   it steady while the content underneath fades. Safe to name because Base.astro
+   renders exactly one <header>, and a duplicate name silently kills the whole
+   transition. */
+header[data-vt-header] {
+  view-transition-name: site-header;
+}
+
 /* Hide the scrollbar on snap rails (timeline carousel) without killing scroll */
 @utility no-scrollbar {
   scrollbar-width: none;

@@ -7,7 +7,7 @@
  *
  * Reads `dist/search-index.json` (built by `scripts/search-index-integration.mjs`)
  * and reports *every* occurrence of the query across the site, with surrounding
- * context, grouped by page — JetBrains "Find in Files", not a ranked one-excerpt-
+ * context, grouped by page - JetBrains "Find in Files", not a ranked one-excerpt-
  * per-page result list.
  *
  * The previous implementation loaded Pagefind, whose WASM the production CSP blocks
@@ -48,7 +48,7 @@ type Row = {
 	hit: string;
 	post: string;
 	/** Document position within the page, so merged AND-fallback rows can be put
-	 *  back into reading order. Rows are never sorted by relevance — shuffling them
+	 *  back into reading order. Rows are never sorted by relevance - shuffling them
 	 *  destroys the map-of-the-page meaning that makes find-in-files useful. */
 	order: number;
 };
@@ -73,7 +73,7 @@ const input = document.getElementById('palette-input') as HTMLInputElement | nul
 const results = document.getElementById('palette-results');
 const status = document.getElementById('palette-status');
 
-/** Folded block text, memoised per index load — folding 250 blocks per keystroke is
+/** Folded block text, memoised per index load - folding 250 blocks per keystroke is
  *  cheap but pointless when the corpus never changes. */
 const foldedText = new WeakMap<IndexBlock, string>();
 
@@ -344,7 +344,7 @@ function update() {
 	let groups = searchAll(q.phrase, raw);
 	let notice = '';
 
-	// Phrase first — that is the find-in-files contract. Only when it finds nothing
+	// Phrase first - that is the find-in-files contract. Only when it finds nothing
 	// do we relax to AND-of-terms, and then we say so rather than quietly changing
 	// what the results mean.
 	if (!groups.length && q.canFallback) {
@@ -397,7 +397,7 @@ function update() {
 
 /**
  * Opening is owned by `search-boot.ts`, which is what dynamically imports this
- * module — by the time this runs, the keystroke or click that asked for it is long
+ * module - by the time this runs, the keystroke or click that asked for it is long
  * since handled. Everything *while* the palette is open is owned here.
  */
 export function open() {
@@ -419,7 +419,7 @@ function close() {
 	if (lastFocus instanceof HTMLElement) {
 		lastFocus.focus();
 		// Opening from the mobile nav closes that panel, so the element we came from
-		// can be display:none by now and silently refuse focus — which would drop the
+		// can be display:none by now and silently refuse focus - which would drop the
 		// user at the top of the document. Fall back to whichever trigger is visible.
 		if (document.activeElement !== lastFocus) {
 			[...document.querySelectorAll<HTMLElement>('#cmdk, #nav-toggle')]
@@ -442,11 +442,11 @@ palette?.addEventListener('click', (e) => {
 });
 
 document.addEventListener('keydown', (e) => {
-	// Only ever handles an *open* palette. Opening — ⌘K, `/`, the trigger button —
+	// Only ever handles an *open* palette. Opening - ⌘K, `/`, the trigger button -
 	// belongs to search-boot.ts, because until it happens this module is not loaded.
 	if (!palette || palette.hidden) return;
 
-	// Bare `e.key === 'k'` misses with Caps Lock on — the old palette's quietest bug.
+	// Bare `e.key === 'k'` misses with Caps Lock on - the old palette's quietest bug.
 	if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 		e.preventDefault();
 		close();
@@ -460,7 +460,7 @@ document.addEventListener('keydown', (e) => {
 	}
 
 	// Focus stays in the input and `aria-activedescendant` points at the selected
-	// option — the standard combobox/listbox pattern, and its own focus trap.
+	// option - the standard combobox/listbox pattern, and its own focus trap.
 	if (e.key === 'Tab') {
 		e.preventDefault();
 		input?.focus();

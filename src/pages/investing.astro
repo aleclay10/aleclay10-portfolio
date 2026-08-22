@@ -40,7 +40,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 			</p>
 		</div>
 
-		<!-- Day performance — a stat tile, not a chart. Status colour always ships
+		<!-- Day performance - a stat tile, not a chart. Status colour always ships
 		     with an explicit sign so it never depends on hue alone. -->
 		<section class="reveal reveal-2 mt-12 border-t border-line pt-10">
 			<div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
@@ -89,7 +89,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 			</div>
 		</section>
 
-		<!-- The thesis behind each vector — the actual point of the page -->
+		<!-- The thesis behind each vector - the actual point of the page -->
 		<section class="mt-10 border-t border-line pt-10">
 			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The theses</p>
 			<div class="mt-6 grid max-w-4xl gap-x-10 gap-y-7 sm:grid-cols-2">
@@ -263,7 +263,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 </Base>
 
 <script>
-	// Live prices from /prices.json — same-origin, written by a scheduled job on the
+	// Live prices from /prices.json - same-origin, written by a scheduled job on the
 	// host. Progressive enhancement: without it the table shows em-dashes and the
 	// server-rendered baseline weights, which is a coherent page on its own.
 	type Quote = { price?: number; changePct?: number; weight?: number };
@@ -331,7 +331,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 					const el = document.querySelector<HTMLElement>(`[data-weight="${ticker}"]`);
 					if (el) el.textContent = `${nf(q.weight)}%`;
 				}
-				// Watchlist grid mirrors the same quotes — held and watch-only alike.
+				// Watchlist grid mirrors the same quotes - held and watch-only alike.
 				if (typeof q.price === 'number') {
 					const el = document.querySelector<HTMLElement>(`[data-watch-price="${ticker}"]`);
 					if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
@@ -341,7 +341,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				}
 			}
 
-			// The theses cards show the same per-vector weight as the donut legend —
+			// The theses cards show the same per-vector weight as the donut legend -
 			// keep them on the same live number rather than the static baseline, so
 			// the two never disagree on screen (2026-08-21 QA report, B1).
 			for (const [id, weight] of Object.entries(data.vectors ?? {})) {
@@ -352,7 +352,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 			const asof = document.getElementById('price-asof');
 			if (asof) {
 				const t = new Date(gen);
-				// Say "checked" rather than "live" when the market is shut — the prices are
+				// Say "checked" rather than "live" when the market is shut - the prices are
 				// real but they are the last close, not a live tick.
 				asof.textContent =
 					data.marketState === 'market open'

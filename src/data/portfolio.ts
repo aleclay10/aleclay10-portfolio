@@ -1,7 +1,7 @@
 // Portfolio composition for /investing.
 //
 // ⚠️ THIS FILE IS IN A PUBLIC REPO. It must contain NO share counts, NO dollar
-// values, and NO cost basis — only allocation percentages, which Alec has agreed
+// values, and NO cost basis - only allocation percentages, which Alec has agreed
 // to publish. Share counts live in ~/portfolio/holdings.json on the mini (mode
 // 600, never committed); fetch-prices.mjs reads them there to compute live
 // weights and publishes only percentages to www/prices.json.
@@ -15,7 +15,7 @@ export type VectorId = 'compute' | 'robotics' | 'space' | 'index' | 'crypto' | '
 export type Vector = {
 	id: VectorId;
 	label: string;
-	/** Categorical palette slot (1-indexed) — see validated palette in the page's <style>. */
+	/** Categorical palette slot (1-indexed) - see validated palette in the page's <style>. */
 	slot: number;
 	/** The thesis in one line. This is the "why" the page exists to show. */
 	thesis: string;
@@ -23,7 +23,7 @@ export type Vector = {
 
 // Order is fixed and meaningful: conviction vectors first by size, then the
 // index core, then crypto, then the book's own failures last. Do not reorder to
-// make it look tidier — palette slots are assigned by this order and the slot
+// make it look tidier - palette slots are assigned by this order and the slot
 // ordering is the CVD-safety mechanism.
 export const vectors: Vector[] = [
 	{
@@ -74,7 +74,7 @@ export type Holding = {
 	ticker: string;
 	name: string;
 	vector: VectorId;
-	/** % of the brokerage + crypto book. Baseline snapshot — see note above. */
+	/** % of the brokerage + crypto book. Baseline snapshot - see note above. */
 	weight: number;
 	kind: 'stock' | 'etf' | 'crypto';
 	/** Optional one-line note shown in the table. Reasoning, not performance. */
@@ -82,7 +82,7 @@ export type Holding = {
 };
 
 // Baseline as of 2026-07-29 brokerage marks. Excludes $6 of uninvested brokerage
-// cash and everything outside the taxable book (retirement, savings) — the page
+// cash and everything outside the taxable book (retirement, savings) - the page
 // is explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
 	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 15.88, kind: 'stock', note: 'The compute layer itself. Largest position.' },
@@ -106,7 +106,7 @@ export const holdings: Holding[] = [
 	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.07, kind: 'crypto' },
 ];
 
-// Watch-only names: tracked, no position. Seeded empty — the watchlist currently
+// Watch-only names: tracked, no position. Seeded empty - the watchlist currently
 // shows the held book, which is where Alec asked to start. Add entries here as
 // genuine watch-only ideas appear and they will render alongside the held names
 // with a "watching" marker instead of "held". Anything added here must ALSO be
@@ -115,7 +115,7 @@ export const holdings: Holding[] = [
 export const watching: { ticker: string; name: string; why?: string }[] = [];
 
 /**
- * Everything on the radar — held positions plus watch-only names.
+ * Everything on the radar - held positions plus watch-only names.
  * Rendered as a compact price grid, deliberately distinct from the positions
  * table (which carries weights, vectors and reasoning).
  */
@@ -126,7 +126,7 @@ export function watchlist(): { ticker: string; name: string; held: boolean; why?
 	];
 }
 
-/** Vector totals from the per-asset baseline — one source of truth. */
+/** Vector totals from the per-asset baseline - one source of truth. */
 export function vectorWeights(source: { ticker: string; weight: number }[] = holdings) {
 	return vectors.map((v) => ({
 		...v,
@@ -136,7 +136,7 @@ export function vectorWeights(source: { ticker: string; weight: number }[] = hol
 	}));
 }
 
-/** Principles shown alongside the chart — the philosophy, stated plainly. */
+/** Principles shown alongside the chart - the philosophy, stated plainly. */
 export const principles: { rule: string; detail: string }[] = [
 	{
 		rule: 'Pick a vector, not fifteen stories',

@@ -7,13 +7,13 @@
  * The ordinal is assigned at build time by `scripts/search-index-integration.mjs`
  * and recomputed here against the live DOM. Both sides call the same
  * `extractBlocks` / `blockTextMap` / `fold` / `findMatches` out of
- * `src/lib/search-core.js` — that shared walker is the only reason `&i=3` reliably
+ * `src/lib/search-core.js` - that shared walker is the only reason `&i=3` reliably
  * means the same occurrence in both places.
  *
  * Wrapping uses `Range` + `<mark>` rather than the CSS Custom Highlight API:
  * `::highlight()` cannot do `border-radius`, so it could not reproduce the existing
  * `mark` style and would need a second styling path plus feature detection. Mutating
- * the DOM is safe here — the site ships zero framework islands and zero `client:*`
+ * the DOM is safe here - the site ships zero framework islands and zero `client:*`
  * directives, so nothing else owns these nodes.
  */
 
@@ -30,7 +30,7 @@ import {
 type Segment = { node: Text; start: number; end: number };
 
 /**
- * A match may span several text nodes — `, including ` followed by
+ * A match may span several text nodes - `, including ` followed by
  * `<a>Kowalski</a>` is one phrase across two. A single `Range.surroundContents()`
  * over that would throw, and `extractContents()` would tear the `<a>` in half, so
  * each contiguous run inside one text node gets its own `<mark>` and they are tied
@@ -44,11 +44,11 @@ function segmentsFor(
 	const out: Segment[] = [];
 	for (let i = start; i < end; i++) {
 		const origin = map[i];
-		if (!origin) continue; // synthetic <br> space — nothing to wrap
+		if (!origin) continue; // synthetic <br> space - nothing to wrap
 		const last = out[out.length - 1];
 		if (last && last.node === origin.node) {
 			// Offsets are strictly increasing within a text node, so anything else is
-			// a map invariant violation — drop it rather than wrap a range twice.
+			// a map invariant violation - drop it rather than wrap a range twice.
 			if (origin.offset < last.end) continue;
 			if (origin.offset === last.end) {
 				last.end = origin.offset + 1;

@@ -4,16 +4,16 @@
  *
  * THE CORRECTNESS HINGE. Three consumers share this module:
  *
- *   1. scripts/search-index-integration.mjs — walks the built HTML in `dist/` under
+ *   1. scripts/search-index-integration.mjs - walks the built HTML in `dist/` under
  *      Node (via linkedom) at build time and writes `dist/search-index.json`.
- *   2. src/scripts/search-palette.ts — matches against that JSON in the ⌘K palette.
- *   3. src/scripts/search-highlight.ts — re-walks the *live* DOM on `?q=` arrival
+ *   2. src/scripts/search-palette.ts - matches against that JSON in the ⌘K palette.
+ *   3. src/scripts/search-highlight.ts - re-walks the *live* DOM on `?q=` arrival
  *      and highlights the requested occurrence.
  *
  * (1) assigns each occurrence an ordinal; (3) recomputes that ordinal from scratch.
  * If the two walkers can ever disagree about which blocks exist, in what order, or
  * what text they hold, every deep link becomes a coin flip. So there is exactly one
- * walker — this one — and it must run unmodified in both environments. That is why
+ * walker - this one - and it must run unmodified in both environments. That is why
  * it only uses DOM APIs linkedom actually implements (`matches`, `closest`,
  * `children`, `childNodes`, `classList`, `previousElementSibling`, `parentElement`)
  * and why the block-dropping and dedupe rules live *here* rather than in the
@@ -27,7 +27,7 @@
  * ## Extraction contract
  *
  * - **Scope is the page's `<main>`.** Nav, header, footer and `#palette` all live
- *   outside it in `Base.astro`, so chrome exclusion is structural — no opt-in
+ *   outside it in `Base.astro`, so chrome exclusion is structural - no opt-in
  *   attribute, nothing to forget on a new page.
  * - **SKIP_SELECTOR** removes non-content and the `/investing` live-price cells.
  *   Those hold a literal `–` at build time and are rewritten by that page's own
@@ -42,7 +42,7 @@
  * - **Text** is the concatenation of descendant text nodes in order, whitespace
  *   collapsed and trimmed, with a synthetic space at every `<br>` and at the edge of
  *   every non-inline element. Synthesising those spaces is only safe because it
- *   happens *here*, in the walker both consumers share — the two sides insert the
+ *   happens *here*, in the walker both consumers share - the two sides insert the
  *   same characters at the same offsets, so ordinals still agree, and the synthetic
  *   characters carry a null origin so the highlighter skips over them. Word
  *   boundaries lost between two *inline* elements are not recoverable structurally
@@ -83,7 +83,7 @@ export const BLOCK_SELECTOR =
 
 /**
  * Elements that are inline by default, i.e. the ones whose boundaries are *not* word
- * boundaries. Everything else contributes a space on the way in and out — see
+ * boundaries. Everything else contributes a space on the way in and out - see
  * `blockTextMap`.
  */
 const INLINE_TAGS = new Set([
@@ -95,8 +95,8 @@ const INLINE_TAGS = new Set([
 /**
  * The site labels its sections with styled `<p>` eyebrows rather than headings
  * ("Colophon", "The pipeline", "Security posture"). They are identified by the two
- * utility classes every one of them carries. Fragile by construction — see R1 in the
- * plan — so `[data-search-section]` overrides it and an unlabelled block warns.
+ * utility classes every one of them carries. Fragile by construction - see R1 in the
+ * plan - so `[data-search-section]` overrides it and an unlabelled block warns.
  */
 const EYEBROW_CLASSES = ['uppercase', 'tracking-[0.2em]'];
 
@@ -119,7 +119,7 @@ export const NAV_ORDER = [
 /** The most occurrences reported for a single page. */
 export const MAX_MATCHES_PER_PAGE = 200;
 
-/** Queries shorter than this are ignored — every page matches "a". */
+/** Queries shorter than this are ignored - every page matches "a". */
 export const MIN_QUERY = 2;
 
 /** `\s` already covers U+00A0; U+200B does not match it and renders as nothing. */
@@ -162,7 +162,7 @@ export function isHeading(el) {
  * A block's text plus a per-character map back to the text nodes it came from.
  *
  * The map is what lets the arrival highlighter wrap a phrase that spans a text-node
- * boundary (`, including ` + `<a>Kowalski</a>`) — and, more importantly, lets it
+ * boundary (`, including ` + `<a>Kowalski</a>`) - and, more importantly, lets it
  * *count* that phrase the same way the indexer counted it.
  *
  * @typedef {{ node: Text, offset: number } | null} CharOrigin
@@ -182,7 +182,7 @@ export function blockTextMap(el) {
 				const child_ = /** @type {Element} */ (/** @type {unknown} */ (child));
 				if (isSkipped(child_)) continue;
 				// A <br>, or the edge of any non-inline element, is a word boundary in the
-				// rendered page but contributes no text node — so synthesise one. Without
+				// rendered page but contributes no text node - so synthesise one. Without
 				// this an atomic `dl > div` indexes as "LanguagesPython, C, C++" and a
 				// table row as "AssetVectorWeightPriceToday".
 				//
@@ -329,7 +329,7 @@ function hasBlockDescendant(el) {
  * Both the block-length floor and the within-page dedupe are applied here rather
  * than in the indexer: they change which ordinal each occurrence gets, so both
  * consumers must apply them identically or deep links drift. Dedupe is per page
- * only — "Cloudflare Tunnel" legitimately appears on three different pages.
+ * only - "Cloudflare Tunnel" legitimately appears on three different pages.
  *
  * @param {Element} root Normally the page's `<main>`.
  * @returns {Block[]}
@@ -369,7 +369,7 @@ export function extractBlocks(root) {
  * `fold(s).length === s.length` is load-bearing: the context window and the
  * highlighter both index the *unfolded* string with offsets found in the folded one.
  * So folding runs per code point and only substitutes when the replacement is the
- * same length — `é → e` (single combining mark stripped) applies, `ﬁ` and `ß` fall
+ * same length - `é → e` (single combining mark stripped) applies, `ﬁ` and `ß` fall
  * through unchanged. Typographic quotes and dashes are normalised 1:1 so a visitor
  * typing `that's` matches the page's rendered `that’s`.
  *
@@ -391,7 +391,10 @@ export function fold(s) {
 			out += '"';
 			continue;
 		}
-		if (ch === '–' || ch === '—' || ch === '−') {
+		// en dash / em dash / minus sign, by code point so no build step can
+		// fold them back into literal glyphs in the shipped chunk
+		const code = ch.codePointAt(0);
+		if (code === 0x2013 || code === 0x2014 || code === 0x2212) {
 			out += '-';
 			continue;
 		}
@@ -434,7 +437,7 @@ export function parseQuery(raw) {
 
 /**
  * Every occurrence of `needle` in `hay`, including overlapping ones (advance by
- * `start + 1`, not `start + needle.length` — "aaa" contains two "aa").
+ * `start + 1`, not `start + needle.length` - "aaa" contains two "aa").
  *
  * Both arguments must already be folded, and folding is offset-preserving, so the
  * returned offsets index the unfolded string too.

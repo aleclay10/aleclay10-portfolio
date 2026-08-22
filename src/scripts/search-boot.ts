@@ -7,7 +7,7 @@
  *   - "the visitor wants to search" → pull in `search-palette.ts`, which with its
  *     share of `search-core.js` is ~10 KB. Loading that eagerly would make search
  *     the single largest thing this site ships, on every page, for a feature most
- *     visitors never open — the wrong trade at a stated bar of ~0 JS.
+ *     visitors never open - the wrong trade at a stated bar of ~0 JS.
  *   - "this visitor arrived from a search result" → pull in `search-highlight.ts`.
  *
  * Both live here rather than in two `<script>` tags so the preload helper they share
@@ -20,7 +20,7 @@ if (new URLSearchParams(location.search).has('q')) void import('./search-highlig
 const palette = document.getElementById('palette');
 // Two triggers: the desktop header button, and the item inside the mobile
 // disclosure nav (the header button is `sm:flex`, so below `sm` that panel is the
-// only way in — there is no keyboard to press ⌘K on).
+// only way in - there is no keyboard to press ⌘K on).
 const triggers = ['cmdk', 'cmdk-mobile']
 	.map((id) => document.getElementById(id))
 	.filter((el): el is HTMLElement => el !== null);
@@ -54,7 +54,7 @@ for (const trigger of triggers) {
 
 document.addEventListener('keydown', (e) => {
 	// Only opening lives here. Once the palette is open the engine's own handler has
-	// the keyboard, including ⌘K to close — so bail the moment it is visible.
+	// the keyboard, including ⌘K to close - so bail the moment it is visible.
 	if (!palette || !palette.hidden) return;
 
 	// `e.key.toLowerCase()` rather than a bare `=== 'k'`: with Caps Lock on, the old

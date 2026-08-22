@@ -6,8 +6,8 @@ import { fetchShipLog, REPO } from '../lib/ship-log.mjs';
  * Release velocity on this repo, fetched at build time with the committed
  * snapshot as a fallback.
  *
- * Never fails the build. GitHub being unreachable — or the unauthenticated
- * 60/hr limit being exhausted by a run of local builds — degrades to slightly
+ * Never fails the build. GitHub being unreachable - or the unauthenticated
+ * 60/hr limit being exhausted by a run of local builds - degrades to slightly
  * stale numbers, which is strictly better than blocking a release. Refresh the
  * fallback with `npm run ship-log`.
  */
@@ -21,7 +21,7 @@ try {
 } catch (err) {
 	// Named, not swallowed: a bare catch is what kept the Pagefind outage
 	// invisible for weeks. The build log should say which failure happened.
-	console.warn(`[ship-log] live fetch failed (${err instanceof Error ? err.message : err}) — using committed snapshot from ${cached.refreshed}`);
+	console.warn(`[ship-log] live fetch failed (${err instanceof Error ? err.message : err}) - using committed snapshot from ${cached.refreshed}`);
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

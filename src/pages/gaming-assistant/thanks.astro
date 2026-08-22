@@ -1,0 +1,50 @@
+---
+// Confirmation page for an early-access signup submitted WITHOUT JavaScript.
+//
+// The Worker answers a native form POST with a 303 to this route. It exists as a
+// real Astro page rather than an HTML string returned by the Worker so the no-JS
+// path lands somewhere fully site-styled instead of on a bare white page.
+//
+// Visitors with JavaScript never get here — the enhanced path swaps in an inline
+// confirmation without navigating. Hence noindex, plus data-search-skip so a ⌘K
+// search for "early access" cannot surface "You're on the list" at someone who
+// is not. Note that isSkipped() in search-core.js is `el.matches()`, not
+// `closest()`, so the attribute does NOT cascade — every indexable block below
+// carries it individually. Add it to anything new here too.
+import Base from '../../layouts/Base.astro';
+
+const title = 'You’re on the list · AI Gaming Assistant';
+const description = 'Your early-access request for the AI Gaming Assistant was received.';
+---
+
+<Base title={title} description={description} noindex>
+	<main class="flex flex-1 flex-col py-16">
+		<div class="max-w-2xl">
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent" data-search-skip>
+				Early access · request received
+			</p>
+			<h1
+				data-search-skip
+				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
+				style="font-optical-sizing: auto;"
+			>
+				You’re on<br /><span class="italic text-accent">the list.</span>
+			</h1>
+			<p class="mt-7 text-[17px] leading-relaxed text-muted" data-search-skip>
+				That’s all I needed. I’ll email you the moment there’s a build worth your
+				time on Windows or macOS, and nothing before then.
+			</p>
+			<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
+				<a
+					href="/gaming-assistant"
+					class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90"
+				>
+					Back to the product
+				</a>{' '}
+				<a href="/" class="px-2 py-2.5 text-muted transition hover:text-ink">
+					Or see the rest of the site ↗
+				</a>
+			</div>
+		</div>
+	</main>
+</Base>

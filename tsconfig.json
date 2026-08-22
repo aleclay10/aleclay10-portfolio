@@ -1,5 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "comment": "waitlist-worker is a separate package with its own tsconfig and Cloudflare Workers types (D1Database, ExportedHandler). Type-checking it against the site's browser/Astro lib is meaningless and errors. Check it with `npm --prefix waitlist-worker run typecheck`.",
+  "exclude": ["dist", "waitlist-worker"]
 }

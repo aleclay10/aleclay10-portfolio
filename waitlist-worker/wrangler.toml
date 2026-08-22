@@ -1,0 +1,54 @@
+# Waitlist API for aleclay10.dev.
+#
+# NOTE: no `account_id` here on purpose — this repo is public. Pass it via the
+# CLOUDFLARE_ACCOUNT_ID env var at deploy time. The D1 `database_id` below is an
+# opaque identifier that is useless without an API token, so it is fine committed.
+#
+# This Worker deploys via `wrangler deploy`, which is a SEPARATE pipeline from the
+# signed-tag release that ships the static site. See ../CLAUDE.md → Deploy.
+
+name = "aleclay10-waitlist"
+main = "src/index.ts"
+compatibility_date = "2026-08-21"
+
+# Matches at the Cloudflare edge, so the request never reaches the tunnel or the
+# Mac mini. Same-origin with the site, which is what keeps the production CSP
+# (`default-src 'self'`) satisfied with no `connect-src` amendment.
+# Both hostnames, because www.aleclay10.dev serves the site rather than redirecting
+# to the apex. A route on the apex alone would leave the form 404ing on www.
+routes = [
+  { pattern = "aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" },
+  { pattern = "www.aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aleclay10-waitlist"
+database_id = "3f9294fb-6c36-43f7-94d7-49a312f23dbe"
+
+# Per-IP rate limiting, in code rather than as a WAF rule.
+#
+# The Free plan's dashboard rate limiting locks BOTH the counting period and the
+# block duration to 10s, which lets a scripted client sustain ~26k requests/day —
+# not worth spending the single free WAF rule on. This binding allows period = 60,
+# and leaves that rule available for something else.
+#
+# Trade-off: this runs inside the Worker, so a blocked request still costs an
+# invocation (irrelevant against the 100k/day free allowance). A WAF rule would
+# reject at the edge before the Worker starts.
+#
+# `period` must be exactly 10 or 60 — the runtime rejects anything else.
+#
+# 10/60s rather than something tighter, because the failure costs are asymmetric: a
+# false 429 turns a genuinely interested person away, while a bot that slips through
+# leaves a junk row that takes one DELETE to remove. Mobile carriers put many users
+# behind one CGNAT address, so a tight per-IP limit punishes real visitors first.
+# Enforcement is approximate anyway — measured against production, a burst gets
+# ~8-11 requests through before the counter propagates and then clamps hard.
+[[ratelimits]]
+name = "WAITLIST_LIMITER"
+namespace_id = "1001"
+
+[ratelimits.simple]
+limit = 10
+period = 60

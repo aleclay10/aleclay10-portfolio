@@ -1,5 +1,7 @@
 # build output
 dist/
+# wrangler local state — miniflare's on-disk D1/cache SQLite for `wrangler dev --local`
+waitlist-worker/.wrangler/
 # generated types
 .astro/
 

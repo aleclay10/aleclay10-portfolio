@@ -40,13 +40,14 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 
 ## Repository layout
 
-- `src/pages/` — routes (`.astro`). Eight today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`.
+- `src/pages/` — routes (`.astro`). Nine today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`, and `gaming-assistant/thanks` (the no-JS confirmation for the waitlist form — `noindex`, and excluded from the sitemap and the ⌘K index).
 - `src/layouts/Base.astro` — the shared shell every page renders through (head, nav, footer, theme init, `global.css` import).
 - `src/components/` — reusable UI (`AllocationDonut.astro`, `UptimeChip.astro`).
 - `src/data/portfolio.ts` — holdings/watchlist data behind `/investing`.
 - `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
 - `public/` — static assets served as-is (e.g. `favicon.svg`, `theme-init.js`). Note `/status.json` is **not** here and **not** a build artifact — `health-check.sh` writes it on the host, so it 404s in dev and `UptimeChip` degrades quietly. That 404 is expected, not a bug.
 - `scripts/` — repo tooling not part of the build (e.g. `build-resume-pdf.sh`).
+- `waitlist-worker/` — the `/api/waitlist` Cloudflare Worker + D1 schema behind the early-access form. A **separate npm package with its own deploy pipeline**; see [Waitlist API](#waitlist-api). Excluded from the root `tsconfig.json`, because Workers globals (`D1Database`) do not type-check against the site's browser lib.
 - `astro.config.mjs`, `tsconfig.json` — config.
 
 ### Résumé
@@ -60,6 +61,7 @@ When adding structure, follow Astro conventions: shared markup → `src/layouts/
 - **Components:** `.astro` by default — static, zero JS. Only reach for a `client:*` directive (`client:load` / `client:idle` / `client:visible`) when a piece genuinely needs interactivity, and pick the laziest one that works.
 - **Content collections (Projects, blog):** when added, use the Content Layer API — define schemas in `src/content.config.ts` (not the legacy `src/content/config.ts`) with a `glob()` loader and Zod schemas (`z.coerce.date()` for frontmatter dates). Query via `getCollection()` / `getEntry()`. Match the existing config file's `z` import path if one already exists.
 - **Styling:** use Tailwind utilities and `@theme` tokens rather than raw hex values or one-off inline `<style>`. Keep class lists readable.
+- **No em dashes in visitor-facing copy.** Reword, or use a colon, a full stop, or a comma. Page titles use a middle dot as the separator (`'/stack · how this site works'`), and `build-og-images.mjs` parses that separator, so a title using ` — ` also breaks its OG card. This applies to anything that reaches the page: prose, labels, placeholders, `aria-label`s, tooltips, and UI strings in bundled scripts **and in the waitlist Worker's error responses**, which render in the form. **Source comments are exempt** — nothing they say reaches the page.
 - **Self-host assets** (fonts included) rather than adding third-party `<link>` tags — it's better for the performance bar and the "fully self-hosted" goal.
 
 ## Search
@@ -114,6 +116,27 @@ The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows releas
 - **Tokens:** semantic palette lives as CSS vars in `src/styles/global.css` (`--bg`, `--ink`, `--muted`, `--line`, `--accent`…) flipped by `.dark`, exposed to Tailwind via `@theme` (`bg-canvas`, `text-ink`, `text-accent`, `border-line`, …). Prefer these tokens over raw hex.
 - **Motion:** restrained — fade-up reveals, page transitions, subtle hover. Always gate on `prefers-reduced-motion`. No heavy animation libs until earned.
 - **Layout:** asymmetric editorial grids over the predictable centered column; oversized serif type does the work. References: Paco Coursey, Rauno Freiberg, Brittany Chiang (craft bar) + thesephist, Simon Willison (substance bar). Favor whitespace and typography over chrome.
+
+## Waitlist API
+
+The early-access form on `/gaming-assistant` POSTs to `/api/waitlist`, which is **not part
+of this build**. It is a Cloudflare Worker backed by D1, living in `waitlist-worker/` and
+deployed with `wrangler` — see that directory's README.
+
+Three things worth knowing before touching either half:
+
+- **There are now two deploy pipelines.** The site ships only on a signed tag (below); the
+  Worker ships instantly via `npx wrangler deploy`. They are independent. **Deploy the
+  Worker before the frontend reaches production**, or the form is live against a 404.
+- **The form must keep working with JavaScript disabled.** It is a native `<form>` POST;
+  the Worker answers a no-JS submission with a 303 to `/gaming-assistant/thanks`. The page
+  script only upgrades that to an inline result.
+- **Same-origin is load-bearing.** `/api/waitlist` on the site's own hostnames is what lets
+  the `fetch` satisfy `default-src 'self'` with no `connect-src` amendment. A dedicated
+  subdomain would require loosening the CSP; don't.
+
+Note that `www.aleclay10.dev` serves the site rather than redirecting to the apex, so the
+Worker is routed and origin-allow-listed for **both** hostnames.
 
 ## Deploy
 

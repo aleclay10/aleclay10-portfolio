@@ -5,9 +5,10 @@ const title = 'AI Gaming Assistant · early access';
 const description =
 	'A lightweight desktop companion for gamers: AI chat with play-history context, session tracking, and Discord without alt-tabbing. Early access.';
 
-// Waitlist form endpoint (Buttondown/Formspree). Empty = fall back to a mailto
-// CTA so the page never ships a dead form. Set once Alec creates the account.
-const WAITLIST_ACTION = '';
+const labelClass =
+	'mb-1.5 block font-mono text-[11px] uppercase tracking-[0.14em] text-muted';
+const fieldClass =
+	'w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-[13px] text-ink placeholder:text-muted focus:border-accent focus:outline-none';
 
 const features = [
 	{
@@ -193,26 +194,162 @@ const tiers = [
 			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-accent">Early access</p>
 			<h2 class="mt-4 font-serif text-3xl text-ink">Be first through the door.</h2>
 			<p class="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
-				Windows and macOS builds land soon.{' '}
-				{WAITLIST_ACTION
-					? "Join the list and you'll hear the moment the doors open. Nothing else, no spam."
-					: "Email me and I'll hear from you the moment the doors open. No spam, no list."}
+				Windows and macOS builds land soon. Join the list and you'll hear the moment
+				the doors open. Nothing else, no spam.
 			</p>
-			{WAITLIST_ACTION ? (
-				<form method="post" action={WAITLIST_ACTION} class="mt-6 flex max-w-md flex-wrap gap-3">
-					<label class="sr-only" for="email">Email address</label>
-					<input id="email" type="email" name="email" required placeholder="you@example.com"
-						class="min-w-0 flex-1 rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-[13px] text-ink placeholder:text-muted focus:border-accent focus:outline-none" />
-					<button type="submit" class="rounded-md bg-accent px-4 py-2.5 font-mono text-[13px] font-medium text-canvas transition hover:opacity-90">
-						Join the list
+			<form
+				id="waitlist-form"
+				method="post"
+				action="/api/waitlist"
+				class="mt-7 max-w-md space-y-4"
+			>
+				<div class="grid gap-4 sm:grid-cols-2">
+					<div>
+						<label for="first_name" class={labelClass}>First name</label>
+						<input id="first_name" name="first_name" type="text" required maxlength="80"
+							autocomplete="given-name" class={fieldClass} />
+					</div>
+					<div>
+						<label for="last_name" class={labelClass}>Last name</label>
+						<input id="last_name" name="last_name" type="text" required maxlength="80"
+							autocomplete="family-name" class={fieldClass} />
+					</div>
+				</div>
+
+				<div>
+					<label for="email" class={labelClass}>Email</label>
+					<input id="email" name="email" type="email" required maxlength="254"
+						autocomplete="email" placeholder="you@example.com" class={fieldClass} />
+				</div>
+
+				<div>
+					<label for="notes" class={labelClass}>
+						Anything I should know? <span class="normal-case tracking-normal text-muted/70">optional</span>
+					</label>
+					<textarea id="notes" name="notes" rows="3" maxlength="2000"
+						placeholder="What you play, what you'd want it to do…"
+						class={`${fieldClass} resize-y`}></textarea>
+				</div>
+
+				{/* Honeypot. Hidden from sight, the a11y tree and the tab order — anything
+				    that fills it in is automated, and the server discards the submission
+				    while still reporting success. */}
+				<div class="hidden" aria-hidden="true">
+					<label for="company">Leave this field empty</label>
+					<input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+				</div>
+
+				<div class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+					<button type="submit" id="waitlist-submit"
+						class="rounded-md bg-accent px-4 py-2.5 font-mono text-[13px] font-medium text-canvas transition hover:opacity-90 disabled:opacity-60">
+						Request early access
 					</button>
-				</form>
-			) : (
-				<a href="mailto:alec.layton100@gmail.com?subject=AI%20Gaming%20Assistant%20%E2%80%94%20early%20access"
-					class="mt-6 inline-block rounded-md bg-accent px-4 py-2.5 font-mono text-[13px] font-medium text-canvas transition hover:opacity-90">
-					Request early access ↗
-				</a>
-			)}
+					<p id="waitlist-message" role="status" aria-live="polite"
+						class="font-mono text-[12px] leading-relaxed text-muted"></p>
+				</div>
+			</form>
+
+			<p class="mt-4 font-mono text-[12px] leading-relaxed text-muted">
+				Your address is stored so I can tell you when builds are ready. Nothing else,
+				never sold, and every message will carry an unsubscribe link.
+			</p>
 		</section>
 	</main>
 </Base>
+
+<script>
+	// Progressive enhancement for the early-access form.
+	//
+	// The form works with no JavaScript at all: it is a native POST to /api/waitlist,
+	// and the Worker answers a no-JS submission with a 303 to /gaming-assistant/thanks.
+	// Everything below only upgrades that to an inline result with no page navigation.
+	//
+	// Every failure path falls back to the native submit rather than showing a broken
+	// widget — same rule as UptimeChip.astro, where a failed fetch leaves the static
+	// markup untouched. The one thing this must never do is swallow a submission.
+
+	const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
+	const button = document.getElementById('waitlist-submit') as HTMLButtonElement | null;
+	const message = document.getElementById('waitlist-message');
+
+	function say(text: string, tone: 'error' | 'muted' = 'error') {
+		if (!message) return;
+		message.textContent = text;
+		message.classList.toggle('text-accent', tone === 'error');
+		message.classList.toggle('text-muted', tone === 'muted');
+	}
+
+	// The no-JS error path redirects back here with ?e=1, since a static page cannot
+	// render a server-side validation message. Surface it, then strip the parameter so
+	// a reload or a shared link does not resurface a stale error.
+	if (form && new URLSearchParams(location.search).has('e')) {
+		say('Something in that submission did not go through. Give it another try?');
+		const url = new URL(location.href);
+		url.searchParams.delete('e');
+		history.replaceState(null, '', url.pathname + url.search + url.hash);
+	}
+
+	form?.addEventListener('submit', async (event) => {
+		if (!form.reportValidity()) return;
+		event.preventDefault();
+
+		const data = new FormData(form);
+		const payload = {
+			first_name: String(data.get('first_name') ?? ''),
+			last_name: String(data.get('last_name') ?? ''),
+			email: String(data.get('email') ?? ''),
+			notes: String(data.get('notes') ?? ''),
+			company: String(data.get('company') ?? ''),
+		};
+
+		if (button) {
+			button.disabled = true;
+			button.textContent = 'Sending…';
+		}
+		say('', 'muted');
+
+		let res: Response;
+		try {
+			res = await fetch(form.action, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+		} catch {
+			// Offline, blocked, or the edge is unreachable. Hand the submission back to
+			// the browser: a full-page POST may still succeed, and if it does not the
+			// user gets the browser's own error rather than a silently dead button.
+			form.submit();
+			return;
+		}
+
+		if (button) {
+			button.disabled = false;
+			button.textContent = 'Request early access';
+		}
+
+		if (res.ok) {
+			const done = document.createElement('div');
+			done.className = 'mt-7 max-w-md rounded-xl border border-accent p-5';
+			done.setAttribute('role', 'status');
+			done.innerHTML =
+				'<p class="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">You’re on the list</p>' +
+				'<p class="mt-2 text-[15px] leading-relaxed text-muted">' +
+				'I’ll email you the moment there’s a build worth your time. Nothing before then.</p>';
+			form.replaceWith(done);
+			return;
+		}
+
+		if (res.status === 429) {
+			say('That’s a few too many tries in a row. Give it a minute.');
+			return;
+		}
+
+		const problem = await res.json().catch(() => null);
+		const detail =
+			problem && typeof problem === 'object' && typeof (problem as { error?: unknown }).error === 'string'
+				? (problem as { error: string }).error
+				: 'Something went wrong on my end. Try again in a moment?';
+		say(detail);
+	});
+</script>

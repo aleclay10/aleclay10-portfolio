@@ -10,6 +10,26 @@ const labelClass =
 const fieldClass =
 	'w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-[13px] text-ink placeholder:text-muted focus:border-accent focus:outline-none';
 
+// One entry per no-JS failure class. The Worker redirects each failure to
+// /gaming-assistant?e=<code>#w-err-<code>; CSS :target reveals the matching block
+// below with no script involved, and the page script uses the same text for the
+// live region before removing the block. Keep the codes in step with retryPath()
+// in waitlist-worker/src/index.ts, and never collapse these into one message.
+const failures = [
+	{
+		code: 'invalid',
+		text: 'Something in that submission did not pass the checks. Look over the fields and try again.',
+	},
+	{
+		code: 'rate',
+		text: 'Too many attempts in a row. Wait a minute, then try once more.',
+	},
+	{
+		code: 'server',
+		text: 'Something went wrong on my end. Nothing was saved. Try again in a moment.',
+	},
+];
+
 const features = [
 	{
 		label: 'AI chat that knows your games',
@@ -197,6 +217,25 @@ const tiers = [
 				Windows and macOS builds land soon. Join the list and you'll hear the moment
 				the doors open. Nothing else, no spam.
 			</p>
+
+			{/* No-JS failure messages, one per class, revealed by CSS :target when the
+			    Worker's redirect fragment points at them. The Back-button line is real:
+			    session history still holds the submitted values on a plain form POST.
+			    data-search-skip on every block element because isSkipped() does not
+			    cascade; an error string must not surface in a ⌘K search. */}
+			{failures.map((f) => (
+				<div
+					id={`w-err-${f.code}`}
+					data-search-skip
+					class="mt-6 hidden max-w-md rounded-md border border-accent/60 p-4 font-mono text-[12px] leading-relaxed target:block"
+				>
+					<p class="text-ink" data-search-skip>{f.text}</p>
+					<p class="mt-2 text-muted" data-search-skip>
+						What you typed is still in the form if you use your browser's Back button.
+					</p>
+				</div>
+			))}
+
 			<form
 				id="waitlist-form"
 				method="post"
@@ -233,10 +272,14 @@ const tiers = [
 
 				{/* Honeypot. Hidden from sight, the a11y tree and the tab order — anything
 				    that fills it in is automated, and the server discards the submission
-				    while still reporting success. */}
+				    while still reporting success. Named gamer_tag, NOT anything in the
+				    browsers' autofill vocabulary: the previous name, company, is Chrome's
+				    "organization" heuristic and Chrome ignores autocomplete="off", so a
+				    real visitor's autofill could have tripped it and silently lost the
+				    signup. Keep the name in step with HONEYPOT_FIELDS in the Worker. */}
 				<div class="hidden" aria-hidden="true">
-					<label for="company">Leave this field empty</label>
-					<input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+					<label for="gamer_tag">Leave this field empty</label>
+					<input id="gamer_tag" name="gamer_tag" type="text" tabindex="-1" autocomplete="off" />
 				</div>
 
 				<div class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
@@ -248,6 +291,12 @@ const tiers = [
 						class="font-mono text-[12px] leading-relaxed text-muted"></p>
 				</div>
 			</form>
+
+			{/* Success announcements land here, not in #waitlist-message: that region
+			    lives inside the form, and the success path replaces the form wholesale,
+			    which would destroy the region mid-announcement. This one is outside the
+			    swap and visually hidden; sighted users read the inserted card instead. */}
+			<p id="waitlist-announce" role="status" aria-live="polite" class="sr-only"></p>
 
 			<p class="mt-4 font-mono text-[12px] leading-relaxed text-muted">
 				Your address is stored so I can tell you when builds are ready. Nothing else,
@@ -271,6 +320,22 @@ const tiers = [
 	const form = document.getElementById('waitlist-form') as HTMLFormElement | null;
 	const button = document.getElementById('waitlist-submit') as HTMLButtonElement | null;
 	const message = document.getElementById('waitlist-message');
+	const announcer = document.getElementById('waitlist-announce');
+
+	// Written just before handing a failed fetch back to the native form POST, read
+	// back when the Worker's error redirect returns here. sessionStorage because the
+	// draft should survive the round trip but not the tab.
+	const DRAFT_KEY = 'waitlist-draft';
+	const FIELDS = ['first_name', 'last_name', 'email', 'notes'] as const;
+
+	// Must match the copy in the static #w-err-* blocks above, which cover the same
+	// codes for no-JS visitors. Unknown codes (including a stale ?e=1 from a Worker
+	// version behind this page) fall back to the generic line.
+	const failureMessages: Record<string, string> = {
+		invalid: 'Something in that submission did not pass the checks. Look over the fields and try again.',
+		rate: 'Too many attempts in a row. Wait a minute, then try once more.',
+		server: 'Something went wrong on my end. Nothing was saved. Try again in a moment.',
+	};
 
 	function say(text: string, tone: 'error' | 'muted' = 'error') {
 		if (!message) return;
@@ -279,11 +344,34 @@ const tiers = [
 		message.classList.toggle('text-muted', tone === 'muted');
 	}
 
-	// The no-JS error path redirects back here with ?e=1, since a static page cannot
-	// render a server-side validation message. Surface it, then strip the parameter so
-	// a reload or a shared link does not resurface a stale error.
-	if (form && new URLSearchParams(location.search).has('e')) {
-		say('Something in that submission did not go through. Give it another try?');
+	// The no-JS error path redirects back here with ?e=<code>. Surface the matching
+	// message through the live region, drop the CSS :target block so the same text is
+	// not shown twice, restore anything stashed before a native-fallback POST, then
+	// strip the parameter so a reload or a shared link does not resurface a stale
+	// error.
+	const failureCode = new URLSearchParams(location.search).get('e');
+	if (form && failureCode !== null) {
+		say(failureMessages[failureCode] ?? 'Something in that submission did not go through. Give it another try?');
+		document.getElementById(`w-err-${failureCode}`)?.remove();
+		try {
+			const draft = sessionStorage.getItem(DRAFT_KEY);
+			if (draft) {
+				const values = JSON.parse(draft) as Partial<Record<string, string>>;
+				for (const field of FIELDS) {
+					const input = form.elements.namedItem(field);
+					if (
+						(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) &&
+						typeof values[field] === 'string'
+					) {
+						input.value = values[field];
+					}
+				}
+				sessionStorage.removeItem(DRAFT_KEY);
+			}
+		} catch {
+			// Storage unavailable (private mode, quota). The error message still shows;
+			// only the repopulation is lost.
+		}
 		const url = new URL(location.href);
 		url.searchParams.delete('e');
 		history.replaceState(null, '', url.pathname + url.search + url.hash);
@@ -299,14 +387,16 @@ const tiers = [
 			last_name: String(data.get('last_name') ?? ''),
 			email: String(data.get('email') ?? ''),
 			notes: String(data.get('notes') ?? ''),
-			company: String(data.get('company') ?? ''),
+			gamer_tag: String(data.get('gamer_tag') ?? ''),
 		};
 
 		if (button) {
 			button.disabled = true;
 			button.textContent = 'Sending…';
 		}
-		say('', 'muted');
+		// Real feedback for the live region, not a wipe: clearing the region here is
+		// what left the whole submission unannounced to screen readers.
+		say('Sending…', 'muted');
 
 		let res: Response;
 		try {
@@ -319,6 +409,22 @@ const tiers = [
 			// Offline, blocked, or the edge is unreachable. Hand the submission back to
 			// the browser: a full-page POST may still succeed, and if it does not the
 			// user gets the browser's own error rather than a silently dead button.
+			// Stash the typed values first so the ?e= handler above can restore them if
+			// the Worker bounces the native POST back here. Never the honeypot field:
+			// restoring that would trip the trap on the retry.
+			try {
+				sessionStorage.setItem(
+					DRAFT_KEY,
+					JSON.stringify({
+						first_name: payload.first_name,
+						last_name: payload.last_name,
+						email: payload.email,
+						notes: payload.notes,
+					})
+				);
+			} catch {
+				// Storage unavailable; the native POST still goes out.
+			}
 			form.submit();
 			return;
 		}
@@ -329,14 +435,29 @@ const tiers = [
 		}
 
 		if (res.ok) {
+			try {
+				sessionStorage.removeItem(DRAFT_KEY);
+			} catch {
+				// Nothing stashed, or storage unavailable. Either way done.
+			}
 			const done = document.createElement('div');
-			done.className = 'mt-7 max-w-md rounded-xl border border-accent p-5';
-			done.setAttribute('role', 'status');
+			done.className = 'mt-7 max-w-md rounded-xl border border-accent p-5 focus:outline-none';
+			// No role="status" here: a live region announces changes to content it
+			// already had, so text arriving together with a brand-new node is read by
+			// nothing. The pre-existing #waitlist-announce region does the announcing;
+			// moving focus onto the card covers it a second way and fixes focus
+			// otherwise dropping to <body> when the form disappears under it.
+			done.tabIndex = -1;
 			done.innerHTML =
 				'<p class="font-mono text-[12px] uppercase tracking-[0.14em] text-accent">You’re on the list</p>' +
 				'<p class="mt-2 text-[15px] leading-relaxed text-muted">' +
 				'I’ll email you the moment there’s a build worth your time. Nothing before then.</p>';
 			form.replaceWith(done);
+			if (announcer) {
+				announcer.textContent =
+					'You’re on the list. I’ll email you the moment there’s a build worth your time.';
+			}
+			done.focus();
 			return;
 		}
 

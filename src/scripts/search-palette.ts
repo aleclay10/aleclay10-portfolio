@@ -318,7 +318,7 @@ function update() {
 		clear(results);
 		options = [];
 		active = -1;
-		setStatus('Search index not built — run npm run build, then npm run preview.');
+		setStatus('Search index not built. Run npm run build, then npm run preview.');
 		return;
 	}
 	if (loadState === 'error' || !index) {
@@ -372,7 +372,7 @@ function update() {
 				return g;
 			});
 		groups = rankPages(merged).slice(0, MAX_GROUPS);
-		if (groups.length) notice = `No page contains that phrase — showing pages with all ${q.terms.length} words.`;
+		if (groups.length) notice = `No page contains that phrase; showing pages with all ${q.terms.length} words.`;
 	}
 
 	if (!groups.length) {

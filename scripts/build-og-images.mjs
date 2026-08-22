@@ -82,11 +82,11 @@ export function slugOf(route) {
 }
 
 /**
- * Site titles read `<short name> — <rest>`.
+ * Site titles read `<short name> · <rest>`.
  * @returns {{ head: string, tail: string }}
  */
 function splitTitle(title) {
-	const at = title.indexOf(' — ');
+	const at = title.indexOf(' · ');
 	if (at === -1) return { head: title.trim(), tail: '' };
 	return { head: title.slice(0, at).trim(), tail: title.slice(at + 3).trim() };
 }
@@ -95,7 +95,7 @@ function splitTitle(title) {
  * The small label in the bottom-right corner.
  *
  * Normally the route. But four of the eight pages are titled after their own
- * route ("/investing — how and why I invest"), so the headline and the route
+ * route ("/investing · how and why I invest"), so the headline and the route
  * label would print the same string twice; those get the title's back half
  * instead. `/kowalski` and `/resume` cannot use the back half — theirs is the
  * site suffix "Alec Layton", which only restates the wordmark — and they do not
@@ -111,12 +111,12 @@ function labelOf(headline, tail, route) {
 
 /**
  * Descriptions written for search results often open by restating the page name
- * ("Alec Layton — I build autonomous agent systems…"). On a card the headline is
+ * ("Alec Layton: I build autonomous agent systems…"). On a card the headline is
  * already six inches tall directly above, so the prefix is dead weight.
  */
 function trimRestatedHeadline(description, headline) {
-	const prefix = `${headline} — `;
-	if (!description.startsWith(prefix)) return description;
+	const prefix = [`${headline}: `, `${headline}, `].find((p) => description.startsWith(p));
+	if (!prefix) return description;
 	const rest = description.slice(prefix.length);
 	return rest.charAt(0).toUpperCase() + rest.slice(1);
 }

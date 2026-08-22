@@ -3,9 +3,9 @@ import Base from '../layouts/Base.astro';
 import AllocationDonut from '../components/AllocationDonut.astro';
 import { vectors, holdings, principles, watchlist } from '../data/portfolio';
 
-const title = '/investing — how and why I invest';
+const title = '/investing · how and why I invest';
 const description =
-	'The thesis behind my brokerage and crypto book — allocation by conviction vector, live prices, and the rules behind every add and exit.';
+	'The thesis behind my brokerage and crypto book: allocation by conviction vector, live prices, and the rules behind every add and exit.';
 
 // Baseline "as of" for the server-rendered weights. Live prices override the
 // numbers client-side; this date describes the fallback, not the live feed.
@@ -33,7 +33,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				Concentration, <span class="italic text-accent">on purpose.</span>
 			</h1>
 			<p class="mt-7 text-[17px] leading-relaxed text-muted">
-				This is my taxable brokerage book and crypto — the aggressive half of a barbell,
+				This is my taxable brokerage book and crypto: the aggressive half of a barbell,
 				where the other half is a fully indexed retirement account I never touch. Every
 				position maps to a thesis vector or it is marked for exit. Percentages and prices
 				only: no dollar values, no share counts, no advice.
@@ -57,7 +57,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 						<span
 							id="day-change"
 							class="font-sans text-5xl font-medium tabular-nums leading-none text-muted/30"
-							>—</span
+							>–</span
 						>
 						<span id="day-change-label" class="font-mono text-[13px] text-muted"
 							>awaiting live prices</span
@@ -81,7 +81,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 			</p>
 			<p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">
 				Nineteen positions grouped into six vectors. Grouped rather than sliced per-ticker
-				because nineteen slices is an unreadable chart — the exact per-asset percentages are
+				because nineteen slices is an unreadable chart; the exact per-asset percentages are
 				in the table below.
 			</p>
 			<div class="mt-8 max-w-2xl">
@@ -127,7 +127,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 					Positions · live prices
 				</p>
 				<p class="font-mono text-[11px] text-muted">
-					Allocation, price and daily move only — never values or share counts
+					Allocation, price and daily move only, never values or share counts
 				</p>
 			</div>
 
@@ -173,12 +173,12 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 									<td
 										data-price={h.ticker}
 										class="py-3 pr-4 text-right font-mono text-[13px] tabular-nums text-muted">
-										—
+										–
 									</td>
 									<td
 										data-change={h.ticker}
 										class="py-3 text-right font-mono text-[13px] tabular-nums text-muted">
-										—
+										–
 									</td>
 								</tr>
 							))
@@ -187,7 +187,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				</table>
 			</div>
 			<p id="price-note" class="mt-4 font-mono text-[11px] leading-relaxed text-muted">
-				Prices refresh on the Mac mini that serves this page and are published same-origin —
+				Prices refresh on the Mac mini that serves this page and are published same-origin;
 				no third-party script runs in your browser.
 			</p>
 		</section>
@@ -219,14 +219,14 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 								{!w.held && (
 									<span
 										class="shrink-0 rounded border border-accent/40 px-1 py-px font-mono text-[9px] uppercase tracking-wider text-accent"
-										title="Watching — no position">
+										title="Watching, no position">
 										watching
 									</span>
 								)}
 							</span>
 							<span class="flex shrink-0 items-baseline gap-x-3 font-mono text-[12px] tabular-nums">
-								<span data-watch-price={w.ticker} class="text-muted">—</span>
-								<span data-watch-change={w.ticker} class="w-14 text-right text-muted">—</span>
+								<span data-watch-price={w.ticker} class="text-muted">–</span>
+								<span data-watch-change={w.ticker} class="w-14 text-right text-muted">–</span>
 							</span>
 						</li>
 					))

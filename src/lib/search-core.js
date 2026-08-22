@@ -30,7 +30,7 @@
  *   outside it in `Base.astro`, so chrome exclusion is structural — no opt-in
  *   attribute, nothing to forget on a new page.
  * - **SKIP_SELECTOR** removes non-content and the `/investing` live-price cells.
- *   Those hold a literal `—` at build time and are rewritten by that page's own
+ *   Those hold a literal `–` at build time and are rewritten by that page's own
  *   script after load: indexing them would pollute the index with em-dashes, and
  *   highlighting them would race a script that overwrites `textContent` wholesale.
  * - **ATOMIC_SELECTOR** (`tr`, `dl > div`) emits as a single record without
@@ -162,7 +162,7 @@ export function isHeading(el) {
  * A block's text plus a per-character map back to the text nodes it came from.
  *
  * The map is what lets the arrival highlighter wrap a phrase that spans a text-node
- * boundary (`— including ` + `<a>Kowalski</a>`) — and, more importantly, lets it
+ * boundary (`, including ` + `<a>Kowalski</a>`) — and, more importantly, lets it
  * *count* that phrase the same way the indexer counted it.
  *
  * @typedef {{ node: Text, offset: number } | null} CharOrigin

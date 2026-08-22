@@ -1,32 +1,32 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const title = '/uses — hardware & tools';
+const title = '/uses · hardware & tools';
 const description = 'The hardware, software, and infrastructure Alec Layton uses to build and ship.';
 
 const sections: { heading: string; items: { name: string; note: string }[] }[] = [
 	{
 		heading: 'Home server',
 		items: [
-			{ name: 'Apple M4 Mac mini · 16 GB', note: 'Runs 24/7 — serves this site, hosts Kowalski, and does the security rounds at night.' },
+			{ name: 'Apple M4 Mac mini · 16 GB', note: 'Runs 24/7: serves this site, hosts Kowalski, and does the security rounds at night.' },
 			{ name: 'Caddy + Cloudflare Tunnel', note: 'Loopback web server behind an outbound-only tunnel. Zero open ports.' },
-			{ name: 'launchd everything', note: 'Deploy poller, health checks, log rotation — cron jobs with a macOS accent.' },
+			{ name: 'launchd everything', note: 'Deploy poller, health checks, log rotation: cron jobs with a macOS accent.' },
 		],
 	},
 	{
 		heading: 'Building',
 		items: [
 			{ name: 'Claude Code + Kowalski', note: 'An autonomous agent does the shipping; I do the deciding. Pull requests are the contract.' },
-			{ name: 'Astro + Tailwind v4', note: 'This site — static output, semantic tokens, ~0 JS by default.' },
-			{ name: 'Tauri 2 + Rust · React 19 · FastAPI', note: 'The AI Gaming Assistant stack — desktop app in megabytes, not hundreds of them.' },
+			{ name: 'Astro + Tailwind v4', note: 'This site: static output, semantic tokens, ~0 JS by default.' },
+			{ name: 'Tauri 2 + Rust · React 19 · FastAPI', note: 'The AI Gaming Assistant stack: a desktop app in megabytes, not hundreds of them.' },
 			{ name: 'TypeScript, strict', note: 'Non-negotiable. The compiler is the cheapest reviewer I employ.' },
 		],
 	},
 	{
 		heading: 'Day to day',
 		items: [
-			{ name: 'C# / .NET · Python · SQL', note: 'The payroll-engine toolkit at Paycom — compliance controls, ETL pipelines, tax APIs.' },
-			{ name: 'Git, PR-first', note: 'Everything lands through a reviewed pull request — even when the author is an AI.' },
+			{ name: 'C# / .NET · Python · SQL', note: 'The payroll-engine toolkit at Paycom: compliance controls, ETL pipelines, tax APIs.' },
+			{ name: 'Git, PR-first', note: 'Everything lands through a reviewed pull request, even when the author is an AI.' },
 		],
 	},
 ];

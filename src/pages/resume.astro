@@ -1,9 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const title = 'Résumé — Alec Layton';
+const title = 'Résumé · Alec Layton';
 const description =
-	'Résumé for Alec Layton — software engineer building backend systems, automation, and AI agent tooling. Paycom, Valero, UTSA.';
+	'Résumé for Alec Layton, a software engineer building backend systems, automation, and AI agent tooling. Paycom, Valero, UTSA.';
 
 // Content mirrors the master résumé in Drive (Alec_Layton_Resume_Recent) with two
 // deliberate differences for the public web version:
@@ -26,7 +26,7 @@ const contact: { label: string; href?: string }[] = [
 ];
 
 const summary =
-	'Software engineer with 3+ years building and owning mission-critical software across the full development lifecycle, with a focus on automation, data pipelines, and microservices. Ships systems that process hundreds of millions of dollars in transactions, including ETL automation that eliminates 100+ hours of manual work per quarter while holding error rates under 1%. Increasingly focused on AI agent tooling — least-privilege automation with human-in-the-loop approval on anything outward-facing. Thrives in fast-moving, high-ownership environments.';
+	'Software engineer with 3+ years building and owning mission-critical software across the full development lifecycle, with a focus on automation, data pipelines, and microservices. Ships systems that process hundreds of millions of dollars in transactions, including ETL automation that eliminates 100+ hours of manual work per quarter while holding error rates under 1%. Increasingly focused on AI agent tooling: least-privilege automation with human-in-the-loop approval on anything outward-facing. Thrives in fast-moving, high-ownership environments.';
 
 const skills: { label: string; value: string }[] = [
 	{ label: 'Languages', value: 'Python, C, C++, C#, JavaScript, SQL, Rust, PHP, ABAP' },
@@ -45,14 +45,14 @@ const experience: { role: string; org: string; location: string; dates: string; 
 		dates: 'December 2022 – Present',
 		bullets: [
 			'Architected and implemented an internationalization framework for an enterprise-scale tax API using C# and .NET, enabling automated multi-country payroll controls processing across 5 countries with high compliance accuracy.',
-			'Led end-to-end design and delivery of mission-critical regulatory compliance controls for domestic garnishment, tax withholding, and earnings regulations within the core payroll engine — processing hundreds of millions of dollars in annual transactions while maintaining 100% audit compliance.',
+			'Led end-to-end design and delivery of mission-critical regulatory compliance controls for domestic garnishment, tax withholding, and earnings regulations within the core payroll engine, processing hundreds of millions of dollars in annual transactions while maintaining 100% audit compliance.',
 			'Independently architected and deployed a full-SDLC automated ETL pipeline to parse, validate, and transform 50+ state-specific SUTA tax rate files into controlled system updates, eliminating 100+ hours of manual processing per quarter and reducing error rates to under 1%.',
-			'Proactively monitor production systems, triage incidents, and implement reliability improvements — reducing downtime and increasing application availability for enterprise-scale payroll infrastructure.',
+			'Proactively monitor production systems, triage incidents, and implement reliability improvements, reducing downtime and increasing application availability for enterprise-scale payroll infrastructure.',
 			'Collaborate cross-functionally with product, QA, and engineering teams to gather requirements, design system architecture, and conduct code reviews that uphold reliability and security standards.',
 		],
 	},
 	{
-		role: 'Enterprise Architect Developer — Internship',
+		role: 'Enterprise Architect Developer (Internship)',
 		org: 'Valero Energy Corporation',
 		location: 'San Antonio, TX',
 		dates: 'May 2021 – December 2021',
@@ -70,8 +70,8 @@ const projects: { name: string; kind: string; href?: string; bullets: string[] }
 		kind: 'Personal AI Agent System',
 		href: '/kowalski',
 		bullets: [
-			'Stood up a “Second Brain” long-term memory system in Obsidian, semantically organized across people, projects, security, and finance, so the agent retains decision history and context across sessions instead of starting cold each time — paired with a 15+ tool integration layer (Gmail, Calendar, Drive, GitHub, voice synthesis) for end-to-end task handling.',
-			'Extended the agent into a financial decision-support tool that tracks portfolio positions, maintains investment-thesis notes, and summarizes account activity from email — while keeping trade execution and approval strictly manual to preserve financial-control discipline.',
+			'Stood up a “Second Brain” long-term memory system in Obsidian, semantically organized across people, projects, security, and finance, so the agent retains decision history and context across sessions instead of starting cold each time. Paired with a 15+ tool integration layer (Gmail, Calendar, Drive, GitHub, voice synthesis) for end-to-end task handling.',
+			'Extended the agent into a financial decision-support tool that tracks portfolio positions, maintains investment-thesis notes, and summarizes account activity from email, while keeping trade execution and approval strictly manual to preserve financial-control discipline.',
 		],
 	},
 	{
@@ -86,7 +86,7 @@ const projects: { name: string; kind: string; href?: string; bullets: string[] }
 ];
 
 const additional = [
-	'ACM ICPC member — strengthened algorithmic problem-solving through team-based competitive programming.',
+	'ACM ICPC member; strengthened algorithmic problem-solving through team-based competitive programming.',
 	'Experienced public speaker with strong written and verbal communication skills.',
 	'Bias toward full ownership and rapid iteration in high-intensity, mission-driven environments.',
 ];

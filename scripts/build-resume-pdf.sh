@@ -54,7 +54,7 @@ TMP_PROFILE="$(mktemp -d)"
 
 # Headless Chrome writes the PDF and then frequently fails to exit. Run it in the
 # background, wait for the file to appear AND stop growing, then kill it. Polling
-# the artifact is what makes this deterministic — never `wait` on Chrome.
+# the artifact is what makes this deterministic - never `wait` on Chrome.
 "$CHROME" \
   --headless \
   --disable-gpu \
@@ -73,7 +73,7 @@ for _ in $(seq 1 120); do
     new="$(wc -c <"$OUT" | tr -d ' ')"
     if [ "$new" = "$size" ]; then
       stable=$((stable + 1))
-      [ "$stable" -ge 2 ] && break   # same size across ~1s — write is complete
+      [ "$stable" -ge 2 ] && break   # same size across ~1s - write is complete
     else
       stable=0
       size="$new"
@@ -105,4 +105,4 @@ print(max(counts) if counts else '?')
 " "$OUT" 2>/dev/null || echo '?')"
 echo "==> wrote $OUT ($(du -h "$OUT" | cut -f1 | tr -d ' '), $pages pages)"
 [ "$pages" = "1" ] || [ "$pages" = "2" ] \
-  || echo "WARN: expected a 1-2 page résumé, got $pages — check the @media print block" >&2
+  || echo "WARN: expected a 1-2 page résumé, got $pages - check the @media print block" >&2

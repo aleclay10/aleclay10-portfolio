@@ -11,7 +11,7 @@ import { extractBlocks, isHeading } from '../src/lib/search-core.js';
  *
  * An Astro **integration** rather than a `package.json` script chain, on purpose.
  * `deploy-signed.sh` runs `npm run build`, but CLAUDE.md documents the host as
- * running `astro build` — anyone reconciling that discrepancy by "fixing" the
+ * running `astro build` - anyone reconciling that discrepancy by "fixing" the
  * script would silently stop the index being generated, which is the exact failure
  * class as the CSP bug this replaces: the search looks built, ships, and does
  * nothing. An integration survives every invocation of the build.
@@ -23,14 +23,14 @@ import { extractBlocks, isHeading } from '../src/lib/search-core.js';
  * would make every deep link a coin flip.
  *
  * Emits `dist/search-index.json`. Deliberately carries no build timestamp: the Astro
- * build is otherwise byte-deterministic and that is a property worth keeping — it is
+ * build is otherwise byte-deterministic and that is a property worth keeping - it is
  * how a deploy gets verified against a local build.
  */
 
 const STRICT = process.env.SEARCH_STRICT === '1';
 
 /**
- * Word boundaries lost between two *inline* elements — either from Astro's JSX
+ * Word boundaries lost between two *inline* elements - either from Astro's JSX
  * whitespace compression eating the newline before an `<a>` (see CLAUDE.md), or from
  * two adjacent spans separated only by a margin class. The walker can synthesise a
  * boundary at any non-inline element, but between inline elements there is no
@@ -42,7 +42,7 @@ const STRICT = process.env.SEARCH_STRICT === '1';
 const INLINE = 'a|span|em|strong|b|i|code|abbr|time|small|sub|sup|mark|q|cite|var|samp|kbd';
 // A word character is required on *both* sides of every boundary, which is what
 // keeps the site's empty decorative spans (`<span class="h-2 w-2 …"></span>Text`)
-// out of the results — nothing is glued to nothing.
+// out of the results - nothing is glued to nothing.
 const GLUED = [
 	new RegExp(`\\w<(?:${INLINE})\\b[^>]*>\\w`, 'g'),
 	new RegExp(`\\w</(?:${INLINE})>\\w`, 'g'),
@@ -75,13 +75,13 @@ function routeOf(distDir, file) {
 }
 
 /**
- * The site's titles read `<short name> — <description>`. Split them so the palette
+ * The site's titles read `<short name> - <description>`. Split them so the palette
  * can show the route-ish half in mono and the prose half in serif.
  * @param {string} title
  * @param {string} route
  */
 function splitTitle(title, route) {
-	const at = title.indexOf(' — ');
+	const at = title.indexOf(' - ');
 	if (at === -1) return { n: route, t: title };
 	return { n: title.slice(0, at).trim(), t: title.slice(at + 3).trim() };
 }
@@ -108,7 +108,7 @@ export default function searchIndex() {
 
 					const main = document.querySelector('main');
 					if (!main) {
-						warnings.push(`${route} has no <main> — not indexed`);
+						warnings.push(`${route} has no <main> - not indexed`);
 						continue;
 					}
 
@@ -131,7 +131,7 @@ export default function searchIndex() {
 					for (const block of extractBlocks(main)) {
 						if (!block.section) {
 							warnings.push(
-								`${route} — block has no resolvable section label: "${block.text.slice(0, 60)}". ` +
+								`${route} - block has no resolvable section label: "${block.text.slice(0, 60)}". ` +
 									`Add data-search-section to the enclosing <section>.`
 							);
 						}

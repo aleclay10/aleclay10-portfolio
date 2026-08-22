@@ -47,7 +47,7 @@ const FONTS = [
 	['node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff', 'JetBrains Mono', 500],
 ];
 
-/** Minimal createElement — satori wants React-shaped nodes and this file is not JSX. */
+/** Minimal createElement - satori wants React-shaped nodes and this file is not JSX. */
 const h = (type, style, children) => ({ type, props: { style, children } });
 
 /** @param {string} dir */
@@ -74,7 +74,7 @@ function routeOf(distDir, file) {
 
 /**
  * `/` → `home`, `/gaming-assistant/` → `gaming-assistant`.
- * Base.astro derives the same slug from Astro.url.pathname — keep them in step.
+ * Base.astro derives the same slug from Astro.url.pathname - keep them in step.
  */
 export function slugOf(route) {
 	const trimmed = route.replace(/^\/+|\/+$/g, '');
@@ -97,8 +97,8 @@ function splitTitle(title) {
  * Normally the route. But four of the eight pages are titled after their own
  * route ("/investing · how and why I invest"), so the headline and the route
  * label would print the same string twice; those get the title's back half
- * instead. `/kowalski` and `/resume` cannot use the back half — theirs is the
- * site suffix "Alec Layton", which only restates the wordmark — and they do not
+ * instead. `/kowalski` and `/resume` cannot use the back half - theirs is the
+ * site suffix "Alec Layton", which only restates the wordmark - and they do not
  * need to, because their headline is a name rather than a path.
  */
 function labelOf(headline, tail, route) {
@@ -195,7 +195,7 @@ async function main() {
 	try {
 		files = await htmlFiles(distDir);
 	} catch {
-		console.error('[og] no dist/ — run `npm run build` first (or use `npm run og`, which does both).');
+		console.error('[og] no dist/ - run `npm run build` first (or use `npm run og`, which does both).');
 		process.exit(1);
 	}
 
@@ -224,7 +224,7 @@ async function main() {
 			?.trim();
 
 		if (!title || !description) {
-			console.warn(`[og] ${route} — missing title or description, skipped`);
+			console.warn(`[og] ${route} - missing title or description, skipped`);
 			continue;
 		}
 
@@ -243,7 +243,7 @@ async function main() {
 		count += 1;
 	}
 
-	console.log(`[og] wrote ${count} card(s) to public/og/ — commit them`);
+	console.log(`[og] wrote ${count} card(s) to public/og/ - commit them`);
 }
 
 await main();

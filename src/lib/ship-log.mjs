@@ -1,13 +1,13 @@
 // @ts-check
 
 /**
- * Ship log — release velocity on this repo, read from the public GitHub API.
+ * Ship log - release velocity on this repo, read from the public GitHub API.
  *
  * Replaces the "GitHub activity strip" from the roadmap, which was scoped as a
  * contribution calendar. That was measured before building and rejected on the
  * data: the account shows 70 contributions across 20 active days in 365, because
  * the professional work is not on this account and Kowalski is not on GitHub. As
- * green squares that reads "barely writes code" — the opposite of the intent.
+ * green squares that reads "barely writes code" - the opposite of the intent.
  * The same repo framed as shipping velocity is both accurate and strong.
  *
  * Unauthenticated on purpose. The host builds with no GitHub credential and
@@ -65,7 +65,7 @@ async function api(path) {
  */
 export async function fetchShipLog() {
 	// Ceiling: one page. At 26 closed PRs today this is fine, and `per_page` caps
-	// at 100. Past that the count silently under-reports and this needs paging —
+	// at 100. Past that the count silently under-reports and this needs paging -
 	// the same class of ceiling documented for the search index.
 	const [closed, tags] = /** @type {[GhPull[], unknown[]]} */ (
 		await Promise.all([
@@ -78,7 +78,7 @@ export async function fetchShipLog() {
 		.filter((pr) => pr.merged_at !== null)
 		.sort((a, b) => (String(a.merged_at) < String(b.merged_at) ? 1 : -1));
 
-	if (merged.length === 0) throw new Error('no merged PRs returned — refusing to publish an empty ship log');
+	if (merged.length === 0) throw new Error('no merged PRs returned - refusing to publish an empty ship log');
 
 	return {
 		repo: REPO,

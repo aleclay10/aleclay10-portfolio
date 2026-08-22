@@ -9,7 +9,7 @@
 /* Toggle dark mode via a `.dark` class on <html> instead of OS preference alone */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Semantic palette — flips with the .dark class. Ember accent both modes. */
+/* Semantic palette - flips with the .dark class. Ember accent both modes. */
 :root {
   --bg: #fbf8f4;        /* warm paper, not pure white */
   --surface: #f3ede3;
@@ -66,7 +66,7 @@ html {
    navigation into a DOM swap, which would cost ~7 KB of JS and break three
    things that currently work by parsing once: the theme toggle and mobile-nav
    listeners (Base.astro), search-boot, and the anti-FOUC .dark class that
-   public/theme-init.js sets in <head> — the last of those is the known
+   public/theme-init.js sets in <head> - the last of those is the known
    flash-on-navigate bug, and fixing it means re-applying on astro:after-swap.
    None of that is worth a cross-fade on a static site whose bar is ~0 JS.
 
@@ -74,7 +74,7 @@ html {
    Firefox ignores it and navigates exactly as it does today. No CSP surface,
    because there is no script.
 
-   Only real page-to-page moves transition — the /#timeline and /#projects nav
+   Only real page-to-page moves transition - the /#timeline and /#projects nav
    links are same-document and are unaffected.
    --------------------------------------------------------------------------- */
 @view-transition {
@@ -91,7 +91,7 @@ html {
 }
 
 /* The header is identical on every page, so letting it ride the root snapshot
-   makes it cross-fade with itself — a faint flicker on an element that should
+   makes it cross-fade with itself - a faint flicker on an element that should
    read as fixed chrome. Naming it lifts it out of the root transition and holds
    it steady while the content underneath fades. Safe to name because Base.astro
    renders exactly one <header>, and a duplicate name silently kills the whole
@@ -108,7 +108,7 @@ header[data-vt-header] {
   }
 }
 
-/* Shared classes used by both the layout and page content — a scoped
+/* Shared classes used by both the layout and page content - a scoped
    <style> in the layout would not reach slotted page markup. */
 .link {
   color: var(--muted);
@@ -155,7 +155,7 @@ header[data-vt-header] {
    Print / PDF.
    public/resume.pdf is generated from the live /resume page by
    scripts/build-resume-pdf.sh, so this block IS the PDF's stylesheet. Keep it
-   deterministic — no dark-mode leakage, no animation, no site chrome.
+   deterministic - no dark-mode leakage, no animation, no site chrome.
    --------------------------------------------------------------------------- */
 @media print {
   /* Force the light palette even if the visitor is in dark mode: printing a
@@ -265,7 +265,7 @@ header[data-vt-header] {
     break-inside: avoid;
   }
 
-  /* Reveal animations start at opacity 0 — that would print a blank page. */
+  /* Reveal animations start at opacity 0 - that would print a blank page. */
   .reveal {
     animation: none;
     opacity: 1;
@@ -292,11 +292,11 @@ header[data-vt-header] {
 /* ---------------------------------------------------------------------------
    Chart tokens (/investing).
    Categorical slots 1–6 in FIXED slot order from the validated default dataviz
-   palette — the ordering is the colour-blindness safety mechanism, not cosmetic,
+   palette - the ordering is the colour-blindness safety mechanism, not cosmetic,
    so do not reorder to taste. Validated with scripts/validate_palette.js against
    THIS site's surfaces (#fbf8f4 light / #0c0c0d dark), both modes, all hard gates
    passing. Light mode reports slots 3/4/5 under 3:1 contrast, which obligates a
-   relief channel — the legend's visible % labels and the holdings table are it.
+   relief channel - the legend's visible % labels and the holdings table are it.
    Status colours are reserved and always ship with a sign or glyph, never hue alone.
    --------------------------------------------------------------------------- */
 .viz-root {
@@ -323,7 +323,7 @@ header[data-vt-header] {
   --viz-bad: #e66767;
 }
 
-/* Search highlights — used by both the ⌘K palette's context rows and the on-page
+/* Search highlights - used by both the ⌘K palette's context rows and the on-page
    highlighter that runs on a ?q= arrival. Contrast against --accent-soft is ~13:1
    in light mode and ~12:1 in dark. */
 mark {
@@ -342,7 +342,7 @@ mark[data-search-hit='current'] {
 
 @media print {
   /* A visitor who arrives from a search result and hits Cmd+P should get the page,
-     not their query. Neutralised rather than hidden — the text must still print. */
+     not their query. Neutralised rather than hidden - the text must still print. */
   mark,
   mark[data-search-hit='current'] {
     background: transparent !important;

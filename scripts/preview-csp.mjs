@@ -4,12 +4,12 @@
 // This exists because nothing else in the toolchain exercises the production CSP:
 // `astro dev` and `astro preview` set no CSP at all, and the Caddyfile lives outside
 // the repo. A fully-built, correctly-deployed Pagefind search was dead for weeks
-// behind exactly that gap — the WASM downloaded fine and then failed to compile,
+// behind exactly that gap - the WASM downloaded fine and then failed to compile,
 // because `default-src 'self'` has no `wasm-unsafe-eval`. Run this before shipping
 // anything that adds or moves a script.
 //
 // The header below is copied byte-for-byte from /opt/homebrew/etc/Caddyfile:40.
-// If the two ever diverge, this file is lying — diff them.
+// If the two ever diverge, this file is lying - diff them.
 //
 //   npm run build && node scripts/preview-csp.mjs   →  http://localhost:4321
 
@@ -53,7 +53,7 @@ async function resolve(urlPath) {
 
 createServer(async (req, res) => {
 	const file = await resolve(req.url ?? '/');
-	// Set on every response, 404s included — the same as Caddy's `header` block.
+	// Set on every response, 404s included - the same as Caddy's `header` block.
 	res.setHeader('Content-Security-Policy', CSP);
 	res.setHeader('X-Content-Type-Options', 'nosniff');
 	res.setHeader('X-Frame-Options', 'DENY');

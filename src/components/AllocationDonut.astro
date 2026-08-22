@@ -3,7 +3,7 @@
 //
 // Server-rendered from the baseline weights in src/data/portfolio.ts, then updated
 // in place from /prices.json when that file is fresh. One implementation, data
-// swapped — no second chart for the no-JS path.
+// swapped - no second chart for the no-JS path.
 //
 // Form choice: a donut is only legible at ~6 slices, so the 19 individual holdings
 // are grouped by thesis vector and the per-asset percentages live in the table
@@ -12,7 +12,7 @@
 //
 // Colour: categorical (each vector is an identity, not a magnitude), 6 slots from
 // the validated default palette in fixed slot order. Validated against THIS site's
-// surfaces (#fbf8f4 / #0c0c0d) in both modes — all hard gates pass. Light mode
+// surfaces (#fbf8f4 / #0c0c0d) in both modes - all hard gates pass. Light mode
 // reports 3 slots under 3:1 contrast, which obligates a relief channel; the direct
 // % labels in the legend and the full table below are that relief.
 //
@@ -114,7 +114,7 @@ const fmt = (n: number) => `${n.toFixed(1)}%`;
 
 <script>
 	// Recompute the ring from live weights when /prices.json is fresh. Falls back
-	// silently to the server-rendered baseline on any failure — same contract as
+	// silently to the server-rendered baseline on any failure - same contract as
 	// the footer uptime chip.
 	type Prices = {
 		generated?: string;
@@ -136,7 +136,7 @@ const fmt = (n: number) => `${n.toFixed(1)}%`;
 			if (!Number.isFinite(gen) || Date.now() - gen > MAX_AGE_MS) return;
 			if (!data.vectors) return;
 
-			// Only redraw if every rendered segment has a live weight — a partial
+			// Only redraw if every rendered segment has a live weight - a partial
 			// update would produce a ring that does not sum to 100.
 			const segs = [...root.querySelectorAll<SVGCircleElement>('[data-seg]')];
 			const ids = segs.map((s) => s.dataset.seg!);
@@ -158,7 +158,7 @@ const fmt = (n: number) => `${n.toFixed(1)}%`;
 				el.textContent = `${w.toFixed(1)}%`;
 			}
 		} catch {
-			// Offline, blocked, or malformed — keep the server-rendered baseline.
+			// Offline, blocked, or malformed - keep the server-rendered baseline.
 		}
 	}
 

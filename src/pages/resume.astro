@@ -7,7 +7,7 @@ const description =
 
 // Content mirrors the master résumé in Drive (Alec_Layton_Resume_Recent) with two
 // deliberate differences for the public web version:
-//   1. No phone number — this page is crawlable, and the site has kept contact
+//   1. No phone number - this page is crawlable, and the site has kept contact
 //      details off since the Timeline shipped (2026-07-13).
 //   2. Employer-neutral summary and tagline. The master is aimed at one company;
 //      a published résumé should not read as targeted at someone else.
@@ -15,7 +15,7 @@ const description =
 // this page by scripts/build-resume-pdf.sh, so the two can never drift.
 
 // Contact links must be ABSOLUTE. build-resume-pdf.sh prints this page from a local
-// preview server, so a relative href resolves against localhost in the PDF — which
+// preview server, so a relative href resolves against localhost in the PDF - which
 // both breaks the link for anyone who clicks it and leaks the generation setup.
 const contact: { label: string; href?: string }[] = [
 	{ label: 'Dallas, TX' },

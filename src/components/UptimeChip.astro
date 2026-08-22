@@ -38,7 +38,7 @@
 
 	// Guard against a status file that stopped being written (host asleep, launchd
 	// job unloaded). Anything older than 30 min is treated as unknown rather than
-	// reported as fact — a stale "up" is worse than no chip at all.
+	// reported as fact - a stale "up" is worse than no chip at all.
 	const MAX_AGE_MS = 30 * 60 * 1000;
 
 	function fmt(pct: number) {
@@ -66,7 +66,7 @@
 			}
 
 			// A 7d/30d figure computed from fewer observed days than the window
-			// claims is not a measurement of that window — label it as partial
+			// claims is not a measurement of that window - label it as partial
 			// rather than assert a number the data doesn't back yet.
 			const since = data.since ? Date.parse(data.since) : NaN;
 			const observedDays = Number.isFinite(since) ? (checked - since) / 86_400_000 : Infinity;
@@ -82,7 +82,7 @@
 			label.textContent = observedDays >= 7 ? `· ${fmt(week)} / 7d` : `· ${fmt(week)} / ${Math.max(1, Math.floor(observedDays))}d`;
 			label.hidden = false;
 		} catch {
-			// Offline, blocked, or malformed JSON — leave the static footer untouched.
+			// Offline, blocked, or malformed JSON - leave the static footer untouched.
 		}
 	}
 

@@ -171,7 +171,7 @@ export default {
 		const { success } = await env.WAITLIST_LIMITER.limit({ key: ip });
 		if (!success) {
 			return isJson
-				? json({ error: 'That is a few too many tries in a row — give it a minute.' }, 429)
+				? json({ error: 'That is a few too many tries in a row. Give it a minute.' }, 429)
 				: redirect(RETRY_PATH);
 		}
 

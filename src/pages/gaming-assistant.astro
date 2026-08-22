@@ -194,10 +194,8 @@ const tiers = [
 			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-accent">Early access</p>
 			<h2 class="mt-4 font-serif text-3xl text-ink">Be first through the door.</h2>
 			<p class="mt-3 max-w-md text-[15px] leading-relaxed text-muted">
-				Windows and macOS builds land soon.{' '}
-				{WAITLIST_ACTION
-					? "Join the list and you'll hear the moment the doors open. Nothing else, no spam."
-					: "Email me and I'll hear from you the moment the doors open. No spam, no list."}
+				Windows and macOS builds land soon. Join the list and you'll hear the moment
+				the doors open. Nothing else, no spam.
 			</p>
 			<form
 				id="waitlist-form"
@@ -252,7 +250,7 @@ const tiers = [
 			</form>
 
 			<p class="mt-4 font-mono text-[12px] leading-relaxed text-muted">
-				Your address is stored so I can tell you when builds are ready — nothing else,
+				Your address is stored so I can tell you when builds are ready. Nothing else,
 				never sold, and every message will carry an unsubscribe link.
 			</p>
 		</section>
@@ -343,7 +341,7 @@ const tiers = [
 		}
 
 		if (res.status === 429) {
-			say('That’s a few too many tries in a row — give it a minute.');
+			say('That’s a few too many tries in a row. Give it a minute.');
 			return;
 		}
 

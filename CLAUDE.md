@@ -61,6 +61,7 @@ When adding structure, follow Astro conventions: shared markup → `src/layouts/
 - **Components:** `.astro` by default — static, zero JS. Only reach for a `client:*` directive (`client:load` / `client:idle` / `client:visible`) when a piece genuinely needs interactivity, and pick the laziest one that works.
 - **Content collections (Projects, blog):** when added, use the Content Layer API — define schemas in `src/content.config.ts` (not the legacy `src/content/config.ts`) with a `glob()` loader and Zod schemas (`z.coerce.date()` for frontmatter dates). Query via `getCollection()` / `getEntry()`. Match the existing config file's `z` import path if one already exists.
 - **Styling:** use Tailwind utilities and `@theme` tokens rather than raw hex values or one-off inline `<style>`. Keep class lists readable.
+- **No em dashes in visitor-facing copy.** Reword, or use a colon, a full stop, or a comma. Page titles use a middle dot as the separator (`'/stack · how this site works'`), and `build-og-images.mjs` parses that separator, so a title using ` — ` also breaks its OG card. This applies to anything that reaches the page: prose, labels, placeholders, `aria-label`s, tooltips, and UI strings in bundled scripts **and in the waitlist Worker's error responses**, which render in the form. **Source comments are exempt** — nothing they say reaches the page.
 - **Self-host assets** (fonts included) rather than adding third-party `<link>` tags — it's better for the performance bar and the "fully self-hosted" goal.
 
 ## Search

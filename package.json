@@ -13,7 +13,8 @@
     "astro": "astro",
     "resume:pdf": "bash scripts/build-resume-pdf.sh",
     "og": "astro build && node scripts/build-og-images.mjs",
-    "preview:csp": "node scripts/preview-csp.mjs"
+    "preview:csp": "node scripts/preview-csp.mjs",
+    "ship-log": "node scripts/refresh-ship-log.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

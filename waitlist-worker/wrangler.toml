@@ -24,4 +24,4 @@ routes = [
 [[d1_databases]]
 binding = "DB"
 database_name = "aleclay10-waitlist"
-database_id = "PLACEHOLDER_SET_BY_WRANGLER_D1_CREATE"
+database_id = "3f9294fb-6c36-43f7-94d7-49a312f23dbe"

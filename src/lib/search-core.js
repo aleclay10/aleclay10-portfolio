@@ -67,6 +67,11 @@ export const SKIP_SELECTOR = [
 	'[data-weight]',
 	'[data-watch-price]',
 	'[data-watch-change]',
+	'[data-thesis-weight]',
+	'[data-seg-value]',
+	'#day-change',
+	'#day-change-label',
+	'#price-asof',
 ].join(', ');
 
 /** Emitted whole, never descended into. @type {string} */

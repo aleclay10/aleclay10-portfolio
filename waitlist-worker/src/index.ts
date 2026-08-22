@@ -18,6 +18,7 @@
 
 export interface Env {
 	DB: D1Database;
+	WAITLIST_LIMITER: RateLimit;
 }
 
 // Both hostnames serve the site: cloudflared routes aleclay10.dev AND
@@ -91,14 +92,18 @@ function validate(raw: Record<string, unknown>): { ok: true; data: Submission } 
 	return { ok: true, data: { first_name, last_name, email, notes: notes || null } };
 }
 
-async function readBody(request: Request): Promise<{ raw: Record<string, unknown>; isJson: boolean } | null> {
+function wantsJson(request: Request): boolean {
+	return (request.headers.get('content-type') ?? '').includes('application/json');
+}
+
+async function readBody(request: Request): Promise<Record<string, unknown> | null> {
 	const contentType = request.headers.get('content-type') ?? '';
 
 	if (contentType.includes('application/json')) {
 		try {
 			const parsed = await request.json();
 			if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
-			return { raw: parsed as Record<string, unknown>, isJson: true };
+			return parsed as Record<string, unknown>;
 		} catch {
 			return null;
 		}
@@ -112,7 +117,7 @@ async function readBody(request: Request): Promise<{ raw: Record<string, unknown
 			const form = await request.formData();
 			const raw: Record<string, unknown> = {};
 			for (const [key, value] of form.entries()) raw[key] = value;
-			return { raw, isJson: false };
+			return raw;
 		} catch {
 			return null;
 		}
@@ -156,9 +161,22 @@ export default {
 			return json({ error: 'Forbidden.' }, 403);
 		}
 
-		const body = await readBody(request);
-		if (!body) return json({ error: 'Malformed request.' }, 400);
-		const { raw, isJson } = body;
+		const isJson = wantsJson(request);
+
+		// Rate limit before reading the body: a request that is going to be rejected
+		// should not get to allocate anything. Keyed on the client IP, which at the
+		// edge is CF-Connecting-IP; a missing header falls back to a shared bucket
+		// rather than to no limit at all.
+		const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+		const { success } = await env.WAITLIST_LIMITER.limit({ key: ip });
+		if (!success) {
+			return isJson
+				? json({ error: 'That is a few too many tries in a row — give it a minute.' }, 429)
+				: redirect(RETRY_PATH);
+		}
+
+		const raw = await readBody(request);
+		if (!raw) return json({ error: 'Malformed request.' }, 400);
 
 		// Honeypot: report success, write nothing. A bot that can tell it was caught
 		// is a bot that can be tuned against the filter.

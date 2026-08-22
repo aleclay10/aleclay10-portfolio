@@ -1,29 +1,29 @@
 {
 	"repo": "aleclay10/aleclay10-portfolio",
-	"mergedPrs": 25,
-	"releases": 5,
+	"mergedPrs": 33,
+	"releases": 6,
 	"since": "2026-06-17",
 	"recent": [
 		{
-			"number": 25,
-			"title": "Replace the broken search with find-in-files keyword search",
-			"mergedAt": "2026-08-18"
+			"number": 33,
+			"title": "Fix a11y, nav, and copy nits (S1, S2, S3, S5, S6, S8)",
+			"mergedAt": "2026-08-22"
 		},
 		{
-			"number": 24,
-			"title": "Add a mobile nav so the site is navigable on a phone",
-			"mergedAt": "2026-08-18"
+			"number": 32,
+			"title": "Fix misleading copy and contradictory disclosures (M4-M10)",
+			"mergedAt": "2026-08-22"
 		},
 		{
-			"number": 23,
-			"title": "Re-crop hero portrait to centre the face in the frame",
-			"mergedAt": "2026-08-18"
+			"number": 31,
+			"title": "Fix three blockers from the 2026-08-21 QA report",
+			"mergedAt": "2026-08-22"
 		},
 		{
-			"number": 22,
-			"title": "Surface the signed-tag release requirement at the top of CLAUDE.md",
-			"mergedAt": "2026-08-17"
+			"number": 30,
+			"title": "Correct /stack's description of the deploy model",
+			"mergedAt": "2026-08-22"
 		}
 	],
-	"refreshed": "2026-08-21"
+	"refreshed": "2026-08-22"
 }

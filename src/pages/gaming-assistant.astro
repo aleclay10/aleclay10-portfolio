@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 
 const title = 'AI Gaming Assistant — early access';
 const description =
-	'A lightweight desktop companion for gamers — AI chat that knows your play history, session tracking across 80+ titles, Discord without alt-tabbing, and notifications smart enough to wait for the respawn screen. Join the early access list.';
+	'A lightweight desktop companion for gamers — AI chat with play-history context, session tracking, and Discord without alt-tabbing. Early access.';
 
 // Waitlist form endpoint (Buttondown/Formspree). Empty = fall back to a mailto
 // CTA so the page never ships a dead form. Set once Alec creates the account.
@@ -61,7 +61,7 @@ const tiers = [
 ---
 
 <Base title={title} description={description}>
-	<main class="flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16">
 		<!-- Hero -->
 		<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
 			<div class="reveal max-w-2xl">

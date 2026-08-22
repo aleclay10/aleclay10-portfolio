@@ -5,7 +5,7 @@ import { vectors, holdings, principles, watchlist } from '../data/portfolio';
 
 const title = '/investing — how and why I invest';
 const description =
-	'The thesis behind my brokerage and crypto book: allocation by conviction vector, live prices, and the rules that govern every add and exit. Percentages only — no values, no share counts.';
+	'The thesis behind my brokerage and crypto book — allocation by conviction vector, live prices, and the rules behind every add and exit.';
 
 // Baseline "as of" for the server-rendered weights. Live prices override the
 // numbers client-side; this date describes the fallback, not the live feed.
@@ -23,7 +23,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 ---
 
 <Base title={title} description={description}>
-	<main class="viz-root flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="viz-root flex flex-1 flex-col py-16">
 		<!-- Hero -->
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>

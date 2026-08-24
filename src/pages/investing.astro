@@ -9,7 +9,7 @@ const description =
 
 // Baseline "as of" for the server-rendered weights. Live prices override the
 // numbers client-side; this date describes the fallback, not the live feed.
-const asOf = 'July 29, 2026';
+const asOf = 'August 24, 2026';
 
 const byVector = vectors.map((v) => ({
 	...v,
@@ -27,8 +27,15 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 		<!-- Hero -->
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>
+			<!-- The `max-[359px]` step is not decoration. "Concentration," is one
+			     unbreakable 14-character word, and at the shared `text-5xl` base it
+			     measures wider than a 320px viewport, so it pushed the whole document
+			     31px sideways on an iPhone SE class screen: the page gained a
+			     horizontal scrollbar and the word was visibly clipped. Every other h1
+			     on the site has a short enough first word to fit, which is why this
+			     step is here and not in the shared heading style. -->
 			<h1
-				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
+				class="mt-5 font-serif text-4xl font-medium leading-[0.98] tracking-tight text-ink min-[360px]:text-5xl sm:text-6xl text-display-serif">
 				Concentration, <span class="italic text-accent">on purpose.</span>
 			</h1>
 			<p class="mt-7 text-[17px] leading-relaxed text-muted">

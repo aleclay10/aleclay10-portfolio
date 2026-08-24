@@ -58,7 +58,10 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<meta name="author" content="Alec Layton" />
-		<link rel="canonical" href={canonical} />
+		{/* A noindex page has no canonical URL to declare. /404 in particular resolved
+		     its canonical to https://aleclay10.dev/404/ - a URL that itself 404s - which
+		     is worse than having no tag at all. */}
+		{!noindex && <link rel="canonical" href={canonical} />}
 		<title>{title}</title>
 
 		<!-- Open Graph / social cards -->
@@ -111,7 +114,12 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 							class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink sm:flex">
 							<span>Search</span>
 						</button>
-						<button id="theme-toggle" type="button" aria-label="Toggle theme"
+						<!-- aria-label is a placeholder: the script below rewrites it on load to
+						     name the theme this button switches *to*, because the active theme is
+						     set by theme-init.js before paint and is conveyed only by an icon
+						     swap. A static "Toggle theme" told a screen-reader user nothing about
+						     which theme they were currently in. -->
+						<button id="theme-toggle" type="button" aria-label="Switch theme"
 							class="rounded-md border border-line p-2 text-muted transition hover:border-accent hover:text-ink">
 							<svg class="hidden h-4 w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
 							<svg class="h-4 w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -165,9 +173,20 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 		</div>
 
 		<script>
-			document.getElementById('theme-toggle')?.addEventListener('click', () => {
+			const themeToggle = document.getElementById('theme-toggle');
+
+			// Name the button after the theme it switches *to*, and keep that in step with
+			// the class theme-init.js already applied before this script ran.
+			function syncThemeLabel() {
+				const dark = document.documentElement.classList.contains('dark');
+				themeToggle?.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+			}
+			syncThemeLabel();
+
+			themeToggle?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
 				localStorage.setItem('theme', dark ? 'dark' : 'light');
+				syncThemeLabel();
 			});
 
 			// Mobile disclosure nav. Bundled (not is:inline) - the production CSP blocks inline scripts.

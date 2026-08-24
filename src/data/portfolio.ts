@@ -81,29 +81,29 @@ export type Holding = {
 	note?: string;
 };
 
-// Baseline as of 2026-07-29 brokerage marks. Excludes $6 of uninvested brokerage
+// Baseline as of 2026-08-24 brokerage marks. Excludes $6 of uninvested brokerage
 // cash and everything outside the taxable book (retirement, savings) - the page
 // is explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
-	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 15.88, kind: 'stock', note: 'The compute layer itself. Largest position.' },
-	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 14.15, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
-	{ ticker: 'CRM', name: 'Salesforce', vector: 'offthesis', weight: 11.09, kind: 'stock', note: 'Exit decided. Correlated with my salary and RSUs: the same seat-based SaaS bet three times.' },
-	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 8.61, kind: 'etf' },
-	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 7.38, kind: 'stock', note: 'Bought post-IPO on launch cadence. Down hard; thesis unchanged.' },
-	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 6.16, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
-	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.25, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
-	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 5.08, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
-	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 4.43, kind: 'etf' },
-	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 4.37, kind: 'crypto' },
-	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.15, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
-	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.47, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
-	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 2.63, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
-	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.54, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
-	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 1.99, kind: 'stock', note: 'Integrated model, silicon, and distribution.' },
-	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 1.41, kind: 'etf' },
-	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 0.94, kind: 'stock', note: 'Flagged for exit for ten weeks. Worst performer in the book.' },
-	{ ticker: 'XRP', name: 'XRP', vector: 'crypto', weight: 0.41, kind: 'crypto' },
-	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.07, kind: 'crypto' },
+	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 15.19, kind: 'stock', note: 'The compute layer itself. Largest position.' },
+	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 14.71, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
+	{ ticker: 'CRM', name: 'Salesforce', vector: 'offthesis', weight: 10.54, kind: 'stock', note: 'Exit decided. Correlated with my salary and RSUs: the same seat-based SaaS bet three times.' },
+	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 7.63, kind: 'etf' },
+	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 7.57, kind: 'stock', note: 'Bought post-IPO on launch cadence. Down hard; thesis unchanged.' },
+	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 5.51, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
+	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.82, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
+	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 6.34, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
+	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 3.98, kind: 'etf' },
+	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 4.73, kind: 'crypto' },
+	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.41, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
+	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.21, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
+	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 3.31, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
+	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.37, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
+	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 1.74, kind: 'stock', note: 'Integrated model, silicon, and distribution.' },
+	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 1.24, kind: 'etf' },
+	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 1.16, kind: 'stock', note: 'Flagged for exit for ten weeks. Worst performer in the book.' },
+	{ ticker: 'XRP', name: 'XRP', vector: 'crypto', weight: 0.47, kind: 'crypto' },
+	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.06, kind: 'crypto' },
 ];
 
 // Watch-only names: tracked, no position. Seeded empty - the watchlist currently

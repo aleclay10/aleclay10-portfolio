@@ -28,8 +28,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 		<div class="reveal max-w-2xl">
 			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>
 			<h1
-				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl"
-				style="font-optical-sizing: auto;">
+				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
 				Concentration, <span class="italic text-accent">on purpose.</span>
 			</h1>
 			<p class="mt-7 text-[17px] leading-relaxed text-muted">
@@ -98,8 +97,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 						<article>
 							<div class="flex items-baseline gap-x-2.5">
 								<span
-									class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-sm"
-									style={`background: var(--series-${v.slot})`}
+									class={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-sm series-bg-${v.slot}`}
 									aria-hidden="true"
 								/>
 								<h2 class="font-serif text-[19px] font-medium text-ink">{v.label}</h2>
@@ -158,8 +156,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 									<td class="py-3 pr-4 whitespace-nowrap">
 										<span class="flex items-center gap-x-2">
 											<span
-												class="h-2 w-2 shrink-0 rounded-sm"
-												style={`background: var(--series-${slotOf(h.vector)})`}
+												class={`h-2 w-2 shrink-0 rounded-sm series-bg-${slotOf(h.vector)}`}
 												aria-hidden="true"
 											/>
 											<span class="font-mono text-[12px] text-muted">{labelOf(h.vector)}</span>

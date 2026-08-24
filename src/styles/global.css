@@ -323,6 +323,22 @@ header[data-vt-header] {
   --viz-bad: #e66767;
 }
 
+/* Static swatch classes for the six palette slots. Needed because the CSP drops
+   'unsafe-inline' from style-src (2026-08-23 pentest LOW-1) - a computed
+   style={`background: var(--series-${slot})`} would be blocked. */
+.series-bg-1 { background: var(--series-1); }
+.series-bg-2 { background: var(--series-2); }
+.series-bg-3 { background: var(--series-3); }
+.series-bg-4 { background: var(--series-4); }
+.series-bg-5 { background: var(--series-5); }
+.series-bg-6 { background: var(--series-6); }
+
+/* Optical sizing for large display serif (Fraunces Variable) headings. Pulled
+   out of an inline style attribute for the same CSP reason as above. */
+.text-display-serif {
+  font-optical-sizing: auto;
+}
+
 /* Search highlights - used by both the ⌘K palette's context rows and the on-page
    highlighter that runs on a ?q= arrival. Contrast against --accent-soft is ~13:1
    in light mode and ~12:1 in dark. */

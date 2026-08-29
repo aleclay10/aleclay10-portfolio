@@ -106,6 +106,17 @@ export default function searchIndex() {
 					const html = await readFile(file, 'utf8');
 					const { document } = parseHTML(html);
 
+					// A page that tells search engines not to index it should not be in the
+					// site's own search either. Two pages rely on this: /404, which was
+					// otherwise fully searchable and would answer a query with "Nothing here.
+					// That page doesn't exist." on a URL the visitor reached deliberately;
+					// and /gaming-assistant/thanks, which was previously kept out block by
+					// block with `data-search-skip` - correct, but it still counted as a page
+					// in the palette's "Search N pages" line, and it only stayed correct as
+					// long as every future block remembered the attribute.
+					const robots = document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '';
+					if (/\bnoindex\b/i.test(robots)) continue;
+
 					const main = document.querySelector('main');
 					if (!main) {
 						warnings.push(`${route} has no <main> - not indexed`);

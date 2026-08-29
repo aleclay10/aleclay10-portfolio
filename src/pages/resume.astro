@@ -57,7 +57,10 @@ const experience: { role: string; org: string; location: string; dates: string; 
 		location: 'San Antonio, TX',
 		dates: 'May 2021 – December 2021',
 		bullets: [
-			'Developed a mission-critical SAP GUI application in ABAP for the Accounts Payable team, supporting processing for 90% of all U.S. financial transactions with high reliability and accuracy.',
+			// Scoped to the company. The master résumé reads "90% of all U.S. financial
+			// transactions", which survives inside a résumé about Valero but not as a
+			// standalone claim on a crawlable page. Same metric, stated accurately.
+			"Developed a mission-critical SAP GUI application in ABAP for the Accounts Payable team, supporting processing for 90% of the company's U.S. financial transactions with high reliability and accuracy.",
 			'Engineered enterprise-grade software within a Fortune 500 environment, translating complex operational requirements into scalable, production-ready systems.',
 			'Documented software components, integration flows, and technical specifications for cross-team knowledge transfer.',
 		],
@@ -68,7 +71,7 @@ const projects: { name: string; kind: string; href?: string; bullets: string[] }
 	{
 		name: 'Kowalski',
 		kind: 'Personal AI Agent System',
-		href: '/kowalski',
+		href: '/kowalski/',
 		bullets: [
 			'Stood up a “Second Brain” long-term memory system in Obsidian, semantically organized across people, projects, security, and finance, so the agent retains decision history and context across sessions instead of starting cold each time. Paired with a 15+ tool integration layer (Gmail, Calendar, Drive, GitHub, voice synthesis) for end-to-end task handling.',
 			'Extended the agent into a financial decision-support tool that tracks portfolio positions, maintains investment-thesis notes, and summarizes account activity from email, while keeping trade execution and approval strictly manual to preserve financial-control discipline.',
@@ -77,7 +80,7 @@ const projects: { name: string; kind: string; href?: string; bullets: string[] }
 	{
 		name: 'AI Gaming Assistant',
 		kind: 'Full-Stack Desktop Application',
-		href: '/gaming-assistant',
+		href: '/gaming-assistant/',
 		bullets: [
 			'Built a cross-platform desktop gaming companion (Tauri 2 + Rust, React/TypeScript; FastAPI backend on Supabase + Upstash Redis) with streaming AI chat, automatic session tracking across 80+ games, Discord integration, and a content feed.',
 			'Engineered a dual-mode AI inference router with failover across cloud providers (Groq, Together AI) and local models (Ollama); shipped Stripe subscription billing and a game-aware notification engine, backed by 238 automated tests across Python, TypeScript, and Rust.',

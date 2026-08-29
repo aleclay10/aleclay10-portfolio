@@ -16,7 +16,14 @@
   --ink: #1a1714;
   --muted: #6b645c;
   --line: #e7ddcf;
-  --accent: #e8590c;    /* Ember, light mode */
+  /* Ember, light mode. Was #e8590c, which is only 3.38:1 against --bg: it passes
+     AA for large text but fails it for every small accent element on the site -
+     the section eyebrows, inline accent links, ship-log PR numbers - and, as the
+     fill behind cream label text, for all three primary CTAs too. #c2410c is
+     4.89:1 both as text on --bg and as a button fill under --bg-coloured text.
+     Same hue, and already the value the @media print block darkens to. Dark mode
+     needs no change: #ff8a5b on #0c0c0d is 5.46:1. */
+  --accent: #c2410c;
   --accent-soft: #fbe7d8;
 }
 

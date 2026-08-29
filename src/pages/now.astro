@@ -4,18 +4,21 @@ import Base from '../layouts/Base.astro';
 const title = '/now · what I’m doing';
 const description = 'What Alec Layton is focused on right now: shipping AI Gaming Assistant, building Kowalski, and payroll systems at Paycom.';
 
-const updated = 'July 14, 2026';
+// A /now page is only worth having if it is current: nownownow.com, which this
+// page links to, exists to make exactly that point. Bump this whenever the list
+// below stops being true.
+const updated = 'August 24, 2026';
 
 const focus = [
 	{
 		title: 'Shipping AI Gaming Assistant',
-		desc: 'Pushing the desktop companion toward early access: installers, release pipeline, and the first wave of the waitlist.',
-		href: '/gaming-assistant',
+		desc: 'The early-access waitlist is open. Next up: Windows and macOS installers, the release pipeline, and getting builds into the first testers’ hands.',
+		href: '/gaming-assistant/',
 	},
 	{
 		title: 'Building Kowalski in public',
-		desc: 'My autonomous agent keeps gaining capabilities. It runs my calendar, mail, security scans, and ships this site.',
-		href: '/kowalski',
+		desc: 'My autonomous agent keeps gaining capabilities. It runs my calendar, mail, security scans, and writes most of this site: it opens the pull requests, I sign the release.',
+		href: '/kowalski/',
 	},
 	{
 		title: 'Payroll systems at Paycom',
@@ -23,8 +26,8 @@ const focus = [
 	},
 	{
 		title: 'Running this site off a Mac mini',
-		desc: 'Self-hosted everything. The infrastructure is the hobby.',
-		href: '/stack',
+		desc: 'Self-hosted everything, now released only by signed tag. The infrastructure is the hobby.',
+		href: '/stack/',
 	},
 ];
 ---

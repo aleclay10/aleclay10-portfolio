@@ -446,6 +446,12 @@ document.addEventListener('keydown', (e) => {
 	// belongs to search-boot.ts, because until it happens this module is not loaded.
 	if (!palette || palette.hidden) return;
 
+	// ...but "open" is not enough on its own. Once this module is cached, the very
+	// keydown that search-boot.ts just used to open the palette reaches this handler
+	// in the same dispatch, with the palette already visible. Treating it as a close
+	// toggle is what made ⌘K work exactly once per page load. See OPEN_CLAIMED there.
+	if (Object.getOwnPropertySymbols(e).includes(Symbol.for('aleclay10.palette.openClaimed'))) return;
+
 	// Bare `e.key === 'k'` misses with Caps Lock on - the old palette's quietest bug.
 	if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 		e.preventDefault();

@@ -32,7 +32,26 @@ function load() {
 	return engine;
 }
 
-function openPalette() {
+/**
+ * Marks the keydown that asked for an open, so `search-palette.ts` - which binds ⌘K
+ * too, as the *close* toggle - does not treat that same event as a close.
+ *
+ * Without it the two handlers fight inside a single dispatch, and only after the
+ * engine has been loaded once. On the first ⌘K the dynamic import below is a real
+ * async task that settles long after the event is done, so the palette opens and
+ * stays open. On every later ⌘K `load()` returns an already-resolved promise, so
+ * `.then` runs at the microtask checkpoint *between* the two listeners: this one
+ * opens the palette, the checkpoint fires, and the palette's own listener then sees
+ * a visible palette and closes it again. Net effect was that ⌘K worked exactly once
+ * per page load and then silently did nothing.
+ *
+ * `Symbol.for` rather than a module-local symbol: these two files are separate
+ * chunks and have to agree on the key without importing each other.
+ */
+const OPEN_CLAIMED = Symbol.for('aleclay10.palette.openClaimed');
+
+function openPalette(e?: KeyboardEvent) {
+	if (e) Object.defineProperty(e, OPEN_CLAIMED, { value: true });
 	void load().then((m) => m.open());
 }
 
@@ -49,7 +68,9 @@ function isTyping(target: EventTarget | null): boolean {
 for (const trigger of triggers) {
 	trigger.addEventListener('pointerenter', () => void load());
 	trigger.addEventListener('focus', () => void load());
-	trigger.addEventListener('click', openPalette);
+	// No event passed: a click cannot be mistaken for the palette's ⌘K close toggle,
+	// so it needs no claim marker.
+	trigger.addEventListener('click', () => openPalette());
 }
 
 document.addEventListener('keydown', (e) => {
@@ -61,12 +82,12 @@ document.addEventListener('keydown', (e) => {
 	// palette's shortcut silently did nothing.
 	if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
 		e.preventDefault();
-		openPalette();
+		openPalette(e);
 		return;
 	}
 
 	if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !isTyping(e.target)) {
 		e.preventDefault();
-		openPalette();
+		openPalette(e);
 	}
 });

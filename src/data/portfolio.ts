@@ -16,7 +16,7 @@
  * this so they can never disagree about what "as of" means. Keep it in step
  * with the `weight` values when refreshing the baseline.
  */
-export const baselineAsOf = 'August 24, 2026';
+export const baselineAsOf = 'August 29, 2026';
 
 export type VectorId = 'compute' | 'robotics' | 'space' | 'index' | 'crypto' | 'offthesis';
 
@@ -89,29 +89,28 @@ export type Holding = {
 	note?: string;
 };
 
-// Baseline as of 2026-08-24 brokerage marks. Excludes $6 of uninvested brokerage
+// Baseline as of 2026-08-29 brokerage marks. Excludes $8 of uninvested brokerage
 // cash and everything outside the taxable book (retirement, savings) - the page
 // is explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
-	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 15.19, kind: 'stock', note: 'The compute layer itself. Largest position.' },
-	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 14.71, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
-	{ ticker: 'CRM', name: 'Salesforce', vector: 'offthesis', weight: 10.54, kind: 'stock', note: 'Exit decided. Correlated with my salary and RSUs: the same seat-based SaaS bet three times.' },
-	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 7.63, kind: 'etf' },
-	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 7.57, kind: 'stock', note: 'Bought post-IPO on launch cadence. Down hard; thesis unchanged.' },
-	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 5.51, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
-	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.82, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
-	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 6.34, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
-	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 3.98, kind: 'etf' },
-	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 4.73, kind: 'crypto' },
-	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 4.41, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
-	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.21, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
-	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 3.31, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
-	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.37, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
-	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 1.74, kind: 'stock', note: 'Integrated model, silicon, and distribution.' },
-	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 1.24, kind: 'etf' },
-	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 1.16, kind: 'stock', note: 'Flagged for exit for ten weeks. Worst performer in the book.' },
-	{ ticker: 'XRP', name: 'XRP', vector: 'crypto', weight: 0.47, kind: 'crypto' },
-	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.06, kind: 'crypto' },
+	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 14.83, kind: 'stock', note: 'The compute layer itself. Largest position.' },
+	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 13.78, kind: 'stock', note: 'Bought post-IPO on launch cadence, added through the unwind. Now the second-largest position.' },
+	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 13.58, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
+	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 10.12, kind: 'stock', note: 'Integrated model, silicon, and distribution. Built from the Salesforce exit proceeds.' },
+	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 7.39, kind: 'etf' },
+	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 6.35, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
+	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.44, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
+	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 5.39, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
+	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 3.83, kind: 'etf' },
+	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 3.76, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
+	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 3.56, kind: 'crypto' },
+	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.18, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
+	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 3.05, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
+	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.27, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
+	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 2.04, kind: 'etf' },
+	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 1.05, kind: 'stock', note: 'Flagged for exit since May. Worst performer in the book.' },
+	{ ticker: 'XRP', name: 'XRP', vector: 'crypto', weight: 0.33, kind: 'crypto' },
+	{ ticker: 'DOGE', name: 'Dogecoin', vector: 'crypto', weight: 0.05, kind: 'crypto' },
 ];
 
 // Watch-only names: tracked, no position. Seeded empty - the watchlist currently
@@ -174,6 +173,6 @@ export const principles: { rule: string; detail: string }[] = [
 	{
 		rule: 'Correlation hides in your paycheque',
 		detail:
-			'My salary and RSUs are both enterprise SaaS. Holding a third bet on the same thing was concentration I had not counted, which is why it is being exited.',
+			'My salary and RSUs are both enterprise SaaS. Holding a third bet on the same thing was concentration I had not counted, which is why it was exited.',
 	},
 ];

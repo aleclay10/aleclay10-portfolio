@@ -10,6 +10,14 @@
 // fallback when prices.json is missing or stale. When prices.json is fresh, the
 // page recomputes weights from live prices so the chart does not drift.
 
+/**
+ * Baseline snapshot date for the server-rendered weights below. Every surface
+ * that renders the fallback (the /investing page, the home BookChip) imports
+ * this so they can never disagree about what "as of" means. Keep it in step
+ * with the `weight` values when refreshing the baseline.
+ */
+export const baselineAsOf = 'August 24, 2026';
+
 export type VectorId = 'compute' | 'robotics' | 'space' | 'index' | 'crypto' | 'offthesis';
 
 export type Vector = {

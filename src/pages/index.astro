@@ -1,9 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
+import BookChip from '../components/BookChip.astro';
 
-const title = 'Alec Layton · Autonomous agent systems';
+const title = 'Alec Layton · Agents, products, and the book';
 const description =
-	'Alec Layton: I build autonomous agent systems. Projects, writing, and experiments in AI infrastructure.';
+	'Alec Layton: I build autonomous agents, ship AI products, and run a concentrated investing book. Self-hosted projects, writing, and experiments.';
 
 const eras: { years: string; title: string; org: string; desc: string; tag: string; current?: boolean; href?: string; linkText?: string }[] = [
 	{
@@ -70,16 +71,18 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 			<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
 				<div class="reveal">
 					<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">
-						Software engineer · AI agent systems
+						Software engineer · builder · investor
 					</p>
 					<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-7xl text-display-serif">
-						I build<br />autonomous<br /><span class="italic text-accent">agent systems.</span>
+						I build agents,<br />ship products,<br /><span class="italic text-accent">run the book.</span>
 					</h1>
 					<p class="mt-7 max-w-md text-[17px] leading-relaxed text-muted">
-						I design and ship AI tooling and the infrastructure under it, including{' '}
-						<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
-						an autonomous agent that runs my day. This site is self-hosted
-						on a Mac mini in my apartment, served over a Cloudflare tunnel.
+						I design and ship AI tooling: <a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
+						the autonomous agent that runs my day, and an{' '}
+						<a href="/gaming-assistant/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">AI Gaming Assistant</a>{' '}
+						now in early access. The rest of my conviction lives in a concentrated
+						book at <a href="/investing/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">/investing</a>.
+						This site is self-hosted on my Mac mini, served over a Cloudflare tunnel.
 					</p>
 					<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
 						<a href="#projects" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
@@ -104,6 +107,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 							Currently building · agents + infra
 						</div>
 					</div>
+					<BookChip />
 				</div>
 			</div>
 		</section>

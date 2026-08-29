@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import AllocationDonut from '../components/AllocationDonut.astro';
-import { vectors, holdings, principles, watchlist } from '../data/portfolio';
+import { vectors, holdings, principles, watchlist, baselineAsOf } from '../data/portfolio';
 
 const title = '/investing · how and why I invest';
 const description =
@@ -9,7 +9,7 @@ const description =
 
 // Baseline "as of" for the server-rendered weights. Live prices override the
 // numbers client-side; this date describes the fallback, not the live feed.
-const asOf = 'August 24, 2026';
+const asOf = baselineAsOf;
 
 const byVector = vectors.map((v) => ({
 	...v,
@@ -270,20 +270,9 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 	// Live prices from /prices.json - same-origin, written by a scheduled job on the
 	// host. Progressive enhancement: without it the table shows em-dashes and the
 	// server-rendered baseline weights, which is a coherent page on its own.
-	type Quote = { price?: number; changePct?: number; weight?: number };
-	type Prices = {
-		generated?: string;
-		marketState?: string;
-		portfolio?: { dayChangePct?: number };
-		quotes?: Record<string, Quote>;
-		vectors?: Record<string, number>;
-	};
-
-	const MAX_AGE_MS = 6 * 60 * 60 * 1000;
-
-	const nf = (n: number, dp = 2) =>
-		n.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
-	const signed = (n: number) => `${n >= 0 ? '+' : '−'}${nf(Math.abs(n))}%`;
+	// Fetch, freshness guard and formatters live in the shared module so this page,
+	// the donut and the home BookChip apply one contract.
+	import { loadFreshPrices, nf, signed } from '../lib/prices-client';
 
 	function paint(el: HTMLElement | null, n: number) {
 		if (!el) return;
@@ -293,78 +282,70 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 	}
 
 	async function load() {
-		try {
-			const res = await fetch('/prices.json', { cache: 'no-store' });
-			if (!res.ok) return;
-			const data: Prices = await res.json();
+		const fresh = await loadFreshPrices();
+		if (!fresh) return;
+		const { data, generatedAt } = fresh;
 
-			const gen = data.generated ? Date.parse(data.generated) : NaN;
-			if (!Number.isFinite(gen) || Date.now() - gen > MAX_AGE_MS) return;
-
-			// Headline: allocation-weighted move for the whole book.
-			const day = data.portfolio?.dayChangePct;
-			if (typeof day === 'number') {
-				const el = document.getElementById('day-change');
-				if (el) {
-					el.textContent = signed(day);
-					// Drop the faint empty-state class before applying the status colour.
-					el.classList.remove('text-muted/30');
-					el.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
-				}
-				// "today" is only true while the market is open; once it closes the figure
-				// is the last completed session, and on a weekend that is days old.
-				const lab = document.getElementById('day-change-label');
-				if (lab) {
-					const open = data.marketState === 'market open';
-					const dir = day >= 0 ? '▲ up' : '▼ down';
-					lab.textContent = open ? `${dir} today` : `${dir} · last close`;
-				}
+		// Headline: allocation-weighted move for the whole book.
+		const day = data.portfolio?.dayChangePct;
+		if (typeof day === 'number') {
+			const el = document.getElementById('day-change');
+			if (el) {
+				el.textContent = signed(day);
+				// Drop the faint empty-state class before applying the status colour.
+				el.classList.remove('text-muted/30');
+				el.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
 			}
-
-			// Per-position price, daily move, and live weight.
-			for (const [ticker, q] of Object.entries(data.quotes ?? {})) {
-				if (typeof q.price === 'number') {
-					const el = document.querySelector<HTMLElement>(`[data-price="${ticker}"]`);
-					// Sub-dollar assets (DOGE) need more precision than equities.
-					if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
-				}
-				if (typeof q.changePct === 'number') {
-					paint(document.querySelector<HTMLElement>(`[data-change="${ticker}"]`), q.changePct);
-				}
-				if (typeof q.weight === 'number') {
-					const el = document.querySelector<HTMLElement>(`[data-weight="${ticker}"]`);
-					if (el) el.textContent = `${nf(q.weight)}%`;
-				}
-				// Watchlist grid mirrors the same quotes - held and watch-only alike.
-				if (typeof q.price === 'number') {
-					const el = document.querySelector<HTMLElement>(`[data-watch-price="${ticker}"]`);
-					if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
-				}
-				if (typeof q.changePct === 'number') {
-					paint(document.querySelector<HTMLElement>(`[data-watch-change="${ticker}"]`), q.changePct);
-				}
+			// "today" is only true while the market is open; once it closes the figure
+			// is the last completed session, and on a weekend that is days old.
+			const lab = document.getElementById('day-change-label');
+			if (lab) {
+				const open = data.marketState === 'market open';
+				const dir = day >= 0 ? '▲ up' : '▼ down';
+				lab.textContent = open ? `${dir} today` : `${dir} · last close`;
 			}
+		}
 
-			// The theses cards show the same per-vector weight as the donut legend -
-			// keep them on the same live number rather than the static baseline, so
-			// the two never disagree on screen (2026-08-21 QA report, B1).
-			for (const [id, weight] of Object.entries(data.vectors ?? {})) {
-				const el = document.querySelector<HTMLElement>(`[data-thesis-weight="${id}"]`);
-				if (el) el.textContent = `${nf(weight, 1)}%`;
+		// Per-position price, daily move, and live weight.
+		for (const [ticker, q] of Object.entries(data.quotes ?? {})) {
+			if (typeof q.price === 'number') {
+				const el = document.querySelector<HTMLElement>(`[data-price="${ticker}"]`);
+				// Sub-dollar assets (DOGE) need more precision than equities.
+				if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
 			}
+			if (typeof q.changePct === 'number') {
+				paint(document.querySelector<HTMLElement>(`[data-change="${ticker}"]`), q.changePct);
+			}
+			if (typeof q.weight === 'number') {
+				const el = document.querySelector<HTMLElement>(`[data-weight="${ticker}"]`);
+				if (el) el.textContent = `${nf(q.weight)}%`;
+			}
+			// Watchlist grid mirrors the same quotes - held and watch-only alike.
+			if (typeof q.price === 'number') {
+				const el = document.querySelector<HTMLElement>(`[data-watch-price="${ticker}"]`);
+				if (el) el.textContent = `$${nf(q.price, q.price < 1 ? 4 : 2)}`;
+			}
+			if (typeof q.changePct === 'number') {
+				paint(document.querySelector<HTMLElement>(`[data-watch-change="${ticker}"]`), q.changePct);
+			}
+		}
 
-			const asof = document.getElementById('price-asof');
-			if (asof) {
-				const t = new Date(gen);
-				// Say "checked" rather than "live" when the market is shut - the prices are
-				// real but they are the last close, not a live tick.
-				asof.textContent =
-					data.marketState === 'market open'
-						? `Live · updated ${t.toLocaleTimeString()}`
-						: `Market closed · last close, checked ${t.toLocaleTimeString()}`;
-			}
-		} catch {
-			// Leave the server-rendered baseline in place.
+		// The theses cards show the same per-vector weight as the donut legend -
+		// keep them on the same live number rather than the static baseline, so
+		// the two never disagree on screen (2026-08-21 QA report, B1).
+		for (const [id, weight] of Object.entries(data.vectors ?? {})) {
+			const el = document.querySelector<HTMLElement>(`[data-thesis-weight="${id}"]`);
+			if (el) el.textContent = `${nf(weight, 1)}%`;
+		}
+
+		const asof = document.getElementById('price-asof');
+		if (asof) {
+			// Say "checked" rather than "live" when the market is shut - the prices are
+			// real but they are the last close, not a live tick.
+			asof.textContent =
+				data.marketState === 'market open'
+					? `Live · updated ${generatedAt.toLocaleTimeString()}`
+					: `Market closed · last close, checked ${generatedAt.toLocaleTimeString()}`;
 		}
 	}
 

@@ -114,50 +114,38 @@ const fmt = (n: number) => `${n.toFixed(1)}%`;
 <script>
 	// Recompute the ring from live weights when /prices.json is fresh. Falls back
 	// silently to the server-rendered baseline on any failure - same contract as
-	// the footer uptime chip.
-	type Prices = {
-		generated?: string;
-		vectors?: Record<string, number>;
-	};
+	// the footer uptime chip. Fetch + freshness guard live in the shared module.
+	import { loadFreshPrices } from '../lib/prices-client';
 
-	const MAX_AGE_MS = 6 * 60 * 60 * 1000; // prices go stale outside market hours; 6h is generous
 	const GAP = 0.6;
 
 	async function refresh() {
 		const root = document.querySelector('[data-donut]');
 		if (!root) return;
-		try {
-			const res = await fetch('/prices.json', { cache: 'no-store' });
-			if (!res.ok) return;
-			const data: Prices = await res.json();
+		const fresh = await loadFreshPrices();
+		const vectors = fresh?.data.vectors;
+		if (!vectors) return;
 
-			const gen = data.generated ? Date.parse(data.generated) : NaN;
-			if (!Number.isFinite(gen) || Date.now() - gen > MAX_AGE_MS) return;
-			if (!data.vectors) return;
+		// Only redraw if every rendered segment has a live weight - a partial
+		// update would produce a ring that does not sum to 100.
+		const segs = [...root.querySelectorAll<SVGCircleElement>('[data-seg]')];
+		const ids = segs.map((s) => s.dataset.seg!);
+		if (!ids.every((id) => typeof vectors[id] === 'number')) return;
 
-			// Only redraw if every rendered segment has a live weight - a partial
-			// update would produce a ring that does not sum to 100.
-			const segs = [...root.querySelectorAll<SVGCircleElement>('[data-seg]')];
-			const ids = segs.map((s) => s.dataset.seg!);
-			if (!ids.every((id) => typeof data.vectors![id] === 'number')) return;
-
-			let acc = 0;
-			for (const seg of segs) {
-				const w = data.vectors[seg.dataset.seg!];
-				const len = Math.max(0, w - GAP);
-				seg.setAttribute('stroke-dasharray', `${len} ${100 - len}`);
-				seg.setAttribute('stroke-dashoffset', String(-acc));
-				const t = seg.querySelector('title');
-				const label = t?.textContent?.split(': ')[0] ?? '';
-				if (t) t.textContent = `${label}: ${w.toFixed(1)}%`;
-				acc += w;
-			}
-			for (const el of root.querySelectorAll<HTMLElement>('[data-seg-value]')) {
-				const w = data.vectors[el.dataset.segValue!];
-				el.textContent = `${w.toFixed(1)}%`;
-			}
-		} catch {
-			// Offline, blocked, or malformed - keep the server-rendered baseline.
+		let acc = 0;
+		for (const seg of segs) {
+			const w = vectors[seg.dataset.seg!];
+			const len = Math.max(0, w - GAP);
+			seg.setAttribute('stroke-dasharray', `${len} ${100 - len}`);
+			seg.setAttribute('stroke-dashoffset', String(-acc));
+			const t = seg.querySelector('title');
+			const label = t?.textContent?.split(': ')[0] ?? '';
+			if (t) t.textContent = `${label}: ${w.toFixed(1)}%`;
+			acc += w;
+		}
+		for (const el of root.querySelectorAll<HTMLElement>('[data-seg-value]')) {
+			const w = vectors[el.dataset.segValue!];
+			el.textContent = `${w.toFixed(1)}%`;
 		}
 	}
 

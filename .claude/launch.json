@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["astro", "dev", "--port", "4321"],
       "port": 4321
+    },
+    {
+      "name": "preview-csp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview:csp"],
+      "port": 4321
     }
   ]
 }

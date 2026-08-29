@@ -77,6 +77,15 @@
 	@runtime path /status.json /prices.json
 	header @runtime Cache-Control "no-store"
 
+	# Serve the built 404 page (QA 2026-08-22, finding N2). Without this,
+	# file_server emits a bare 404 with an empty body and visitors get the
+	# browser's native error screen while dist/404.html sits deployed and unused.
+	handle_errors {
+		@404 expression {err.status_code} == 404
+		rewrite @404 /404.html
+		file_server
+	}
+
 	log {
 		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log
 	}

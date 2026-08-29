@@ -15,7 +15,14 @@
  * the index fetch, so by the time the click lands the palette usually opens ready.
  */
 
-if (new URLSearchParams(location.search).has('q')) void import('./search-highlight');
+if (new URLSearchParams(location.search).has('q')) {
+	// A lost highlight degrades to a normal page view, but never silently: the
+	// visitor clicked a search result and got no highlight, and without this line
+	// the only trace would be an unhandled-rejection entry pointing nowhere.
+	import('./search-highlight').catch((err) => {
+		console.error('[search] arrival highlighter failed to load', err);
+	});
+}
 
 const palette = document.getElementById('palette');
 // Two triggers: the desktop header button, and the item inside the mobile
@@ -25,10 +32,19 @@ const triggers = ['cmdk', 'cmdk-mobile']
 	.map((id) => document.getElementById(id))
 	.filter((el): el is HTMLElement => el !== null);
 
-let engine: Promise<typeof import('./search-palette')> | null = null;
+let engine: Promise<typeof import('./search-palette') | null> | null = null;
 
 function load() {
-	engine ??= import('./search-palette');
+	// The catch does two jobs. It names the failure (house rule: a chunk that
+	// fails to arrive must say so, not surface as an unhandled rejection). And it
+	// clears the cache: `engine ??=` would otherwise memoise the *rejected*
+	// promise, leaving ⌘K permanently dead for the rest of the page view when the
+	// next attempt - one flaky-network moment later - would have succeeded.
+	engine ??= import('./search-palette').catch((err): null => {
+		console.error('[search] palette engine failed to load', err);
+		engine = null;
+		return null;
+	});
 	return engine;
 }
 
@@ -52,7 +68,7 @@ const OPEN_CLAIMED = Symbol.for('aleclay10.palette.openClaimed');
 
 function openPalette(e?: KeyboardEvent) {
 	if (e) Object.defineProperty(e, OPEN_CLAIMED, { value: true });
-	void load().then((m) => m.open());
+	void load().then((m) => m?.open());
 }
 
 function isTyping(target: EventTarget | null): boolean {

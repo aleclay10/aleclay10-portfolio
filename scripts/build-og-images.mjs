@@ -194,56 +194,90 @@ async function main() {
 	let files;
 	try {
 		files = await htmlFiles(distDir);
-	} catch {
-		console.error('[og] no dist/ - run `npm run build` first (or use `npm run og`, which does both).');
+	} catch (err) {
+		// Only a missing dist/ means "you forgot to build". Anything else (EACCES,
+		// a file where a directory should be) gets reported as itself - telling
+		// someone to rebuild when the problem is permissions sends them in circles.
+		if (err?.code === 'ENOENT') {
+			console.error('[og] no dist/ - run `npm run build` first (or use `npm run og`, which does both).');
+		} else {
+			console.error(`[og] cannot read dist/: ${err?.message ?? err}`);
+		}
 		process.exit(1);
 	}
 
 	const fonts = await Promise.all(
-		FONTS.map(async ([file, name, weight]) => ({
-			name,
-			weight,
-			style: 'normal',
-			data: await readFile(path.resolve(file)),
-		}))
+		FONTS.map(async ([file, name, weight]) => {
+			try {
+				return { name, weight, style: 'normal', data: await readFile(path.resolve(file)) };
+			} catch (err) {
+				// A bare ENOENT stack does not say which package is missing or why the
+				// path is a static @fontsource/* one (satori cannot read the variable
+				// packages' woff2 - see FONTS above).
+				console.error(`[og] cannot read font ${file} (${err?.code ?? err?.message ?? err}) - run \`npm ci\`?`);
+				process.exit(1);
+			}
+		})
 	);
 
 	await mkdir(outDir, { recursive: true });
 
 	let count = 0;
+	/** @type {string[]} */
+	const failed = [];
 	for (const file of files) {
 		const route = routeOf(distDir, file);
-		const { document } = parseHTML(await readFile(file, 'utf8'));
 
-		// Scoped to <head>: /investing renders an inline SVG donut whose <title>
-		// elements are accessible names for the chart segments, not the page title.
-		const title = document.querySelector('head > title')?.textContent?.trim();
-		const description = document
-			.querySelector('head > meta[name="description"]')
-			?.getAttribute('content')
-			?.trim();
+		try {
+			const { document } = parseHTML(await readFile(file, 'utf8'));
 
-		if (!title || !description) {
-			console.warn(`[og] ${route} - missing title or description, skipped`);
-			continue;
+			// Scoped to <head>: /investing renders an inline SVG donut whose <title>
+			// elements are accessible names for the chart segments, not the page title.
+			const title = document.querySelector('head > title')?.textContent?.trim();
+			const description = document
+				.querySelector('head > meta[name="description"]')
+				?.getAttribute('content')
+				?.trim();
+
+			if (!title || !description) {
+				console.warn(`[og] ${route} - missing title or description, skipped`);
+				continue;
+			}
+
+			const { head, tail } = splitTitle(title);
+			const svg = await satori(
+				card({
+					headline: head,
+					description: trimRestatedHeadline(description, head),
+					label: labelOf(head, tail, route),
+				}),
+				{ width: WIDTH, height: HEIGHT, fonts }
+			);
+			const png = new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } }).render().asPng();
+
+			await writeFile(path.join(outDir, `${slugOf(route)}.png`), png);
+			count += 1;
+		} catch (err) {
+			// One page's card failing (a satori layout edge case, a corrupt HTML file)
+			// should not abort the run mid-loop: that leaves public/og/ half-updated
+			// with no summary of which cards are current. Finish the sweep, then fail
+			// with the full list so one run shows every problem.
+			failed.push(route);
+			console.error(`[og] ${route} - card generation failed: ${err?.message ?? err}`);
 		}
-
-		const { head, tail } = splitTitle(title);
-		const svg = await satori(
-			card({
-				headline: head,
-				description: trimRestatedHeadline(description, head),
-				label: labelOf(head, tail, route),
-			}),
-			{ width: WIDTH, height: HEIGHT, fonts }
-		);
-		const png = new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } }).render().asPng();
-
-		await writeFile(path.join(outDir, `${slugOf(route)}.png`), png);
-		count += 1;
 	}
 
 	console.log(`[og] wrote ${count} card(s) to public/og/ - commit them`);
+	if (failed.length) {
+		console.error(`[og] FAILED for ${failed.length} route(s): ${failed.join(', ')} - fix before committing`);
+		process.exit(1);
+	}
+	if (count === 0) {
+		// dist/ existed but produced nothing - every page skipped or dist/ empty.
+		// "wrote 0 cards" exiting 0 would read as success in a chained command.
+		console.error('[og] wrote nothing - dist/ has no usable pages, which is not a state to commit');
+		process.exit(1);
+	}
 }
 
 await main();

@@ -185,7 +185,14 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 
 			themeToggle?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
-				localStorage.setItem('theme', dark ? 'dark' : 'light');
+				try {
+					localStorage.setItem('theme', dark ? 'dark' : 'light');
+				} catch {
+					// Storage blocked or full. The toggle already applied above, so the
+					// theme still switches for this page view; only persistence is lost.
+					// An uncaught throw here would also skip syncThemeLabel() below and
+					// leave the button announcing the wrong direction.
+				}
 				syncThemeLabel();
 			});
 

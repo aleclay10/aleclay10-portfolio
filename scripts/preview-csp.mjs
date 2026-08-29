@@ -24,6 +24,16 @@ const CSP =
 const ROOT = path.resolve('dist');
 const PORT = Number(process.env.PORT ?? 4321);
 
+// Without this the server starts happily over a missing dist/ and 404s every
+// request - which, in the tool that exists to catch invisible production
+// failures, would read as "the CSP broke the whole site".
+try {
+	await stat(path.join(ROOT, 'index.html'));
+} catch {
+	console.error('[preview:csp] no dist/index.html - run `npm run build` first.');
+	process.exit(1);
+}
+
 const TYPES = {
 	'.html': 'text/html; charset=utf-8',
 	'.js': 'text/javascript; charset=utf-8',
@@ -65,7 +75,24 @@ createServer(async (req, res) => {
 		return;
 	}
 	res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] ?? 'application/octet-stream' });
-	createReadStream(file).pipe(res);
-}).listen(PORT, () => {
-	console.log(`dist/ on http://localhost:${PORT} with the production CSP`);
-});
+	createReadStream(file)
+		.on('error', (err) => {
+			// stat() succeeded but the read failed (file replaced mid-request by a
+			// rebuild, most likely). Without a handler this is an uncaught 'error'
+			// event that takes the whole server down over one request.
+			console.error(`[preview:csp] read failed for ${path.relative(ROOT, file)}: ${err.message}`);
+			res.destroy();
+		})
+		.pipe(res);
+})
+	.on('error', (err) => {
+		if (err.code === 'EADDRINUSE') {
+			console.error(`[preview:csp] port ${PORT} is already in use - stop the other server or set PORT.`);
+		} else {
+			console.error(`[preview:csp] server error: ${err.message}`);
+		}
+		process.exit(1);
+	})
+	.listen(PORT, () => {
+		console.log(`dist/ on http://localhost:${PORT} with the production CSP`);
+	});

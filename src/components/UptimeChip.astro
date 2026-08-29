@@ -81,8 +81,12 @@
 			label.title = parts.join(' · ');
 			label.textContent = observedDays >= 7 ? `· ${fmt(week)} / 7d` : `· ${fmt(week)} / ${Math.max(1, Math.floor(observedDays))}d`;
 			label.hidden = false;
-		} catch {
-			// Offline, blocked, or malformed JSON - leave the static footer untouched.
+		} catch (err) {
+			// Offline, blocked, or malformed JSON - leave the static footer untouched,
+			// but name the reason in the console. The expected dev-time 404 returns
+			// earlier via `!res.ok` and never reaches this, so anything logged here is
+			// genuinely unexpected - most likely health-check.sh writing bad JSON.
+			console.debug('[uptime] chip disabled:', err);
 		}
 	}
 

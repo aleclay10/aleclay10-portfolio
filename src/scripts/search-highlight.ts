@@ -69,8 +69,12 @@ function wrap(seg: Segment, ordinal: number): HTMLElement | null {
 		mark.dataset.searchHit = String(ordinal);
 		range.surroundContents(mark);
 		return mark;
-	} catch {
-		// A boundary we cannot wrap is a missing highlight, not a broken page.
+	} catch (err) {
+		// A boundary we cannot wrap is a missing highlight, not a broken page. But
+		// it is also the only runtime symptom of indexer/highlighter walker drift -
+		// the coin-flip failure CLAUDE.md warns about - so name it rather than
+		// swallow it.
+		console.debug('[search] could not wrap match segment', ordinal, err);
 		return null;
 	}
 }

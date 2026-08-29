@@ -151,103 +151,133 @@ const json = (body: unknown, status = 200) =>
 const redirect = (path: string) =>
 	new Response(null, { status: 303, headers: { location: path, 'cache-control': 'no-store' } });
 
+async function handle(request: Request, env: Env): Promise<Response> {
+	const url = new URL(request.url);
+
+	if (url.pathname !== '/api/waitlist') {
+		return json({ error: 'Not found.' }, 404);
+	}
+
+	if (request.method !== 'POST') {
+		return new Response(JSON.stringify({ error: 'Method not allowed.' }), {
+			status: 405,
+			headers: {
+				'content-type': 'application/json; charset=utf-8',
+				allow: 'POST',
+				'cache-control': 'no-store',
+			},
+		});
+	}
+
+	// Modern browsers send Origin on every POST, including a plain form submit,
+	// so this costs the no-JS path nothing and drops most drive-by scripted noise.
+	const origin = request.headers.get('origin');
+	if (!origin || !SITE_ORIGINS.has(origin)) {
+		return json({ error: 'Forbidden.' }, 403);
+	}
+
+	const isJson = wantsJson(request);
+
+	// Rate limit before reading the body: a request that is going to be rejected
+	// should not get to allocate anything. Keyed on the client IP, which at the
+	// edge is CF-Connecting-IP; a missing header falls back to a shared bucket
+	// rather than to no limit at all.
+	//
+	// The limiter is its own service and can fail independently of this Worker.
+	// That failure must not take the form down: the limiter is an abuse control,
+	// not a security boundary, and a real visitor losing their signup to an
+	// internal Cloudflare blip is the worse outcome. Fail open, but say so -
+	// a run of these lines in `wrangler tail` means submissions are currently
+	// unthrottled, which is worth knowing.
+	const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+	let limited = false;
+	try {
+		const { success } = await env.WAITLIST_LIMITER.limit({ key: ip });
+		limited = !success;
+	} catch (err) {
+		console.error('waitlist rate limiter unavailable - failing open', err);
+	}
+	if (limited) {
+		return isJson
+			? json({ error: 'That is a few too many tries in a row. Give it a minute.' }, 429)
+			: redirect(retryPath('rate'));
+	}
+
+	const raw = await readBody(request);
+	// A no-JS browser must never be shown raw JSON; essentially unreachable via
+	// the real form, but a hand-built POST should still land somewhere styled.
+	if (!raw) {
+		return isJson ? json({ error: 'Malformed request.' }, 400) : redirect(retryPath('invalid'));
+	}
+
+	// Honeypot: report success, write nothing. A bot that can tell it was caught
+	// is a bot that can be tuned against the filter. The log line carries no PII;
+	// it exists so `wrangler tail` can measure how often the trap fires, because
+	// a false positive here is silent data loss behind a success message.
+	if (HONEYPOT_FIELDS.some((field) => clean(raw[field]))) {
+		console.warn('waitlist honeypot tripped');
+		return isJson ? json({ ok: true }) : redirect(THANKS_PATH);
+	}
+
+	const result = validate(raw);
+	if (!result.ok) {
+		return isJson ? json({ error: result.error }, 400) : redirect(retryPath('invalid'));
+	}
+	const { first_name, last_name, email, notes } = result.data;
+
+	const country =
+		(request as Request & { cf?: { country?: string } }).cf?.country ?? null;
+
+	try {
+		// Re-submitting an address updates the row instead of erroring. Crucially the
+		// response is byte-identical whether the address was new or already present:
+		// a different answer for a known address is an email-enumeration oracle, and
+		// matching them costs nothing.
+		//
+		// created_at, status and unsubscribe_token are deliberately NOT touched on
+		// conflict — someone who already unsubscribed must not be revived by
+		// resubmitting the form, and the original signup time is the useful one.
+		//
+		// COALESCE on notes means resubmitting with the field blank keeps the old
+		// notes rather than clearing them. Deliberate: a plain form cannot tell
+		// "left blank" apart from "wants it erased", and wiping notes on every
+		// casual resubmit is the worse failure. Consequence: notes can be replaced
+		// but never cleared via the form. Documented in the README.
+		await env.DB.prepare(
+			`INSERT INTO waitlist (email, first_name, last_name, notes, unsubscribe_token, source, country)
+			 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+			 ON CONFLICT(email) DO UPDATE SET
+			   first_name = excluded.first_name,
+			   last_name  = excluded.last_name,
+			   notes      = COALESCE(excluded.notes, waitlist.notes)`
+		)
+			.bind(email, first_name, last_name, notes, crypto.randomUUID(), 'gaming-assistant', country)
+			.run();
+	} catch (err) {
+		console.error('waitlist insert failed', err);
+		return isJson
+			? json({ error: 'Something went wrong on my end. Try again in a moment.' }, 500)
+			: redirect(retryPath('server'));
+	}
+
+	return isJson ? json({ ok: true }) : redirect(THANKS_PATH);
+}
+
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
-		const url = new URL(request.url);
-
-		if (url.pathname !== '/api/waitlist') {
-			return json({ error: 'Not found.' }, 404);
-		}
-
-		if (request.method !== 'POST') {
-			return new Response(JSON.stringify({ error: 'Method not allowed.' }), {
-				status: 405,
-				headers: {
-					'content-type': 'application/json; charset=utf-8',
-					allow: 'POST',
-					'cache-control': 'no-store',
-				},
-			});
-		}
-
-		// Modern browsers send Origin on every POST, including a plain form submit,
-		// so this costs the no-JS path nothing and drops most drive-by scripted noise.
-		const origin = request.headers.get('origin');
-		if (!origin || !SITE_ORIGINS.has(origin)) {
-			return json({ error: 'Forbidden.' }, 403);
-		}
-
-		const isJson = wantsJson(request);
-
-		// Rate limit before reading the body: a request that is going to be rejected
-		// should not get to allocate anything. Keyed on the client IP, which at the
-		// edge is CF-Connecting-IP; a missing header falls back to a shared bucket
-		// rather than to no limit at all.
-		const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
-		const { success } = await env.WAITLIST_LIMITER.limit({ key: ip });
-		if (!success) {
-			return isJson
-				? json({ error: 'That is a few too many tries in a row. Give it a minute.' }, 429)
-				: redirect(retryPath('rate'));
-		}
-
-		const raw = await readBody(request);
-		// A no-JS browser must never be shown raw JSON; essentially unreachable via
-		// the real form, but a hand-built POST should still land somewhere styled.
-		if (!raw) {
-			return isJson ? json({ error: 'Malformed request.' }, 400) : redirect(retryPath('invalid'));
-		}
-
-		// Honeypot: report success, write nothing. A bot that can tell it was caught
-		// is a bot that can be tuned against the filter. The log line carries no PII;
-		// it exists so `wrangler tail` can measure how often the trap fires, because
-		// a false positive here is silent data loss behind a success message.
-		if (HONEYPOT_FIELDS.some((field) => clean(raw[field]))) {
-			console.warn('waitlist honeypot tripped');
-			return isJson ? json({ ok: true }) : redirect(THANKS_PATH);
-		}
-
-		const result = validate(raw);
-		if (!result.ok) {
-			return isJson ? json({ error: result.error }, 400) : redirect(retryPath('invalid'));
-		}
-		const { first_name, last_name, email, notes } = result.data;
-
-		const country =
-			(request as Request & { cf?: { country?: string } }).cf?.country ?? null;
-
+		// Last-resort backstop. Without it, anything `handle` throws that its own
+		// try/catches do not cover surfaces as Cloudflare's raw exception page -
+		// which for the no-JS form visitor is a dead end with no styled retry path,
+		// and for `wrangler tail` an error with no context. Every *expected* failure
+		// is still handled at its own site with its own message; this only exists so
+		// an unexpected one degrades the same way the D1 path does.
 		try {
-			// Re-submitting an address updates the row instead of erroring. Crucially the
-			// response is byte-identical whether the address was new or already present:
-			// a different answer for a known address is an email-enumeration oracle, and
-			// matching them costs nothing.
-			//
-			// created_at, status and unsubscribe_token are deliberately NOT touched on
-			// conflict — someone who already unsubscribed must not be revived by
-			// resubmitting the form, and the original signup time is the useful one.
-			//
-			// COALESCE on notes means resubmitting with the field blank keeps the old
-			// notes rather than clearing them. Deliberate: a plain form cannot tell
-			// "left blank" apart from "wants it erased", and wiping notes on every
-			// casual resubmit is the worse failure. Consequence: notes can be replaced
-			// but never cleared via the form. Documented in the README.
-			await env.DB.prepare(
-				`INSERT INTO waitlist (email, first_name, last_name, notes, unsubscribe_token, source, country)
-				 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-				 ON CONFLICT(email) DO UPDATE SET
-				   first_name = excluded.first_name,
-				   last_name  = excluded.last_name,
-				   notes      = COALESCE(excluded.notes, waitlist.notes)`
-			)
-				.bind(email, first_name, last_name, notes, crypto.randomUUID(), 'gaming-assistant', country)
-				.run();
+			return await handle(request, env);
 		} catch (err) {
-			console.error('waitlist insert failed', err);
-			return isJson
+			console.error('waitlist unhandled error', err);
+			return wantsJson(request)
 				? json({ error: 'Something went wrong on my end. Try again in a moment.' }, 500)
 				: redirect(retryPath('server'));
 		}
-
-		return isJson ? json({ ok: true }) : redirect(THANKS_PATH);
 	},
 } satisfies ExportedHandler<Env>;

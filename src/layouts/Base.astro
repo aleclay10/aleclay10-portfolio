@@ -34,12 +34,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 // directory) rather than import.meta.url: an .astro module is compiled before it
 // runs, so import.meta.url points into the build output, not src/layouts/.
 const slug = Astro.url.pathname.replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'home';
-const hasCard = existsSync(path.resolve(process.cwd(), 'public/og', `${slug}.png`));
+// The 404 page has no card, deliberately: it is only reached through broken
+// links, and link scrapers do not preview error responses. build-og-images.mjs
+// skips the route to match, so looking one up would warn on every build.
+const wantsCard = slug !== '404';
+const hasCard = wantsCard && existsSync(path.resolve(process.cwd(), 'public/og', `${slug}.png`));
 
 // Warn rather than fail: a missing card is a forgotten `npm run og`, not a
 // reason to abort a build and freeze the live site at the next signed tag. The
 // generic card still ships, so the page degrades to what it had before.
-if (!hasCard) {
+if (wantsCard && !hasCard) {
 	console.warn(`[og] no card for ${Astro.url.pathname} (public/og/${slug}.png) - run \`npm run og\`. Falling back to /og.png.`);
 }
 

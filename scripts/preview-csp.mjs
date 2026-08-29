@@ -8,8 +8,9 @@
 // because `default-src 'self'` has no `wasm-unsafe-eval`. Run this before shipping
 // anything that adds or moves a script.
 //
-// The header below is copied byte-for-byte from /opt/homebrew/etc/Caddyfile:40.
-// If the two ever diverge, this file is lying - diff them.
+// The header below is copied byte-for-byte from ops/Caddyfile (the tracked mirror
+// of /opt/homebrew/etc/Caddyfile on the origin host). If the two ever diverge,
+// this file is lying - diff them.
 //
 //   npm run build && node scripts/preview-csp.mjs   →  http://localhost:4321
 
@@ -19,7 +20,7 @@ import { createServer } from 'node:http';
 import path from 'node:path';
 
 const CSP =
-	"default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'";
+	"default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'";
 
 const ROOT = path.resolve('dist');
 const PORT = Number(process.env.PORT ?? 4321);

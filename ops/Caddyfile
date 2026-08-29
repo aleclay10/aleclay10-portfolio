@@ -1,0 +1,83 @@
+# Tracked mirror of /opt/homebrew/etc/Caddyfile on the origin host.
+#
+# THE HOST FILE IS WHAT SERVES TRAFFIC. This copy exists so header changes
+# (above all the CSP) get reviewed in a PR instead of being edited live with
+# no history. The signed-tag deploy pipeline does NOT touch the host file;
+# after a change here merges, apply it manually:
+#
+#   cp /opt/homebrew/etc/Caddyfile /opt/homebrew/etc/Caddyfile.backup.$(date +%Y%m%d)
+#   cp ops/Caddyfile /opt/homebrew/etc/Caddyfile
+#   caddy reload --config /opt/homebrew/etc/Caddyfile \
+#     --address unix//Users/agent.kowalski/portfolio/caddy-admin.sock
+#
+# The CSP below must stay byte-identical to the CSP constant in
+# scripts/preview-csp.mjs. If they diverge, one of them is lying.
+
+# Global options.
+# The admin API is moved off TCP 127.0.0.1:2019 onto a unix socket (audit F-6).
+# It was unauthenticated: any local process could rewrite the web server config.
+# A socket keeps `caddy reload` working — which `admin off` would break, forcing a
+# full service restart on every deploy and a brief outage with it — while removing
+# the listening port. Callers must pass --address; see deploy.sh.
+{
+	admin unix//Users/agent.kowalski/portfolio/caddy-admin.sock
+
+	# Real client IPs in the access log (audit F-2, 2026-08-16).
+	# cloudflared forwards over loopback, so every log entry recorded `::1` and the
+	# true client was invisible — 6,249 hostile probes in the log with no attribution
+	# and no basis for per-IP rate limiting. Cloudflare sets CF-Connecting-IP; we only
+	# honour it from the tunnel on loopback, which is the sole path to this listener
+	# (see `bind` below). remote_ip is still logged, so the proxy hop is not lost.
+	servers {
+		trusted_proxies static 127.0.0.1/32 ::1/128
+		client_ip_headers CF-Connecting-IP
+	}
+}
+
+# Portfolio static site — served on loopback only (:8080).
+# Public TLS is terminated by Cloudflare; the tunnel forwards to this plain HTTP port.
+# Port-only address `:8080` matches any Host (the tunnel forwards Host: aleclay10.dev) and
+# stays plain HTTP (no auto-HTTPS). `bind` restricts the listener to loopback so the origin
+# is NOT reachable from the LAN — only the Cloudflare tunnel can reach it.
+:8080 {
+	bind 127.0.0.1 ::1
+	root * /Users/agent.kowalski/portfolio/www
+	file_server {
+		hide .*
+	}
+	encode gzip
+
+	# CSP notes (2026-08-29):
+	#   style-src 'self': 'unsafe-inline' dropped; v1.3.1 ships zero inline styles
+	#     (PR 40). Do not re-add without a reason in this comment.
+	#   script-src + connect-src: Cloudflare Web Analytics. The edge injects
+	#     beacon.min.js from static.cloudflareinsights.com and it reports to
+	#     cloudflareinsights.com. Without these two the beacon is blocked and
+	#     analytics collects nothing.
+	#   form-action 'self': pentest LOW-2. The waitlist form posts to /api/waitlist
+	#     (same origin).
+	#   object-src 'none': pentest LOW-2.
+	# Cloudflare's inline challenge snippets remain blocked by script-src (they carry
+	# per-request hashes, so they cannot be allowlisted without 'unsafe-inline').
+	# Deliberate: the site never depends on them.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# Runtime JSON written by scheduled jobs on this host, not by the build:
+	#   status.json — footer uptime chip (health-check.sh, every 5 min)
+	#   prices.json — /investing price table (fetch-prices.mjs)
+	# Never cache these. A stale "up" while the site is degraded, or a stale quote
+	# presented as live, are the two failure modes they must not have.
+	@runtime path /status.json /prices.json
+	header @runtime Cache-Control "no-store"
+
+	log {
+		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log
+	}
+}

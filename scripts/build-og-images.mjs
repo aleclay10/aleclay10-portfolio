@@ -228,6 +228,13 @@ async function main() {
 	for (const file of files) {
 		const route = routeOf(distDir, file);
 
+		// Astro emits the 404 page as the flat file dist/404.html, the one route
+		// that is not <dir>/index.html. No card for it, deliberately: a 404 is
+		// only ever reached through a broken link, and link scrapers do not
+		// preview error responses. Base.astro skips its per-page lookup to match
+		// (falling back to the generic /og.png, without the missing-card warning).
+		if (route === '/404.html') continue;
+
 		try {
 			const { document } = parseHTML(await readFile(file, 'utf8'));
 

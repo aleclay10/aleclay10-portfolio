@@ -1,0 +1,68 @@
+---
+// "Book at a glance" chip under the hero portrait, linking to /investing.
+//
+// Progressive enhancement, same contract as UptimeChip: the server-rendered
+// baseline (top thesis vectors + weights from portfolio.ts) is a complete chip
+// on its own, and the script only adds the live day change once /prices.json
+// resolves fresh. No JS, a 404 (expected in dev), or a stale feed degrades to
+// the static allocation line rather than an empty or broken chip.
+//
+// Disclosure contract matches /investing: percentages and weights only, never
+// dollar values or share counts. `data-search-skip` keeps the chip out of the
+// ⌘K index - the script rewrites its text after load, so indexing it would let
+// deep-link highlighting race the rewrite.
+//
+// The live spans start `hidden` rather than empty so the flex gap does not
+// nudge the row for no-JS visitors.
+import { vectorWeights, baselineAsOf } from '../data/portfolio';
+
+const top = vectorWeights().slice(0, 2);
+const alloc = top.map((v) => `${v.label} ${v.weight.toFixed(1)}%`).join(' · ');
+---
+
+<a
+	href="/investing/"
+	data-search-skip
+	title={`Allocation as of ${baselineAsOf}`}
+	class="viz-root group mt-3 flex w-56 flex-col gap-y-1 rounded-xl border border-line bg-surface/40 px-3 py-2 font-mono text-[11px] text-muted transition hover:border-accent/40 sm:w-64">
+	<span class="flex items-center gap-x-2">
+		<span class="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+		<span class="shrink-0 text-ink">The book</span>
+		<span id="book-chip-change" class="tabular-nums" hidden></span>
+		<span id="book-chip-when" class="min-w-0 truncate" hidden></span>
+		<span
+			class="ml-auto shrink-0 text-ink transition group-hover:translate-x-0.5 group-hover:text-accent"
+			aria-hidden="true">→</span>
+	</span>
+	<span class="truncate">{alloc}</span>
+</a>
+
+<script>
+	import { loadFreshPrices, signed } from '../lib/prices-client';
+
+	async function boot() {
+		const change = document.getElementById('book-chip-change');
+		const when = document.getElementById('book-chip-when');
+		if (!change || !when) return;
+
+		const fresh = await loadFreshPrices();
+		if (!fresh) return;
+		const day = fresh.data.portfolio?.dayChangePct;
+		if (typeof day !== 'number') return;
+
+		change.textContent = signed(day);
+		// Sign is in the text, so colour is reinforcement rather than the only cue.
+		change.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
+		change.hidden = false;
+
+		// "today" is only true while the market is open; closed means the figure is
+		// the last completed session - same wording rule as /investing, compressed
+		// to fit the chip's narrow mobile width without truncating. No ▲/▼ glyph:
+		// the sign is already in the number and the row is only 200px wide.
+		const open = fresh.data.marketState === 'market open';
+		when.textContent = open ? 'today' : 'at close';
+		when.hidden = false;
+	}
+
+	boot();
+</script>

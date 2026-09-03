@@ -272,7 +272,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 	// server-rendered baseline weights, which is a coherent page on its own.
 	// Fetch, freshness guard and formatters live in the shared module so this page,
 	// the donut and the home BookChip apply one contract.
-	import { loadFreshPrices, nf, signed } from '../lib/prices-client';
+	import { closeDay, loadFreshPrices, nf, signed } from '../lib/prices-client';
 
 	function paint(el: HTMLElement | null, n: number) {
 		if (!el) return;
@@ -284,7 +284,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 	async function load() {
 		const fresh = await loadFreshPrices();
 		if (!fresh) return;
-		const { data, generatedAt } = fresh;
+		const { data, generatedAt, closesAt } = fresh;
 
 		// Headline: allocation-weighted move for the whole book.
 		const day = data.portfolio?.dayChangePct;
@@ -297,12 +297,17 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 				el.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
 			}
 			// "today" is only true while the market is open; once it closes the figure
-			// is the last completed session, and on a weekend that is days old.
+			// is the last completed session, and on a weekend that is days old. Name
+			// the session when the feed dates it, so a stale close is visibly stale.
 			const lab = document.getElementById('day-change-label');
 			if (lab) {
 				const open = data.marketState === 'market open';
 				const dir = day >= 0 ? '▲ up' : '▼ down';
-				lab.textContent = open ? `${dir} today` : `${dir} · last close`;
+				lab.textContent = open
+					? `${dir} today`
+					: closesAt
+						? `${dir} · ${closeDay(closesAt)} close`
+						: `${dir} · last close`;
 			}
 		}
 
@@ -341,11 +346,15 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 		const asof = document.getElementById('price-asof');
 		if (asof) {
 			// Say "checked" rather than "live" when the market is shut - the prices are
-			// real but they are the last close, not a live tick.
+			// real but they are the last close, not a live tick. Date the close itself:
+			// "checked 7:35 PM" alone looked fresh for six sessions in Aug 2026 while
+			// the numbers underneath were a week old.
 			asof.textContent =
 				data.marketState === 'market open'
 					? `Live · updated ${generatedAt.toLocaleTimeString()}`
-					: `Market closed · last close, checked ${generatedAt.toLocaleTimeString()}`;
+					: closesAt
+						? `Market closed · ${closeDay(closesAt)} close, checked ${generatedAt.toLocaleTimeString()}`
+						: `Market closed · last close, checked ${generatedAt.toLocaleTimeString()}`;
 		}
 	}
 

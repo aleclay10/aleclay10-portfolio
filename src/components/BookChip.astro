@@ -38,7 +38,7 @@ const alloc = top.map((v) => `${v.label} ${v.weight.toFixed(1)}%`).join(' · ');
 </a>
 
 <script>
-	import { loadFreshPrices, signed } from '../lib/prices-client';
+	import { closeDay, loadFreshPrices, signed } from '../lib/prices-client';
 
 	async function boot() {
 		const change = document.getElementById('book-chip-change');
@@ -60,7 +60,8 @@ const alloc = top.map((v) => `${v.label} ${v.weight.toFixed(1)}%`).join(' · ');
 		// to fit the chip's narrow mobile width without truncating. No ▲/▼ glyph:
 		// the sign is already in the number and the row is only 200px wide.
 		const open = fresh.data.marketState === 'market open';
-		when.textContent = open ? 'today' : 'at close';
+		const { closesAt } = fresh;
+		when.textContent = open ? 'today' : closesAt ? `${closeDay(closesAt, 'short')} close` : 'at close';
 		when.hidden = false;
 	}
 

@@ -18,7 +18,25 @@
  */
 export const baselineAsOf = 'August 29, 2026';
 
+// The id stays `compute` for continuity with ~/portfolio/holdings.json and the
+// `vectors` key in prices.json; only the visitor-facing label changed (2026-09-03).
 export type VectorId = 'compute' | 'robotics' | 'space' | 'index' | 'crypto' | 'offthesis';
+
+/**
+ * Layers of the AI stack vector. One vector, several layers: the thesis is that
+ * compute scaling lifts every layer, so a power utility and a GPU designer are
+ * the same bet. Naming the layer is what stops CEG reading as a "compute"
+ * company (Alec, 2026-09-03). Order is the order they appear on the page.
+ */
+export type LayerId = 'silicon' | 'power' | 'infra' | 'platform' | 'software';
+export const layers: { id: LayerId; label: string }[] = [
+	{ id: 'silicon', label: 'silicon' },
+	{ id: 'power', label: 'power' },
+	{ id: 'infra', label: 'infrastructure' },
+	{ id: 'platform', label: 'platform' },
+	{ id: 'software', label: 'defence software' },
+];
+export const layerLabel = (id: LayerId) => layers.find((l) => l.id === id)?.label ?? id;
 
 export type Vector = {
 	id: VectorId;
@@ -36,10 +54,10 @@ export type Vector = {
 export const vectors: Vector[] = [
 	{
 		id: 'compute',
-		label: 'Compute',
+		label: 'AI stack',
 		slot: 1,
 		thesis:
-			'Compute scaling drives the next decade. Own the silicon, the power that feeds it, the infrastructure it runs on, and the defence software built atop it, not just one layer.',
+			'Compute scaling drives the next decade. Own the whole stack, not one layer: the silicon, the power that feeds it, the infrastructure it runs on, the platforms that integrate it, and the defence software built on top.',
 	},
 	{
 		id: 'robotics',
@@ -82,6 +100,8 @@ export type Holding = {
 	ticker: string;
 	name: string;
 	vector: VectorId;
+	/** Which layer of the AI stack this is. Only meaningful for `vector: 'compute'`. */
+	layer?: LayerId;
 	/** % of the brokerage + crypto book. Baseline snapshot - see note above. */
 	weight: number;
 	kind: 'stock' | 'etf' | 'crypto';
@@ -93,20 +113,20 @@ export type Holding = {
 // cash and everything outside the taxable book (retirement, savings) - the page
 // is explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
-	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', weight: 14.83, kind: 'stock', note: 'The compute layer itself. Largest position.' },
+	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', layer: 'silicon', weight: 14.83, kind: 'stock', note: 'The compute layer itself. Largest position.' },
 	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 13.78, kind: 'stock', note: 'Bought post-IPO on launch cadence, added through the unwind. Now the second-largest position.' },
 	{ ticker: 'TSLA', name: 'Tesla', vector: 'robotics', weight: 13.58, kind: 'stock', note: 'Held for Optimus, not cars. Checkpoint missed in 2026; under review, not sold.' },
-	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', weight: 10.12, kind: 'stock', note: 'Integrated model, silicon, and distribution. Built from the Salesforce exit proceeds.' },
+	{ ticker: 'GOOGL', name: 'Alphabet', vector: 'compute', layer: 'platform', weight: 10.12, kind: 'stock', note: 'Integrated model, silicon, and distribution. Built from the Salesforce exit proceeds.' },
 	{ ticker: 'VTI', name: 'Vanguard Total Stock Market', vector: 'index', weight: 7.39, kind: 'etf' },
-	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', weight: 6.35, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
-	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', weight: 5.44, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
-	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', weight: 5.39, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
+	{ ticker: 'PLTR', name: 'Palantir', vector: 'compute', layer: 'software', weight: 6.35, kind: 'stock', note: 'Defence and enterprise AI deployment layer.' },
+	{ ticker: 'COHR', name: 'Coherent', vector: 'compute', layer: 'infra', weight: 5.44, kind: 'stock', note: 'Optical interconnect, the plumbing between accelerators.' },
+	{ ticker: 'CEG', name: 'Constellation Energy', vector: 'compute', layer: 'power', weight: 5.39, kind: 'stock', note: 'The power behind the datacentre. Compute is an energy trade.' },
 	{ ticker: 'VXUS', name: 'Vanguard Total International', vector: 'index', weight: 3.83, kind: 'etf' },
 	{ ticker: 'RKLB', name: 'Rocket Lab', vector: 'space', weight: 3.76, kind: 'stock', note: 'Re-underwriting the Iridium acquisition: a capital-allocation question, not a price one.' },
 	{ ticker: 'BTC', name: 'Bitcoin', vector: 'crypto', weight: 3.56, kind: 'crypto' },
 	{ ticker: 'NFLX', name: 'Netflix', vector: 'offthesis', weight: 3.18, kind: 'stock', note: 'Flagged off-thesis since June. Still held. That is the point of showing this slice.' },
-	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', weight: 3.05, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
-	{ ticker: 'AMD', name: 'AMD', vector: 'compute', weight: 2.27, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
+	{ ticker: 'NBIS', name: 'Nebius Group', vector: 'compute', layer: 'infra', weight: 3.05, kind: 'stock', note: 'Neoclouds: compute capacity as a rentable utility.' },
+	{ ticker: 'AMD', name: 'AMD', vector: 'compute', layer: 'silicon', weight: 2.27, kind: 'stock', note: 'Best call in the book by percentage. Also still a token-sized position, which the framework calls dabbling.' },
 	{ ticker: 'SCHD', name: 'Schwab US Dividend Equity', vector: 'index', weight: 2.04, kind: 'etf' },
 	{ ticker: 'USAR', name: 'USA Rare Earth', vector: 'offthesis', weight: 1.05, kind: 'stock', note: 'Flagged for exit since May. Worst performer in the book.' },
 	{ ticker: 'XRP', name: 'XRP', vector: 'crypto', weight: 0.33, kind: 'crypto' },

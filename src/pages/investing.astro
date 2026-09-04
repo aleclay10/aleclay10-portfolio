@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import AllocationDonut from '../components/AllocationDonut.astro';
-import { vectors, holdings, principles, watchlist, baselineAsOf } from '../data/portfolio';
+import { vectors, holdings, principles, watchlist, baselineAsOf, layers, layerLabel } from '../data/portfolio';
 
 const title = '/investing · how and why I invest';
 const description =
@@ -20,6 +20,17 @@ const byVector = vectors.map((v) => ({
 const sorted = [...holdings].sort((a, b) => b.weight - a.weight);
 const slotOf = (id: string) => vectors.find((v) => v.id === id)?.slot ?? 1;
 const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
+
+// Thesis-card ticker line. A layered vector lists its holdings by layer so the
+// card itself answers "why is a power utility in here"; the rest stay a flat list.
+const tickerLine = (hs: typeof holdings) => {
+	const layered = layers
+		.map((l) => ({ label: l.label, tickers: hs.filter((h) => h.layer === l.id).map((h) => h.ticker) }))
+		.filter((l) => l.tickers.length);
+	return layered.length
+		? layered.map((l) => `${l.label} ${l.tickers.join(', ')}`).join(' · ')
+		: hs.map((h) => h.ticker).join(' · ');
+};
 ---
 
 <Base title={title} description={description}>
@@ -115,9 +126,7 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 								</span>
 							</div>
 							<p class="mt-2 text-[14px] leading-relaxed text-muted">{v.thesis}</p>
-							<p class="mt-2 font-mono text-[11px] text-muted/70">
-								{v.holdings.map((h) => h.ticker).join(' · ')}
-							</p>
+							<p class="mt-2 font-mono text-[11px] text-muted/70">{tickerLine(v.holdings)}</p>
 						</article>
 					))
 				}
@@ -167,6 +176,9 @@ const labelOf = (id: string) => vectors.find((v) => v.id === id)?.label ?? id;
 												aria-hidden="true"
 											/>
 											<span class="font-mono text-[12px] text-muted">{labelOf(h.vector)}</span>
+											{h.layer && (
+												<span class="font-mono text-[11px] text-muted/70">· {layerLabel(h.layer)}</span>
+											)}
 										</span>
 									</td>
 									<td

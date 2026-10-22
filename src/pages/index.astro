@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import BookChip from '../components/BookChip.astro';
 
-const title = 'Alec Layton · Agents, products, and the book';
+const title = 'Alec Layton · agents, products, and the book';
 const description =
 	'Alec Layton: I build autonomous agents, ship AI products, and run a concentrated investing book. Self-hosted projects, writing, and experiments.';
 
@@ -52,10 +52,13 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 	},
 ];
 
-const projects: { n: string; name: string; desc: string; tag: string; href?: string }[] = [
-	{ n: '01', name: 'AI Gaming Assistant', desc: 'Desktop gaming companion: AI chat, play tracking, Discord in-game. Early access.', tag: 'Product', href: '/gaming-assistant/' },
-	{ n: '02', name: 'Kowalski', desc: 'Autonomous personal-ops agent: calendar, mail, vault, code.', tag: 'AI agents', href: '/kowalski/' },
-	{ n: '03', name: 'Self-hosted platform', desc: 'Mac mini + Cloudflare Tunnel: signature-gated releases, zero open ports.', tag: 'Infra' },
+// Every row links somewhere and carries a spec line, so the section reads as
+// work rather than a table of contents. No 01/02/03: the numbers implied an
+// order that was never there.
+const projects: { name: string; desc: string; tag: string; meta: string; href: string }[] = [
+	{ name: 'AI Gaming Assistant', desc: 'Desktop gaming companion: AI chat with play-history context, session tracking, Discord without alt-tab.', tag: 'Product', meta: 'Tauri 2 · Rust · React · FastAPI · early access', href: '/gaming-assistant/' },
+	{ name: 'Kowalski', desc: 'Autonomous personal-ops agent: calendar, mail, vault, code. It opened the pull request that shipped this page.', tag: 'AI agents', meta: 'Claude Agent SDK · five MCP servers · Obsidian · in service', href: '/kowalski/' },
+	{ name: 'Self-hosted platform', desc: 'Mac mini behind a Cloudflare Tunnel: signature-gated releases, zero open ports, an agent that ships the pages.', tag: 'Infra', meta: 'Astro · Caddy · Cloudflare Tunnel · signed-tag deploys', href: '/stack/' },
 ];
 ---
 
@@ -149,22 +152,18 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Selected work</h2>
 			<ul class="mt-4 divide-y divide-line">
 				{projects.map((p) => (
-					<li class="group relative flex items-baseline gap-x-5 py-4 transition">
-						<span class="font-mono text-[12px] text-muted">{p.n}</span>
-						<div class="flex-1">
+					<li class="group relative grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
+						<p class="font-mono text-[12px] uppercase tracking-wider text-muted">{p.tag}</p>
+						<div>
 							<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">
-								{p.href ? (
-									<a href={p.href} class="after:absolute after:inset-0">
-										{p.name}
-										<span aria-hidden="true" class="ml-1 inline-block font-mono text-[14px] text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>
-									</a>
-								) : (
-									p.name
-								)}
+								<a href={p.href} class="after:absolute after:inset-0">
+									{p.name}
+									<span aria-hidden="true" class="ml-1 inline-block font-mono text-[14px] text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>
+								</a>
 							</h3>
-							<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-body">{p.desc}</p>
+							<p class="mt-1.5 max-w-lg text-[14px] leading-relaxed text-body">{p.desc}</p>
+							<p class="mt-2.5 font-mono text-[12px] text-muted">{p.meta}</p>
 						</div>
-						<span class="hidden font-mono text-[11px] uppercase tracking-wider text-muted sm:block">{p.tag}</span>
 					</li>
 				))}
 			</ul>

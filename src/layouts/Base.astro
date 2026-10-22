@@ -15,17 +15,25 @@ interface Props {
 
 const { title, description, noindex = false } = Astro.props;
 // One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
-// One labelling rule: a route is shown as its path (/investing), a section of
-// the home page as a plain word (Projects). Timeline left the bar: it is one
-// scroll below the hero and had the only title-case label pointing at an anchor.
+// Labels are names, not paths: "/gaming-assistant" was a route standing in for a
+// product, and the mix of a word (Projects) beside five paths read as two rules.
+// Page titles use the same names as their first segment, so the tab, the bar
+// and the OG card all agree. Timeline is not in the bar: it is one scroll below
+// the hero.
 const nav = [
 	{ href: '/#projects', label: 'Projects' },
-	{ href: '/gaming-assistant/', label: '/gaming-assistant' },
-	{ href: '/investing/', label: '/investing' },
-	{ href: '/stack/', label: '/stack' },
-	{ href: '/now/', label: '/now' },
-	{ href: '/uses/', label: '/uses' },
+	{ href: '/gaming-assistant/', label: 'Gaming Assistant' },
+	{ href: '/investing/', label: 'Investing' },
+	{ href: '/stack/', label: 'Stack' },
+	{ href: '/now/', label: 'Now' },
+	{ href: '/uses/', label: 'Uses' },
 ];
+
+// Current-page marker. aria-current="page" on the matching link, and global.css
+// draws it in ink. Only exact routes qualify: /#projects is a section of the
+// home page, not a page, so nothing is marked on /.
+const here = Astro.url.pathname;
+const current = (href: string) => (href === here ? 'page' : undefined);
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
@@ -114,7 +122,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 						AL<span class="text-accent">.</span>
 					</a>
 					<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
-						{nav.map((n) => <a class="link" href={n.href}>{n.label}</a>)}
+						{nav.map((n) => <a class="link" href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
 					</nav>
 					<div class="flex items-center gap-x-3">
 						<button id="cmdk" type="button" aria-label="Search"
@@ -145,7 +153,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 				<nav id="mobile-nav" hidden aria-label="Site"
 					class="mt-4 flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface/40 font-mono text-[13px] sm:hidden">
 					{nav.map((n) => (
-						<a class="px-4 py-3 text-muted transition hover:bg-surface hover:text-accent" href={n.href}>{n.label}</a>
+						<a class="px-4 py-3 text-muted transition hover:bg-surface hover:text-accent" href={n.href} aria-current={current(n.href)}>{n.label}</a>
 					))}
 					<button id="cmdk-mobile" type="button"
 						class="px-4 py-3 text-left text-muted transition hover:bg-surface hover:text-accent">Search</button>
@@ -154,11 +162,16 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 
 			<slot />
 
-			<!-- Footer -->
+			<!-- Footer. The contact row is the one place every page offers GitHub,
+			     LinkedIn and email; before this, email lived only in the hero and
+			     LinkedIn only on the résumé. -->
 			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
-				<span class="flex items-center gap-x-4">
+				<span class="flex flex-wrap items-center gap-x-4">
 					<span>© 2026 Alec Layton</span>
 					<a class="link -my-3 py-3" href="/resume/">Résumé</a>
+					<a class="link -my-3 py-3" href="https://github.com/aleclay10" rel="noopener">GitHub ↗</a>
+					<a class="link -my-3 py-3" href="https://linkedin.com/in/alec4" rel="noopener">LinkedIn ↗</a>
+					<a class="link -my-3 py-3" href="mailto:alec.layton100@gmail.com">Email ↗</a>
 				</span>
 				<UptimeChip />
 			</footer>

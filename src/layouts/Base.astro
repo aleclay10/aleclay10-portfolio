@@ -15,10 +15,12 @@ interface Props {
 
 const { title, description, noindex = false } = Astro.props;
 // One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
+// One labelling rule: a route is shown as its path (/investing), a section of
+// the home page as a plain word (Projects). Timeline left the bar: it is one
+// scroll below the hero and had the only title-case label pointing at an anchor.
 const nav = [
-	{ href: '/#timeline', label: 'Timeline' },
 	{ href: '/#projects', label: 'Projects' },
-	{ href: '/gaming-assistant/', label: 'Gaming Assistant' },
+	{ href: '/gaming-assistant/', label: '/gaming-assistant' },
 	{ href: '/investing/', label: '/investing' },
 	{ href: '/stack/', label: '/stack' },
 	{ href: '/now/', label: '/now' },
@@ -187,16 +189,36 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 			}
 			syncThemeLabel();
 
+			// A stored value pins the theme, which is what people want when they override
+			// the system. Toggling back to the system's own theme clears it instead, so
+			// "matches the OS" means "follows the OS": before this, one press stopped the
+			// site reacting to a systemwide appearance change for good.
+			const osDark = matchMedia('(prefers-color-scheme: dark)');
 			themeToggle?.addEventListener('click', () => {
 				const dark = document.documentElement.classList.toggle('dark');
 				try {
-					localStorage.setItem('theme', dark ? 'dark' : 'light');
+					if (dark === osDark.matches) localStorage.removeItem('theme');
+					else localStorage.setItem('theme', dark ? 'dark' : 'light');
 				} catch {
 					// Storage blocked or full. The toggle already applied above, so the
 					// theme still switches for this page view; only persistence is lost.
 					// An uncaught throw here would also skip syncThemeLabel() below and
 					// leave the button announcing the wrong direction.
 				}
+				syncThemeLabel();
+			});
+
+			// Nothing pinned: track the OS while the page is open (Auto appearance flips
+			// at sunset; theme-init.js only reads the preference once, before paint).
+			osDark.addEventListener('change', (e) => {
+				let stored: string | null = null;
+				try {
+					stored = localStorage.getItem('theme');
+				} catch {
+					// Storage blocked: nothing can be pinned, so the OS wins.
+				}
+				if (stored) return;
+				document.documentElement.classList.toggle('dark', e.matches);
 				syncThemeLabel();
 			});
 
@@ -217,7 +239,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 
 			navToggle?.addEventListener('click', () => setNav(mobileNav?.hidden !== false));
 
-			// Same-page anchors (/#timeline) do not reload, so the panel has to close itself.
+			// Same-page anchors (/#projects) do not reload, so the panel has to close itself.
 			mobileNav?.addEventListener('click', (e) => {
 				if ((e.target as HTMLElement).closest('a, button')) setNav(false);
 			});

@@ -11,7 +11,8 @@
 // rule rather than inventing 19 distinguishable hues, which is not possible.
 //
 // Colour: categorical (each vector is an identity, not a magnitude), 6 slots from
-// the validated default palette in fixed slot order. Validated against THIS site's
+// the validated default palette in fixed slot order, minus its orange (the accent
+// hue): aqua moves up to slot 2 and violet takes slot 3, see global.css. Validated against THIS site's
 // surfaces (#fbf8f4 / #0c0c0d) in both modes - all hard gates pass. Light mode
 // reports 3 slots under 3:1 contrast, which obligates a relief channel; the direct
 // % labels in the legend and the full table below are that relief.

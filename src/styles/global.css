@@ -179,6 +179,13 @@ header[data-vt-header] {
     animation: none;
   }
 }
+/* Second and later pages of a tab session skip the reveal; theme-init.js sets
+   the class before paint. */
+.no-reveal .reveal {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
 
 @keyframes breathe {
   0%,

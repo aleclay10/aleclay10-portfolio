@@ -110,7 +110,7 @@ The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows releas
 
 "Engineered, with a signature" — a true 50/50 of *competent systems engineer* and *creative*. The brand promise is "I have my shit together, but I also am creative," so keep the discipline (restraint, performance, tight grid) but always carry one expressive signal.
 
-- **Dual theme:** ship **both light and dark**, toggled via a `.dark` class on `<html>` (anti-FOUC inline script in `<head>`; persisted to `localStorage`). Light is warm *paper* off-white, not pure white; dark is warm near-black `#0c0c0d`.
+- **Dual theme:** ship **both light and dark**, toggled via a `.dark` class on `<html>` (anti-FOUC script in `<head>`; persisted to `localStorage` only while the choice differs from the OS, so the site follows the system again once they match). Light is warm *paper* off-white, not pure white; dark is warm near-black `#0c0c0d`.
 - **Type system:** **Fraunces** (variable serif) for headlines — the creative tell; **Inter** for body; **JetBrains Mono** for metadata/labels/code/⌘K. Pairing the editorial serif against mono is what keeps it off the cloned-template path.
 - **Accent — Ember:** `#e8590c` (light) / `#ff8a5b` (dark). One accent, used surgically.
 - **Tokens:** semantic palette lives as CSS vars in `src/styles/global.css` (`--bg`, `--ink`, `--muted`, `--line`, `--accent`…) flipped by `.dark`, exposed to Tailwind via `@theme` (`bg-canvas`, `text-ink`, `text-accent`, `border-line`, …). Prefer these tokens over raw hex.

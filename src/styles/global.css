@@ -81,8 +81,8 @@ html {
    Firefox ignores it and navigates exactly as it does today. No CSP surface,
    because there is no script.
 
-   Only real page-to-page moves transition - the /#timeline and /#projects nav
-   links are same-document and are unaffected.
+   Only real page-to-page moves transition - the /#projects nav link is
+   same-document and is unaffected.
    --------------------------------------------------------------------------- */
 @view-transition {
   navigation: auto;
@@ -124,6 +124,22 @@ header[data-vt-header] {
 }
 .link:hover {
   color: var(--accent);
+}
+
+/* Compact-width type step. Mono labels, captions and table text are 11 and 12px
+   on desktop, which is fine at a Mac's viewing distance but at or under the
+   iPhone floor (11pt) in the hand. Below sm every 11px becomes 12 and every
+   12px becomes 13, here rather than across ~70 class edits. Unlayered on
+   purpose: Tailwind's utilities live in @layer utilities and an unlayered rule
+   wins regardless of source order. The 10px lines in the /gaming-assistant
+   product mock are an illustration and are left alone. */
+@media (width < 40rem) {
+  .text-\[11px\] {
+    font-size: 12px;
+  }
+  .text-\[12px\] {
+    font-size: 13px;
+  }
 }
 
 .reveal {
@@ -298,18 +314,25 @@ header[data-vt-header] {
 
 /* ---------------------------------------------------------------------------
    Chart tokens (/investing).
-   Categorical slots 1–6 in FIXED slot order from the validated default dataviz
-   palette - the ordering is the colour-blindness safety mechanism, not cosmetic,
-   so do not reorder to taste. Validated with scripts/validate_palette.js against
-   THIS site's surfaces (#fbf8f4 light / #0c0c0d dark), both modes, all hard gates
-   passing. Light mode reports slots 3/4/5 under 3:1 contrast, which obligates a
-   relief channel - the legend's visible % labels and the holdings table are it.
-   Status colours are reserved and always ship with a sign or glyph, never hue alone.
+   Categorical slots 1–6 from the validated default dataviz palette, in a FIXED
+   slot order - the ordering is the colour-blindness safety mechanism, not
+   cosmetic, so do not reorder to taste. One deviation from the default order
+   (2026-10-21): the default's slot 2 is orange, which is the Ember accent's hue,
+   so on /investing orange meant both "interactive" and "Robotics". Orange is out;
+   the default's violet (slot 7) is in, and the order is blue, aqua, violet,
+   yellow, magenta, green. Validated with the dataviz skill's
+   validate_palette.js against THIS site's surfaces (#fbf8f4 light / #0c0c0d
+   dark): every hard gate passes in both modes (worst adjacent CVD ΔE 16.3
+   light / 13.0 dark; normal-vision 19.6 / 19.3). Blue↔violet adjacent fails
+   both floors, which is why violet sits in slot 3, not 2. Light mode reports
+   slots 2/4/5 under 3:1 contrast, which obligates a relief channel - the
+   legend's visible % labels and the holdings table are it. Status colours are
+   reserved and always ship with a sign or glyph, never hue alone.
    --------------------------------------------------------------------------- */
 .viz-root {
   --series-1: #2a78d6; /* blue    */
-  --series-2: #eb6834; /* orange  */
-  --series-3: #1baf7a; /* aqua    */
+  --series-2: #1baf7a; /* aqua    */
+  --series-3: #6250d6; /* violet  */
   --series-4: #eda100; /* yellow  */
   --series-5: #e87ba4; /* magenta */
   --series-6: #008300; /* green   */
@@ -320,8 +343,8 @@ header[data-vt-header] {
 
 .dark .viz-root {
   --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
+  --series-2: #199e70;
+  --series-3: #9085e9;
   --series-4: #c98500;
   --series-5: #d55181;
   --series-6: #008300;

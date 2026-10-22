@@ -1,0 +1,39 @@
+---
+/**
+ * "On this page" section list for the right-hand column of long single-column
+ * pages (/stack, /investing, /resume, /uses).
+ *
+ * The container is 1024px wide and reading text stops at 672px, which left about
+ * a third of the width empty on those pages. This fills it with something that
+ * earns its place, and stays out of the way everywhere it cannot: hidden below
+ * lg, hidden in print (the résumé PDF), and skipped by the search indexer.
+ *
+ * Static, no scroll-spy. The labels repeat the section headings on the page, so
+ * `data-search-skip` on the root keeps them out of the ⌘K index; the walker does
+ * not descend a skipped element. The list deliberately carries none of the eyebrow
+ * utility classes the indexer keys on, so nothing in here can ever be mistaken for
+ * a section label by a block that follows it.
+ */
+interface Props {
+	items: { href: string; label: string }[];
+}
+const { items } = Astro.props;
+---
+
+<nav
+	aria-label="On this page"
+	data-search-skip
+	class="no-print hidden lg:sticky lg:top-10 lg:block lg:self-start">
+	<p class="font-mono text-[11px] uppercase tracking-wider text-muted">On this page</p>
+	<ul class="mt-3 border-l border-line">
+		{items.map((i) => (
+			<li>
+				<a
+					href={i.href}
+					class="link -ml-px block border-l border-transparent py-1.5 pl-4 font-mono text-[12px] transition hover:border-accent">
+					{i.label}
+				</a>
+			</li>
+		))}
+	</ul>
+</nav>

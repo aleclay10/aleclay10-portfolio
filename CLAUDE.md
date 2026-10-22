@@ -42,7 +42,7 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 
 - `src/pages/` — routes (`.astro`). Nine today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`, and `gaming-assistant/thanks` (the no-JS confirmation for the waitlist form — `noindex`, and excluded from the sitemap and the ⌘K index).
 - `src/layouts/Base.astro` — the shared shell every page renders through (head, nav, footer, theme init, `global.css` import).
-- `src/components/` — reusable UI (`AllocationDonut.astro`, `UptimeChip.astro`).
+- `src/components/` — reusable UI (`AllocationDonut.astro`, `UptimeChip.astro`, `BookChip.astro`, `ShipLog.astro`, `PageNav.astro`). `PageNav` is the sticky "On this page" list in the right column of `/stack`, `/investing`, `/resume` and `/uses`; it is hidden below `lg`, hidden in print, and `data-search-skip`, so adding it to a page costs nothing in the PDF or the search index. Its `href`s must match the section `id`s on that page.
 - `src/data/portfolio.ts` — holdings/watchlist data behind `/investing`.
 - `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
 - `public/` — static assets served as-is (e.g. `favicon.svg`, `theme-init.js`). Note `/status.json` is **not** here and **not** a build artifact — `health-check.sh` writes it on the host, so it 404s in dev and `UptimeChip` degrades quietly. That 404 is expected, not a bug.
@@ -79,7 +79,7 @@ Rules that are load-bearing rather than stylistic:
 
 - **`search-core.js` is plain ESM with `// @ts-check`, not TypeScript**, because the indexer is a `.mjs` file that must import it under whatever Node the host's nvm resolves highest. `npx astro check` type-checks it through JSDoc.
 - **The indexer and the highlighter must agree on block order and block text**, because the indexer assigns each occurrence an ordinal and the highlighter recomputes it from the live DOM. That is why there is one walker, why `linkedom` (real `matches()`/`closest()`) parses the built HTML, and why block dropping, dedupe and synthetic word-boundary spaces all live inside `extractBlocks`/`blockTextMap` rather than in either caller. A rule applied on one side only silently turns every deep link into a coin flip.
-- **Scope is `<main>`**, so chrome exclusion is structural and a new page needs no opt-in attribute. `[data-search-section]` labels a section with no eyebrow; `[data-search-skip]` excludes content.
+- **Scope is `<main>`**, so chrome exclusion is structural and a new page needs no opt-in attribute. A section is labelled by its serif `h2` (which labels itself, the way a mono eyebrow does); `[data-search-section]` labels a section that has neither; `[data-search-skip]` excludes content.
 - **The build warns and does not fail** on an unlabelled section or a lost word boundary. `SEARCH_STRICT=1` turns warnings into an error — use it locally, never on the host: a build abort on a prose nit would freeze the live site at the next tag.
 - **Ceiling: roughly 50k words / 150 KB raw.** The whole index is one download. Past that, switch to per-page shards or an inverted index. The corpus is ~2.9k words today.
 
@@ -110,6 +110,10 @@ The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows releas
 
 "Engineered, with a signature" — a true 50/50 of *competent systems engineer* and *creative*. The brand promise is "I have my shit together, but I also am creative," so keep the discipline (restraint, performance, tight grid) but always carry one expressive signal.
 
+- **Section headings are serif `h2`s** (`font-serif text-2xl font-medium tracking-tight text-ink`), item titles inside them are `h3`s, and the only mono uppercase eyebrow left is the page kicker above the `h1`, in `--muted`. The 12px eyebrow-as-heading pattern was retired in the 2026-10-21 HIG review: every section read at the same weight as the legal disclaimer.
+- **The italic accent tail on the `h1`** (`run the book.`) belongs to the home hero and the product and substance pages. Utility pages (`/now`, `/uses`, `/404`, the waitlist thanks page) use a plain roman title one size smaller, so the moment stays a moment.
+- **The accent is for interactive and status only** (links, buttons, focus, the live dots, `· now`) plus that one `h1` tail. Not for eyebrows, list numbering, bullets or non-linked names: Apple's colour guidance is that the interactive colour on static text reads as a broken link.
+- **`--faint`** is the token for secondary metadata that used to be `--muted` at 70% or 80% alpha. Those alphas sat at 3:1 on the paper background; the token is 4.61:1 in light and reuses `--muted` in dark. Never fade `--muted` with an alpha for text again.
 - **Dual theme:** ship **both light and dark**, toggled via a `.dark` class on `<html>` (anti-FOUC script in `<head>`; persisted to `localStorage` only while the choice differs from the OS, so the site follows the system again once they match). Light is warm *paper* off-white, not pure white; dark is warm near-black `#0c0c0d`.
 - **Type system:** **Fraunces** (variable serif) for headlines — the creative tell; **Inter** for body; **JetBrains Mono** for metadata/labels/code/⌘K. Pairing the editorial serif against mono is what keeps it off the cloned-template path.
 - **Accent — Ember:** `#e8590c` (light) / `#ff8a5b` (dark). One accent, used surgically.

@@ -93,10 +93,12 @@ const INLINE_TAGS = new Set([
 ]);
 
 /**
- * The site labels its sections with styled `<p>` eyebrows rather than headings
- * ("Colophon", "The pipeline", "Security posture"). They are identified by the two
- * utility classes every one of them carries. Fragile by construction - see R1 in the
- * plan - so `[data-search-section]` overrides it and an unlabelled block warns.
+ * Page-level kickers above an `h1` ("Colophon", "Investing", "Résumé") are styled
+ * `<p>` eyebrows rather than headings, identified by the two utility classes every
+ * one of them carries. Sections themselves carry a real `h2` since the 2026-10-21
+ * design pass, which `sectionLabel` picks up through its heading fallback. Fragile
+ * by construction - see R1 in the plan - so `[data-search-section]` overrides it
+ * and an unlabelled block warns.
  */
 const EYEBROW_CLASSES = ['uppercase', 'tracking-[0.2em]'];
 
@@ -242,9 +244,11 @@ export function blockTextMap(el) {
  * Resolve the human-readable section label for a block.
  *
  * Order: `[data-search-section]` override → the block's own text if it *is* an
- * eyebrow → nearest preceding eyebrow → nearest preceding `h2`/`h3` → `''`. The
- * search is bounded by the block's nearest `<section>` so a section that forgot its
- * eyebrow inherits nothing from the one above it; it reports `''` and the build warns.
+ * eyebrow → nearest preceding eyebrow → the block's own text if it is an `h2` (a
+ * section heading labels itself, exactly as an eyebrow does) → nearest preceding
+ * `h2`/`h3` → `''`. The search is bounded by the block's nearest `<section>` so a
+ * section that forgot its heading inherits nothing from the one above it; it
+ * reports `''` and the build warns.
  *
  * @param {Element} el
  * @param {Element} root
@@ -262,6 +266,7 @@ export function sectionLabel(el, root) {
 		if (isSkipped(p)) continue;
 		if (isEyebrow(p)) return collapse(p.textContent ?? '');
 	}
+	if (el.tagName === 'H2') return collapse(el.textContent ?? '');
 	for (const p of precedingWithin(el, bound)) {
 		if (isSkipped(p)) continue;
 		if (p.tagName === 'H2' || p.tagName === 'H3') return collapse(p.textContent ?? '');

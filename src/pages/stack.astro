@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import ShipLog from '../components/ShipLog.astro';
+import PageNav from '../components/PageNav.astro';
 
 const title = '/stack · how this site works';
 const description =
@@ -17,6 +18,15 @@ const pipeline = [
 	{ step: 'you', note: 'TLS at the edge, HTML always fresh' },
 ];
 
+// Right-column section list. Ids must match the sections below (and ShipLog's).
+const onThisPage = [
+	{ href: '#pipeline', label: 'The pipeline' },
+	{ href: '#parts', label: 'The parts' },
+	{ href: '#security', label: 'Security posture' },
+	{ href: '#agent', label: 'The unusual part' },
+	{ href: '#ship-log', label: 'Ship log' },
+];
+
 const stack = [
 	{ label: 'Framework', value: 'Astro 7, static output, ~0 JS shipped by default' },
 	{ label: 'Styling', value: 'Tailwind CSS v4, CSS-first config, semantic tokens for the dual theme' },
@@ -30,9 +40,10 @@ const stack = [
 ---
 
 <Base title={title} description={description}>
-	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_10rem] lg:gap-x-16">
+		<div class="min-w-0">
 		<div class="reveal max-w-2xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Colophon</p>
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">Colophon</p>
 			<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
 				How this site <span class="italic text-accent">works.</span>
 			</h1>
@@ -45,9 +56,9 @@ const stack = [
 		</div>
 
 		<!-- Deploy pipeline -->
-		<section class="reveal reveal-2 mt-16 border-t border-line pt-10">
-			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The pipeline</h2>
-			<ol class="mt-6 max-w-2xl">
+		<section id="pipeline" class="reveal reveal-2 mt-16 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">The pipeline</h2>
+			<ol class="mt-5 max-w-2xl">
 				{pipeline.map((p, i) => (
 					<li class="flex gap-x-4">
 						<div class="flex flex-col items-center">
@@ -64,9 +75,9 @@ const stack = [
 		</section>
 
 		<!-- Stack table -->
-		<section class="mt-10 border-t border-line pt-10">
-			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The parts</h2>
-			<dl class="mt-6 max-w-2xl divide-y divide-line">
+		<section id="parts" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">The parts</h2>
+			<dl class="mt-4 max-w-2xl divide-y divide-line">
 				{stack.map((s) => (
 					<div class="grid gap-x-6 py-3.5 sm:grid-cols-[8rem_1fr]">
 						<dt class="font-mono text-[12px] uppercase tracking-wider text-muted">{s.label}</dt>
@@ -77,9 +88,9 @@ const stack = [
 		</section>
 
 		<!-- Security -->
-		<section class="mt-10 border-t border-line pt-10">
-			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Security posture</h2>
-			<div class="mt-6 max-w-2xl space-y-4 text-[15px] leading-relaxed text-body">
+		<section id="security" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Security posture</h2>
+			<div class="mt-5 max-w-2xl space-y-4 text-[15px] leading-relaxed text-body">
 				<p>
 					Zero inbound ports: the tunnel dials out, nothing dials in. The web server
 					binds to loopback and serves static files with a strict Content-Security-Policy,
@@ -107,9 +118,9 @@ const stack = [
 		</section>
 
 		<!-- The agent -->
-		<section class="mt-10 border-t border-line pt-10">
-			<h2 class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The unusual part</h2>
-			<p class="mt-6 max-w-2xl text-[15px] leading-relaxed text-body">
+		<section id="agent" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">The unusual part</h2>
+			<p class="mt-5 max-w-2xl text-[15px] leading-relaxed text-body">
 				The pages on this site are largely written, verified, and pushed by{' '}
 				<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">an autonomous agent</a>{' '}
 				running on the same Mac mini that serves them. It opens branches, runs the
@@ -120,5 +131,7 @@ const stack = [
 		</section>
 
 		<ShipLog />
+		</div>
+		<PageNav items={onThisPage} />
 	</main>
 </Base>

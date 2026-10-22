@@ -41,12 +41,18 @@
 
 .dark {
   --bg: #0c0c0d;        /* warm near-black */
-  --surface: #141414;
+  /* Elevated surface. #141414 sat at 1.06:1 against --bg, so cards and the
+     product mock all but vanished in the dark theme. #1a1917 is 1.11:1, the same
+     step light mode has between its paper and its surface (1.10:1), and warm
+     like the rest of the palette. --line moves with it so borders still read on
+     top of a surface (1.19:1, versus 1.13:1 before). Muted text on a surface
+     stays at 4.75:1. */
+  --surface: #1a1917;
   --ink: #edeae4;
   --body: #bfb9b0;
   --muted: #8a847c;
   --faint: #8a847c;
-  --line: #20201d;
+  --line: #2a2824;
   --accent: #ff8a5b;    /* Ember, dark mode */
   --accent-soft: #2a1a12;
 }

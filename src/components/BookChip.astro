@@ -24,17 +24,19 @@ const alloc = top.map((v) => `${v.label} ${v.weight.toFixed(1)}%`).join(' · ');
 	href="/investing/"
 	data-search-skip
 	title={`Allocation as of ${baselineAsOf}`}
-	class="viz-root group mt-3 flex w-56 flex-col gap-y-1 rounded-xl border border-line bg-surface/40 px-3 py-2 font-mono text-[11px] text-muted transition hover:border-accent/40 sm:w-64">
-	<span class="flex items-center gap-x-2">
+	class="viz-root group relative mt-3 flex w-56 flex-col gap-y-1 rounded-xl border border-line bg-surface/40 px-3 py-2 pr-7 font-mono text-[11px] text-muted transition hover:border-accent/40 sm:w-64">
+	<!-- Nothing here truncates: on a 224px phone chip the lines wrap instead. The
+	     arrow is pinned top-right so a wrapped first line cannot carry it away. -->
+	<span class="flex flex-wrap items-center gap-x-2">
 		<span class="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
 		<span class="shrink-0 text-ink">The book</span>
 		<span id="book-chip-change" class="tabular-nums" hidden></span>
-		<span id="book-chip-when" class="min-w-0 truncate" hidden></span>
-		<span
-			class="ml-auto shrink-0 text-ink transition group-hover:translate-x-0.5 group-hover:text-accent"
-			aria-hidden="true">→</span>
+		<span id="book-chip-when" hidden></span>
 	</span>
-	<span class="truncate">{alloc}</span>
+	<span class="leading-snug">{alloc}</span>
+	<span
+		class="absolute top-2 right-3 text-ink transition group-hover:translate-x-0.5 group-hover:text-accent"
+		aria-hidden="true">→</span>
 </a>
 
 <script>
@@ -56,12 +58,13 @@ const alloc = top.map((v) => `${v.label} ${v.weight.toFixed(1)}%`).join(' · ');
 		change.hidden = false;
 
 		// "today" is only true while the market is open; closed means the figure is
-		// the last completed session - same wording rule as /investing, compressed
-		// to fit the chip's narrow mobile width without truncating. No ▲/▼ glyph:
-		// the sign is already in the number and the row is only 200px wide.
+		// the last completed session - same rule as /investing, compressed to the
+		// bare date so the row fits a 224px phone chip on one line (the chip's
+		// title attribute and /investing carry the "close" wording). No ▲/▼ glyph:
+		// the sign is already in the number.
 		const open = fresh.data.marketState === 'market open';
 		const { closesAt } = fresh;
-		when.textContent = open ? 'today' : closesAt ? `${closeDay(closesAt, 'short')} close` : 'at close';
+		when.textContent = open ? 'today' : closesAt ? closeDay(closesAt, 'short') : 'at close';
 		when.hidden = false;
 	}
 

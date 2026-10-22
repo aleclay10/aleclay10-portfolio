@@ -14,6 +14,12 @@
   --bg: #fbf8f4;        /* warm paper, not pure white */
   --surface: #f3ede3;
   --ink: #1a1714;
+  /* Reading text. Every paragraph used to be set in --muted (5.5:1 here, 5.3:1
+     in dark), the same colour as captions and metadata, so body copy read as
+     de-emphasised. --body sits between ink and muted: 9.1:1 on --bg, 10.0:1 in
+     dark. Rule: Inter paragraphs are body; mono labels, captions and eyebrows
+     stay muted. */
+  --body: #4a443d;
   --muted: #6b645c;
   --line: #e7ddcf;
   /* Ember, light mode. Was #e8590c, which is only 3.38:1 against --bg: it passes
@@ -31,6 +37,7 @@
   --bg: #0c0c0d;        /* warm near-black */
   --surface: #141414;
   --ink: #edeae4;
+  --body: #bfb9b0;
   --muted: #8a847c;
   --line: #20201d;
   --accent: #ff8a5b;    /* Ember, dark mode */
@@ -49,6 +56,7 @@
   --color-canvas: var(--bg);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
+  --color-body: var(--body);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
@@ -174,6 +182,7 @@ header[data-vt-header] {
     --bg: #ffffff;
     --surface: #ffffff;
     --ink: #14120f;
+    --body: #2a2622;
     --muted: #3f3a34;
     --line: #d5cfc5;
     --accent: #c2410c;

@@ -1,29 +1,29 @@
 {
 	"repo": "aleclay10/aleclay10-portfolio",
-	"mergedPrs": 33,
-	"releases": 6,
+	"mergedPrs": 49,
+	"releases": 15,
 	"since": "2026-06-17",
 	"recent": [
 		{
-			"number": 33,
-			"title": "Fix a11y, nav, and copy nits (S1, S2, S3, S5, S6, S8)",
-			"mergedAt": "2026-08-22"
+			"number": 49,
+			"title": "Rename the Compute vector to AI stack and tag each holding's layer",
+			"mergedAt": "2026-09-04"
 		},
 		{
-			"number": 32,
-			"title": "Fix misleading copy and contradictory disclosures (M4-M10)",
-			"mergedAt": "2026-08-22"
+			"number": 48,
+			"title": "Show the session date behind closed-market prices",
+			"mergedAt": "2026-09-03"
 		},
 		{
-			"number": 31,
-			"title": "Fix three blockers from the 2026-08-21 QA report",
-			"mergedAt": "2026-08-22"
+			"number": 47,
+			"title": "Serve the built 404 page via handle_errors (QA N2)",
+			"mergedAt": "2026-08-29"
 		},
 		{
-			"number": 30,
-			"title": "Correct /stack's description of the deploy model",
-			"mergedAt": "2026-08-22"
+			"number": 46,
+			"title": "Reprice /investing to 2026-08-29 brokerage marks",
+			"mergedAt": "2026-08-29"
 		}
 	],
-	"refreshed": "2026-08-22"
+	"refreshed": "2026-09-06"
 }

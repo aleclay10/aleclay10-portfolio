@@ -131,8 +131,8 @@ function run() {
 		for (const mark of chosen) mark.dataset.searchHit = 'current';
 		const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 		// `block: 'center'` makes scroll-margin a non-issue and scrolls horizontal
-		// ancestors too, so a match inside #tl-rail or the /investing table comes
-		// into view laterally for free.
+		// ancestors too, so a match inside the /investing table on a narrow screen
+		// comes into view laterally for free.
 		target.scrollIntoView({ block: 'center', behavior });
 	}
 

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageNav from '../components/PageNav.astro';
 
 const title = 'Résumé · Alec Layton';
 const description =
@@ -23,6 +24,16 @@ const contact: { label: string; href?: string }[] = [
 	{ label: 'linkedin.com/in/alec4', href: 'https://linkedin.com/in/alec4' },
 	{ label: 'github.com/aleclay10', href: 'https://github.com/aleclay10' },
 	{ label: 'aleclay10.dev', href: new URL('/', Astro.site).href },
+];
+
+// Right-column section list (screen only; the PDF never sees it). Ids must match
+// the sections below.
+const onThisPage = [
+	{ href: '#experience', label: 'Experience' },
+	{ href: '#projects', label: 'Projects' },
+	{ href: '#skills', label: 'Technical skills' },
+	{ href: '#education', label: 'Education' },
+	{ href: '#additional', label: 'Additional' },
 ];
 
 const summary =
@@ -96,10 +107,11 @@ const additional = [
 ---
 
 <Base title={title} description={description}>
-	<main id="main-content" tabindex="-1" class="resume flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="resume flex flex-1 flex-col py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_10rem] lg:gap-x-16">
+		<div class="min-w-0">
 		<!-- Masthead -->
 		<div class="reveal max-w-3xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Résumé</p>
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">Résumé</p>
 			<h1
 				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
 				Alec <span class="italic text-accent">Layton.</span>
@@ -125,7 +137,7 @@ const additional = [
 				}
 			</ul>
 
-			<p class="mt-7 max-w-2xl text-[16px] leading-relaxed text-muted">{summary}</p>
+			<p class="mt-7 max-w-2xl text-[16px] leading-relaxed text-body">{summary}</p>
 
 			<!-- Print/download affordance. `download` keeps the PDF out of the print view
 			     itself via the no-print class below. -->
@@ -141,22 +153,22 @@ const additional = [
 		</div>
 
 		<!-- Experience -->
-		<section class="mt-12 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Experience</p>
+		<section id="experience" class="mt-12 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Experience</h2>
 			<div class="mt-6 max-w-3xl space-y-9">
 				{
 					experience.map((job) => (
 						<article class="break-inside-avoid">
 							<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-								<h2 class="font-serif text-[21px] font-medium text-ink">{job.role}</h2>
+								<h3 class="font-serif text-[21px] font-medium text-ink">{job.role}</h3>
 								<p class="font-mono text-[12px] text-muted">{job.dates}</p>
 							</div>
-							<p class="mt-1 font-mono text-[13px] text-accent">
+							<p class="mt-1 font-mono text-[13px] text-ink">
 								{job.org} <span class="text-muted">· {job.location}</span>
 							</p>
 							<ul class="mt-4 space-y-2.5">
 								{job.bullets.map((b) => (
-									<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+									<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
 										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 										<span>{b}</span>
 									</li>
@@ -169,14 +181,14 @@ const additional = [
 		</section>
 
 		<!-- Projects -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Projects</p>
+		<section id="projects" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Projects</h2>
 			<div class="mt-6 max-w-3xl space-y-9">
 				{
 					projects.map((p) => (
 						<article class="break-inside-avoid">
 							<div class="flex flex-wrap items-baseline gap-x-3">
-								<h2 class="font-serif text-[21px] font-medium text-ink">{p.name}</h2>
+								<h3 class="font-serif text-[21px] font-medium text-ink">{p.name}</h3>
 								<p class="font-mono text-[12px] text-muted">{p.kind}</p>
 								{p.href && (
 									<a
@@ -188,7 +200,7 @@ const additional = [
 							</div>
 							<ul class="mt-4 space-y-2.5">
 								{p.bullets.map((b) => (
-									<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+									<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
 										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 										<span>{b}</span>
 									</li>
@@ -201,8 +213,8 @@ const additional = [
 		</section>
 
 		<!-- Skills -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Technical skills</p>
+		<section id="skills" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Technical skills</h2>
 			<dl class="mt-6 max-w-3xl divide-y divide-line">
 				{
 					skills.map((s) => (
@@ -216,29 +228,29 @@ const additional = [
 		</section>
 
 		<!-- Education -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Education</p>
+		<section id="education" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Education</h2>
 			<div class="mt-6 max-w-3xl break-inside-avoid">
 				<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-					<h2 class="font-serif text-[21px] font-medium text-ink">B.S. Computer Science</h2>
+					<h3 class="font-serif text-[21px] font-medium text-ink">B.S. Computer Science</h3>
 					<p class="font-mono text-[12px] text-muted">Graduated December 2022</p>
 				</div>
-				<p class="mt-1 font-mono text-[13px] text-accent">
+				<p class="mt-1 font-mono text-[13px] text-ink">
 					The University of Texas at San Antonio
 				</p>
-				<p class="mt-3 text-[14px] leading-relaxed text-muted">
+				<p class="mt-3 text-[14px] leading-relaxed text-body">
 					Concentrations in Software Engineering &amp; Data Science.
 				</p>
 			</div>
 		</section>
 
 		<!-- Additional -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Additional</p>
+		<section id="additional" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Additional</h2>
 			<ul class="mt-6 max-w-3xl space-y-2.5">
 				{
 					additional.map((a) => (
-						<li class="flex gap-x-3 text-[14px] leading-relaxed text-muted">
+						<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
 							<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 							<span>{a}</span>
 						</li>
@@ -246,5 +258,7 @@ const additional = [
 				}
 			</ul>
 		</section>
+		</div>
+		<PageNav items={onThisPage} />
 	</main>
 </Base>

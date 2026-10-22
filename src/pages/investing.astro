@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import AllocationDonut from '../components/AllocationDonut.astro';
+import PageNav from '../components/PageNav.astro';
 import { vectors, holdings, principles, watchlist, baselineAsOf, layers, layerLabel } from '../data/portfolio';
 
 const title = '/investing · how and why I invest';
@@ -10,6 +11,16 @@ const description =
 // Baseline "as of" for the server-rendered weights. Live prices override the
 // numbers client-side; this date describes the fallback, not the live feed.
 const asOf = baselineAsOf;
+
+// Right-column section list. Ids must match the sections below.
+const onThisPage = [
+	{ href: '#performance', label: 'Book performance' },
+	{ href: '#allocation', label: 'Allocation' },
+	{ href: '#theses', label: 'The theses' },
+	{ href: '#positions', label: 'Positions' },
+	{ href: '#watchlist', label: 'Watchlist' },
+	{ href: '#rules', label: 'The rules' },
+];
 
 const byVector = vectors.map((v) => ({
 	...v,
@@ -34,10 +45,11 @@ const tickerLine = (hs: typeof holdings) => {
 ---
 
 <Base title={title} description={description}>
-	<main id="main-content" tabindex="-1" class="viz-root flex flex-1 flex-col py-16">
+	<main id="main-content" tabindex="-1" class="viz-root flex flex-1 flex-col py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_10rem] lg:gap-x-16">
+		<div class="min-w-0">
 		<!-- Hero -->
 		<div class="reveal max-w-2xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-accent">Investing</p>
+			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">Investing</p>
 			<!-- The `max-[359px]` step is not decoration. "Concentration," is one
 			     unbreakable 14-character word, and at the shared `text-5xl` base it
 			     measures wider than a 320px viewport, so it pushed the whole document
@@ -59,14 +71,14 @@ const tickerLine = (hs: typeof holdings) => {
 
 		<!-- Day performance - a stat tile, not a chart. Status colour always ships
 		     with an explicit sign so it never depends on hue alone. -->
-		<section class="reveal reveal-2 mt-12 border-t border-line pt-10">
+		<section id="performance" class="reveal reveal-2 mt-12 border-t border-line pt-10">
 			<div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
 				<div>
 					<!-- Deliberately not "today": outside market hours the figure is the last
 					     session's close, and the label beside the number says which. -->
-					<p id="perf-heading" class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+					<h2 id="perf-heading" class="font-serif text-2xl font-medium tracking-tight text-ink">
 						Book performance
-					</p>
+					</h2>
 					<!-- Empty state is deliberately faint: a full-weight em-dash at this size
 					     reads as a redaction bar rather than "no data yet". JS sets the real
 					     value and colour once /prices.json resolves. -->
@@ -92,10 +104,10 @@ const tickerLine = (hs: typeof holdings) => {
 		</section>
 
 		<!-- Allocation -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+		<section id="allocation" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">
 				Allocation by thesis vector
-			</p>
+			</h2>
 			<p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-body">
 				Eighteen positions grouped into six vectors. Grouped rather than sliced per-ticker
 				because eighteen slices is an unreadable chart; the exact per-asset percentages are
@@ -107,9 +119,9 @@ const tickerLine = (hs: typeof holdings) => {
 		</section>
 
 		<!-- The thesis behind each vector - the actual point of the page -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The theses</p>
-			<div class="mt-6 grid max-w-4xl gap-x-10 gap-y-7 sm:grid-cols-2">
+		<section id="theses" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">The theses</h2>
+			<div class="mt-5 grid max-w-4xl gap-x-10 gap-y-7 sm:grid-cols-2">
 				{
 					byVector.map((v) => (
 						<article>
@@ -118,7 +130,7 @@ const tickerLine = (hs: typeof holdings) => {
 									class={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-sm series-bg-${v.slot}`}
 									aria-hidden="true"
 								/>
-								<h2 class="font-serif text-[19px] font-medium text-ink">{v.label}</h2>
+								<h3 class="font-serif text-[19px] font-medium text-ink">{v.label}</h3>
 								<span
 									data-thesis-weight={v.id}
 									class="font-mono text-[12px] tabular-nums text-muted">
@@ -126,7 +138,7 @@ const tickerLine = (hs: typeof holdings) => {
 								</span>
 							</div>
 							<p class="mt-2 text-[14px] leading-relaxed text-body">{v.thesis}</p>
-							<p class="mt-2 font-mono text-[11px] text-muted/70">{tickerLine(v.holdings)}</p>
+							<p class="mt-2 font-mono text-[11px] text-faint">{tickerLine(v.holdings)}</p>
 						</article>
 					))
 				}
@@ -135,11 +147,11 @@ const tickerLine = (hs: typeof holdings) => {
 
 		<!-- Holdings table. This is also the contrast-relief channel the palette
 		     validator requires, and the place the per-asset percentages live. -->
-		<section class="mt-10 border-t border-line pt-10">
+		<section id="positions" class="mt-10 border-t border-line pt-10">
 			<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
+				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">
 					Positions · live prices
-				</p>
+				</h2>
 				<p class="font-mono text-[11px] text-muted">
 					Allocation, price and daily move only, never values or share counts
 				</p>
@@ -167,7 +179,7 @@ const tickerLine = (hs: typeof holdings) => {
 										<span class="font-mono text-[13px] font-medium text-ink">{h.ticker}</span>{' '}
 										<span class="ml-2 text-[13px] text-muted">{h.name}</span>
 										{h.note && (
-											<p class="mt-1 max-w-sm text-[12px] leading-relaxed text-muted/80">
+											<p class="mt-1 max-w-sm text-[12px] leading-relaxed text-faint">
 												{h.note}
 											</p>
 										)}
@@ -180,7 +192,7 @@ const tickerLine = (hs: typeof holdings) => {
 											/>
 											<span class="font-mono text-[12px] text-muted">{labelOf(h.vector)}</span>
 											{h.layer && (
-												<span class="font-mono text-[11px] text-muted/70">· {layerLabel(h.layer)}</span>
+												<span class="font-mono text-[11px] text-faint">· {layerLabel(h.layer)}</span>
 											)}
 										</span>
 									</td>
@@ -215,9 +227,9 @@ const tickerLine = (hs: typeof holdings) => {
 		     the `held` marker is what keeps the section honest rather than implying
 		     these are un-owned. Watch-only names added to `watching` in the data
 		     module render here with no marker. -->
-		<section class="mt-10 border-t border-line pt-10">
+		<section id="watchlist" class="mt-10 border-t border-line pt-10">
 			<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-				<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">Watchlist</p>
+				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Watchlist</h2>
 				<p class="font-mono text-[11px] text-muted">
 					{watchlist().filter((w) => !w.held).length === 0
 						? 'Everything I hold, tracked in one place'
@@ -254,13 +266,13 @@ const tickerLine = (hs: typeof holdings) => {
 		</section>
 
 		<!-- Principles -->
-		<section class="mt-10 border-t border-line pt-10">
-			<p class="font-mono text-[12px] uppercase tracking-[0.2em] text-muted">The rules</p>
-			<ol class="mt-6 max-w-2xl divide-y divide-line">
+		<section id="rules" class="mt-10 border-t border-line pt-10">
+			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">The rules</h2>
+			<ol class="mt-4 max-w-2xl divide-y divide-line">
 				{
 					principles.map((p, i) => (
 						<li class="grid gap-x-5 py-4 sm:grid-cols-[2rem_1fr]">
-							<span class="font-mono text-[12px] tabular-nums text-accent">
+							<span class="font-mono text-[12px] tabular-nums text-muted">
 								{String(i + 1).padStart(2, '0')}
 							</span>
 							<div>
@@ -278,6 +290,8 @@ const tickerLine = (hs: typeof holdings) => {
 			documents my own reasoning on my own money, including the parts of it that are not
 			working. Positions change; this page may lag them.
 		</p>
+		</div>
+		<PageNav items={onThisPage} />
 	</main>
 </Base>
 

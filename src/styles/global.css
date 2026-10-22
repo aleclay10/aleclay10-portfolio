@@ -133,6 +133,12 @@ header[data-vt-header] {
 .link:hover {
   color: var(--accent);
 }
+/* The page you are on, in both the desktop bar and the phone panel. Ink rather
+   than accent: the accent means "interactive", and the current page is the one
+   link that goes nowhere. */
+nav a[aria-current='page'] {
+  color: var(--ink);
+}
 
 /* Keyboard focus. The browser default is a blue ring, the only blue on a warm
    palette; this draws it in the accent instead, matching the search-arrival

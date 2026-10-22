@@ -126,6 +126,14 @@ header[data-vt-header] {
   color: var(--accent);
 }
 
+/* Keyboard focus. The browser default is a blue ring, the only blue on a warm
+   palette; this draws it in the accent instead, matching the search-arrival
+   highlight below. :focus-visible only, so pointer clicks stay clean. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(12px);

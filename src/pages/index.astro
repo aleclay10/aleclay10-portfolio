@@ -76,7 +76,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 					<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-7xl text-display-serif">
 						I build agents,<br />ship products,<br /><span class="italic text-accent">run the book.</span>
 					</h1>
-					<p class="mt-7 max-w-md text-[17px] leading-relaxed text-muted">
+					<p class="mt-7 max-w-md text-[17px] leading-relaxed text-body">
 						I design and ship AI tooling: <a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
 						the autonomous agent that runs my day, and an{' '}
 						<a href="/gaming-assistant/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">AI Gaming Assistant</a>{' '}
@@ -140,7 +140,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 						<div class="mt-4 flex-1 rounded-xl border border-line bg-surface/40 p-5 transition hover:border-accent/40">
 							<h3 class="font-serif text-xl text-ink">{e.title}</h3>
 							<p class="mt-0.5 font-mono text-[12px] text-muted">{e.org}</p>
-							<p class="mt-3 text-[14px] leading-relaxed text-muted">{e.desc}</p>
+							<p class="mt-3 text-[14px] leading-relaxed text-body">{e.desc}</p>
 							{e.href && (
 								<a href={e.href} class="link -mb-3 mt-1 inline-block py-3 font-mono text-[13px]">{e.linkText ?? 'More →'}</a>
 							)}
@@ -179,7 +179,7 @@ const projects: { n: string; name: string; desc: string; tag: string; href?: str
 									p.name
 								)}
 							</h3>
-							<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-muted">{p.desc}</p>
+							<p class="mt-1 max-w-lg text-[14px] leading-relaxed text-body">{p.desc}</p>
 						</div>
 						<span class="hidden font-mono text-[11px] uppercase tracking-wider text-muted sm:block">{p.tag}</span>
 					</li>

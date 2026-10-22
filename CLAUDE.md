@@ -113,7 +113,7 @@ The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows releas
 - **Dual theme:** ship **both light and dark**, toggled via a `.dark` class on `<html>` (anti-FOUC inline script in `<head>`; persisted to `localStorage`). Light is warm *paper* off-white, not pure white; dark is warm near-black `#0c0c0d`.
 - **Type system:** **Fraunces** (variable serif) for headlines — the creative tell; **Inter** for body; **JetBrains Mono** for metadata/labels/code/⌘K. Pairing the editorial serif against mono is what keeps it off the cloned-template path.
 - **Accent — Ember:** `#e8590c` (light) / `#ff8a5b` (dark). One accent, used surgically.
-- **Tokens:** semantic palette lives as CSS vars in `src/styles/global.css` (`--bg`, `--ink`, `--muted`, `--line`, `--accent`…) flipped by `.dark`, exposed to Tailwind via `@theme` (`bg-canvas`, `text-ink`, `text-accent`, `border-line`, …). Prefer these tokens over raw hex.
+- **Tokens:** semantic palette lives as CSS vars in `src/styles/global.css` (`--bg`, `--ink`, `--body` for reading paragraphs, `--muted` for labels and captions, `--line`, `--accent`…) flipped by `.dark`, exposed to Tailwind via `@theme` (`bg-canvas`, `text-ink`, `text-accent`, `border-line`, …). Prefer these tokens over raw hex.
 - **Motion:** restrained — fade-up reveals, page transitions, subtle hover. Always gate on `prefers-reduced-motion`. No heavy animation libs until earned.
 - **Layout:** asymmetric editorial grids over the predictable centered column; oversized serif type does the work. References: Paco Coursey, Rauno Freiberg, Brittany Chiang (craft bar) + thesephist, Simon Willison (substance bar). Favor whitespace and typography over chrome.
 

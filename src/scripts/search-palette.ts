@@ -231,15 +231,15 @@ function renderGroups(groups: Group[]) {
 			'sticky top-0 z-10 flex items-baseline gap-x-3 border-b border-line bg-canvas px-4 py-2';
 
 		const name = document.createElement('span');
-		name.className = 'shrink-0 font-mono text-[12px] font-medium text-ink';
+		name.className = 'shrink-0 font-mono t-caption font-medium text-ink';
 		name.textContent = g.page.n;
 
 		const title = document.createElement('span');
-		title.className = 'truncate font-serif text-[13px] text-muted';
+		title.className = 'truncate font-serif t-footnote text-muted';
 		title.textContent = g.page.t;
 
 		const count = document.createElement('span');
-		count.className = 'ml-auto shrink-0 font-mono text-[11px] tabular-nums text-muted';
+		count.className = 'ml-auto shrink-0 font-mono t-caption tabular-nums text-muted';
 		count.textContent = g.hits > g.rows.length ? `${g.rows.length} of ${g.hits}` : String(g.hits);
 
 		head.append(name, title, count);
@@ -265,13 +265,13 @@ function renderGroups(groups: Group[]) {
 
 			if (row.section) {
 				const label = document.createElement('span');
-				label.className = 'hidden w-28 shrink-0 truncate font-mono text-[11px] text-muted sm:block';
+				label.className = 'hidden w-28 shrink-0 truncate font-mono t-caption text-muted sm:block';
 				label.textContent = row.section;
 				a.append(label);
 			}
 
 			const text = document.createElement('span');
-			text.className = 'line-clamp-2 min-w-0 flex-1 text-[13px] leading-relaxed text-muted';
+			text.className = 'line-clamp-2 min-w-0 flex-1 t-footnote leading-relaxed text-muted';
 			const mark = document.createElement('mark');
 			mark.textContent = row.hit;
 			text.append(document.createTextNode(row.pre), mark, document.createTextNode(row.post));

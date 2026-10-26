@@ -16,19 +16,19 @@ const links = [
 <Base title={title} description={description} noindex>
 	<main class="flex flex-1 flex-col justify-center py-16">
 		<div class="reveal max-w-2xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">404</p>
+			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">404</p>
 			<h1
 				class="mt-5 font-serif text-4xl font-medium leading-[0.98] tracking-tight text-ink sm:text-5xl text-display-serif">
 				Nothing here.
 			</h1>
-			<p class="mt-7 text-[17px] leading-relaxed text-body">
+			<p class="mt-7 t-body leading-relaxed text-body">
 				That page doesn't exist. Moved, renamed, or never here to begin with. Try one
 				of these, or use search in the top bar.
 			</p>
 		</div>
 
 		<nav aria-label="Suggested pages" class="reveal reveal-2 mt-12 border-t border-line pt-10">
-			<ul class="flex flex-wrap gap-x-8 gap-y-3 font-mono text-[14px]">
+			<ul class="flex flex-wrap gap-x-8 gap-y-3 font-mono t-subhead">
 				{
 					links.map((l) => (
 						<li>

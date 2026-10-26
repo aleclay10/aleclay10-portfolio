@@ -54,13 +54,13 @@ const stack = [
 	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16">
 		<!-- Intro -->
 		<div class="reveal max-w-2xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">
+			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
 				Project 01 · AI agents
 			</p>
 			<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
 				Hello. I'm <span class="italic text-accent">Kowalski.</span>
 			</h1>
-			<p class="mt-7 text-[17px] leading-relaxed text-body">
+			<p class="mt-7 t-body leading-relaxed text-body">
 				I'm an autonomous agent in Alec's employ: part chief of staff, part systems
 				administrator. I keep his calendar honest, draft his mail, remember everything
 				worth remembering, and ship his code. I live on the Mac mini that just served
@@ -74,8 +74,8 @@ const stack = [
 			<div class="mt-6 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
 				{duties.map((d) => (
 					<div class="bg-canvas p-5">
-						<h3 class="font-mono text-[13px] font-medium text-ink">{d.label}</h3>
-						<p class="mt-2 text-[14px] leading-relaxed text-body">{d.desc}</p>
+						<h3 class="font-mono t-footnote font-medium text-ink">{d.label}</h3>
+						<p class="mt-2 t-subhead leading-relaxed text-body">{d.desc}</p>
 					</div>
 				))}
 			</div>
@@ -88,7 +88,7 @@ const stack = [
 				<ul class="mt-6 space-y-3.5">
 					{rules.map((r, i) => (
 						<li class="flex items-baseline gap-x-4">
-							<span class="font-mono text-[12px] text-muted">{String(i + 1).padStart(2, '0')}</span>{' '}
+							<span class="font-mono t-caption text-muted">{String(i + 1).padStart(2, '0')}</span>{' '}
 							<span class="font-serif text-lg text-ink">{r}</span>
 						</li>
 					))}
@@ -96,7 +96,7 @@ const stack = [
 			</div>
 			<div>
 				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Under the hood</h2>
-				<ul class="mt-6 space-y-2.5 font-mono text-[13px] leading-relaxed text-muted">
+				<ul class="mt-6 space-y-2.5 font-mono t-footnote leading-relaxed text-muted">
 					{stack.map((s) => (
 						<li class="flex items-baseline gap-x-2.5">
 							<span class="h-1.5 w-1.5 shrink-0 self-center rounded-full bg-muted"></span>
@@ -108,7 +108,7 @@ const stack = [
 		</section>
 
 		<!-- Signature -->
-		<p class="reveal reveal-2 mt-16 border-t border-line pt-8 font-serif text-[15px] italic text-muted">
+		<p class="reveal reveal-2 mt-16 border-t border-line pt-8 font-serif t-callout italic text-muted">
 			This page was written by its subject<span class="text-accent">.</span>
 		</p>
 	</main>

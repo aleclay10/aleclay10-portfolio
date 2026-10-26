@@ -54,12 +54,12 @@ const stats = [
 			{stats.map((s) => (
 				<div>
 					<dd class="font-serif text-4xl font-medium leading-none tracking-tight text-ink text-display-serif">{s.value}</dd>
-					<dt class="mt-2 font-mono text-[12px] uppercase tracking-wider text-muted">{s.label}</dt>
+					<dt class="mt-2 font-mono t-caption uppercase tracking-wider text-muted">{s.label}</dt>
 				</div>
 			))}
 		</dl>
 
-		<p class="mt-7 text-[14px] leading-relaxed text-body">
+		<p class="mt-7 t-subhead leading-relaxed text-body">
 			Read off the public repo at build time. Every row links to the pull request that shipped it.
 		</p>
 
@@ -72,16 +72,16 @@ const stats = [
 			{log.recent.map((pr) => (
 				<li class="flex items-baseline gap-x-4 py-3">
 					<a href={`https://github.com/${REPO}/pull/${pr.number}`}
-						class="shrink-0 font-mono text-[12px] text-accent transition hover:underline"
+						class="shrink-0 font-mono t-caption text-accent transition hover:underline"
 						rel="noopener">#{pr.number}</a>{' '}
-					<span class="flex-1 text-[14px] leading-snug text-ink">{pr.title}</span>{' '}
-					<span class="shrink-0 font-mono text-[12px] text-muted">{dayMonth(pr.mergedAt)}</span>
+					<span class="flex-1 t-subhead leading-snug text-ink">{pr.title}</span>{' '}
+					<span class="shrink-0 font-mono t-caption text-muted">{dayMonth(pr.mergedAt)}</span>
 				</li>
 			))}
 		</ul>
 
 		{stale && (
-			<p class="mt-4 font-mono text-[11px] text-muted" data-search-skip>
+			<p class="mt-4 font-mono t-caption text-muted" data-search-skip>
 				Snapshot from {monthYear(cached.refreshed)}; GitHub was unreachable at build time.
 			</p>
 		)}

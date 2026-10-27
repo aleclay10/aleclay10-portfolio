@@ -1,0 +1,32 @@
+---
+/**
+ * The deploy pipeline in four nodes, for the self-hosted platform card. Static
+ * markup; the last node carries the release tag from git at build time and the
+ * live strip replaces it with the host's once status.json resolves. The full
+ * eight-step version with notes is on /stack.
+ */
+import { currentRelease } from '../lib/release.mjs';
+
+const { tag } = currentRelease();
+const nodes = [
+	{ label: 'git tag -s', note: 'Alec signs' },
+	{ label: 'verify', note: 'allow-list on the machine' },
+	{ label: 'build', note: 'npm ci · astro build' },
+	{ label: 'serve', note: tag ?? 'Caddy, loopback only', live: Boolean(tag) },
+];
+---
+
+<ol class="font-mono t-caption">
+	{nodes.map((n, i) => (
+		<li class="flex gap-x-3">
+			<div class="flex flex-col items-center">
+				<span class={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${i === nodes.length - 1 ? 'bg-accent' : 'border border-line bg-canvas'}`}></span>
+				{i < nodes.length - 1 && <span class="w-px flex-1 bg-line"></span>}
+			</div>
+			<div class="flex items-baseline gap-x-2 pb-2.5">
+				<span class="text-ink">{n.label}</span>{' '}
+				<span class="text-muted" data-release-tag={n.live ? '' : undefined}>{n.note}</span>
+			</div>
+		</li>
+	))}
+</ol>

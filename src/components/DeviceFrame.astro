@@ -1,0 +1,42 @@
+---
+/**
+ * A macOS window frame for a real app screenshot: three 8px circles in line
+ * tokens, a 1px title bar, 16:10, surface fill. Receipts, not renders: this
+ * only ever holds a screenshot, never an illustration.
+ *
+ * Two images, one per theme, switched by the .dark class on <html> (a <picture>
+ * media query cannot see that class). Each is a WebP with a PNG fallback. The
+ * hidden one still costs a request in some browsers; acceptable for a hero.
+ *
+ * Expected files, supplied by Alec, no personal content visible, at least
+ * 1600 x 1000, each WebP at or under 200 KB:
+ *   public/gaming-assistant/light.webp  light.png
+ *   public/gaming-assistant/dark.webp   dark.png
+ */
+interface Props {
+	/** Path prefix without the theme or extension, e.g. "/gaming-assistant/". */
+	base: string;
+	alt: string;
+	width: number;
+	height: number;
+}
+const { base, alt, width, height } = Astro.props;
+---
+
+<figure class="w-full max-w-[36rem] overflow-hidden rounded-xl border border-line bg-surface">
+	<div class="flex items-center gap-x-1.5 border-b border-line px-3 py-2" aria-hidden="true">
+		<span class="h-2 w-2 rounded-full bg-line"></span>
+		<span class="h-2 w-2 rounded-full bg-line"></span>
+		<span class="h-2 w-2 rounded-full bg-line"></span>
+	</div>
+	<div class="aspect-[16/10]">
+		<picture class="dark:hidden">
+			<source srcset={`${base}light.webp`} type="image/webp" />
+			<img src={`${base}light.png`} alt={alt} width={width} height={height} decoding="async" class="h-full w-full object-cover" />
+		</picture>
+		<picture class="hidden dark:block">
+			<source srcset={`${base}dark.webp`} type="image/webp" />
+			<img src={`${base}dark.png`} alt={alt} width={width} height={height} decoding="async" class="h-full w-full object-cover" />
+		</picture>
+	</div>
+</figure>

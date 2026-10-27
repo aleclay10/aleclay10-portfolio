@@ -38,7 +38,7 @@ const focus = [
 			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Now</p>
 			<!-- Quiet title: no italic accent tail. That moment belongs to the home hero
 			     and the product pages; repeated on every utility page it stopped being one. -->
-			<h1 class="mt-5 font-serif text-4xl font-medium leading-[0.98] tracking-tight text-ink sm:text-5xl text-display-serif">
+			<h1 class="mt-5 font-serif t-title1 font-medium tracking-tight text-ink">
 				What I'm on right now.
 			</h1>
 			<p class="mt-7 font-mono t-footnote text-muted">Updated {updated} · the <a href="https://nownownow.com/about" class="link underline decoration-line underline-offset-4">/now page</a> convention</p>
@@ -50,7 +50,7 @@ const focus = [
 			<ul class="max-w-2xl divide-y divide-line">
 				{focus.map((f) => (
 					<li class="py-5">
-						<h2 class="font-serif text-xl text-ink">
+						<h2 class="font-serif t-title3 text-ink">
 							{f.href ? <a href={f.href} class="transition hover:text-accent">{f.title} →</a> : f.title}
 						</h2>
 						<p class="mt-1.5 max-w-lg t-subhead leading-relaxed text-body">{f.desc}</p>

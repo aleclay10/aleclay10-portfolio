@@ -1,12 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import BookChip from '../components/BookChip.astro';
+import LiveStrip from '../components/LiveStrip.astro';
+import WorkCard from '../components/WorkCard.astro';
+import PrReceipt from '../components/PrReceipt.astro';
+import PipelineMini from '../components/PipelineMini.astro';
 
 const title = 'Alec Layton · agents, products, and the book';
 const description =
 	'Alec Layton: I build autonomous agents, ship AI products, and run a concentrated investing book. Self-hosted projects, writing, and experiments.';
 
-const eras: { years: string; title: string; org: string; desc: string; tag: string; current?: boolean; href?: string; linkText?: string }[] = [
+// Order on the page: hero, live strip, work, timeline, contact (in the layout),
+// footer. The page's job is that in thirty seconds a hiring manager believes
+// Alec builds real systems and can reach him; the career story sits below the
+// work it led to.
+
+// Industry tags (Energy, Education, FinTech...) were removed 2026-10-26: they
+// encoded nothing a reader uses and cost a line per row.
+const eras: { years: string; title: string; org: string; desc: string; current?: boolean; href?: string; linkText?: string }[] = [
 	{
 		years: '2021',
 		title: 'Enterprise Architect Developer',
@@ -14,21 +24,18 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		// "90% of U.S. transactions" read as 90% of U.S. transactions nationally, which
 		// is not the claim. Scoped to the company, which is what the résumé means.
 		desc: "Fortune 500 internship in the SAP machine room. Built the ABAP app that carried Accounts Payable for 90% of the company's U.S. transactions.",
-		tag: 'Energy',
 	},
 	{
 		years: 'Dec 2022',
 		title: 'B.S. Computer Science',
 		org: 'UT San Antonio',
 		desc: 'Software engineering & data science concentrations. Deep-learning vulnerability research with the grad lab; ACM ICPC for sport.',
-		tag: 'Education',
 	},
 	{
 		years: 'Dec 2022',
 		title: 'Software Engineer',
 		org: 'Paycom · Irving, TX',
 		desc: 'Compliance-critical payroll systems moving hundreds of millions a year: multi-country tax API internationalization, and ETL automation that erased 100+ manual hours a quarter.',
-		tag: 'FinTech',
 		current: true,
 	},
 	{
@@ -36,7 +43,6 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		title: 'AI Gaming Assistant',
 		org: 'Independent',
 		desc: 'Full-stack desktop companion: React/TypeScript on a Rust (Tauri) core with FastAPI, Postgres, and Redis, routing AI inference to cloud or local models.',
-		tag: 'Product',
 		href: '/gaming-assistant/',
 		linkText: 'See the product →',
 	},
@@ -45,99 +51,131 @@ const eras: { years: string; title: string; org: string; desc: string; tag: stri
 		title: 'The agents era',
 		org: 'Kowalski · this site',
 		desc: 'Built an autonomous agent to run my day, then handed it the keys to this Mac mini. It ships pages here now, including its own.',
-		tag: 'AI agents',
 		current: true,
 		href: '/kowalski/',
 		linkText: 'Meet Kowalski →',
 	},
 ];
 
-// Every row links somewhere and carries a spec line, so the section reads as
-// work rather than a table of contents. No 01/02/03: the numbers implied an
-// order that was never there.
-const projects: { name: string; desc: string; tag: string; meta: string; href: string }[] = [
-	{ name: 'AI Gaming Assistant', desc: 'Desktop gaming companion: AI chat with play-history context, session tracking, Discord without alt-tab.', tag: 'Product', meta: 'Tauri 2 · Rust · React · FastAPI · early access', href: '/gaming-assistant/' },
-	{ name: 'Kowalski', desc: 'Autonomous personal-ops agent: calendar, mail, vault, code. It opened the pull request that shipped this page.', tag: 'AI agents', meta: 'Claude Agent SDK · five MCP servers · Obsidian · in service', href: '/kowalski/' },
-	{ name: 'Self-hosted platform', desc: 'Mac mini behind a Cloudflare Tunnel: signature-gated releases, zero open ports, an agent that ships the pages.', tag: 'Infra', meta: 'Astro · Caddy · Cloudflare Tunnel · signed-tag deploys', href: '/stack/' },
+// The Gaming Assistant card's artifact until real screenshots land: the four
+// engineering facts as a quiet spec block. Nothing drawn, nothing illustrative.
+const gamingFacts = [
+	['core', 'Tauri 2 + Rust'],
+	['storage', 'local-first SQLite'],
+	['inference', 'Groq → Together → Ollama'],
+	['tests', '238 across Rust, Python, TS'],
 ];
 ---
 
 <Base title={title} description={description}>
-	<!-- <main> wraps the hero AND the sections below it. It used to close after the
-	     hero, which meant the search index - scoped to <main> - contained none of the
-	     timeline or project copy: "Paycom", "Valero" and "ICPC" returned nothing.
-	     The centring that `justify-center py-16` used to do for the whole page now
-	     belongs to the hero section alone, so the layout is unchanged. -->
+	<!-- <main> wraps everything so the search index, scoped to <main>, sees the
+	     timeline and work copy. The live strip opts itself out. -->
 	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col">
-		<!-- Hero -->
-		<section class="flex flex-1 flex-col justify-center py-16">
+		<!-- Hero. No eyebrow (the title says it), two sentences, three actions. -->
+		<!-- No eyebrow and no h2 here, so the search indexer is told the label. -->
+		<section data-search-section="Intro" class="py-12 sm:py-20">
 			<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
 				<div class="reveal">
-					<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
-						Software engineer · builder · investor
-					</p>
-					<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-7xl text-display-serif">
+					<!-- Compact only: the portrait as a byline, so the title and the primary
+					     action share the first screen. public/alec.webp is 384x480, cropped
+					     4:5 and centred on the face; a 64px square from its centre keeps it. -->
+					<div class="mb-8 flex items-center gap-x-4 sm:hidden">
+						<img src="/alec.webp" alt="" width="64" height="64" decoding="async"
+							class="h-16 w-16 shrink-0 rounded-xl border border-line object-cover" />
+						<div class="font-mono t-footnote">
+							<p class="text-ink">Alec Layton</p>
+							<p class="mt-0.5 text-muted">Dallas, TX</p>
+						</div>
+					</div>
+					<h1 class="font-serif t-display font-medium tracking-tight text-ink">
 						I build agents,<br />ship products,<br /><span class="italic text-accent">run the book.</span>
 					</h1>
-					<p class="mt-7 max-w-md t-body leading-relaxed text-body">
-						I design and ship AI tooling: <a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
-						the autonomous agent that runs my day, and an{' '}
+					<p class="mt-7 max-w-md t-body text-body">
+						I design and ship AI tooling.{' '}
+						<a href="/kowalski/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">Kowalski</a>,
+						the agent that runs my day, ships this site; the{' '}
 						<a href="/gaming-assistant/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">AI Gaming Assistant</a>{' '}
-						now in early access. The rest of my conviction lives in a concentrated
-						book at <a href="/investing/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">/investing</a>.
-						This site is self-hosted on my Mac mini, served over a Cloudflare tunnel.
+						is in early access; the book is public at{' '}
+						<a href="/investing/" class="text-ink underline decoration-line underline-offset-4 transition hover:text-accent hover:decoration-accent">/investing</a>.
 					</p>
-					<!-- Two groups, so a phone wraps to two deliberate rows (the buttons, then
-					     the text links) rather than three items and an orphaned Email. -->
+					<!-- One primary action. Email lives in the contact row and the footer. -->
 					<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono t-footnote">
-						<span class="flex items-center gap-x-3">
-							<a href="#projects" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
-								View projects
-							</a>{' '}
-							<a href="/resume/" class="rounded-md border border-line px-4 py-2.5 font-medium text-ink transition hover:border-accent hover:text-accent">
-								Résumé
-							</a>
-						</span>{' '}
-						<span class="flex items-center gap-x-3">
-							<a href="https://github.com/aleclay10" class="link px-2 py-2.5">GitHub ↗</a>{' '}
-							<a href="mailto:alec.layton100@gmail.com" class="link px-2 py-2.5">Email ↗</a>
-						</span>
+						<a href="#work" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
+							View work
+						</a>{' '}
+						<a href="/resume/" class="rounded-md border border-line px-4 py-2.5 font-medium text-ink transition hover:border-accent hover:text-accent">
+							Résumé
+						</a>{' '}
+						<a href="https://github.com/aleclay10" rel="noopener" class="link px-2 py-2.5">GitHub ↗</a>
 					</div>
 				</div>
 
-				<!-- Portrait. public/alec.webp is 384x480, cropped 4:5 and centered on the face; metadata stripped. -->
-				<div class="reveal reveal-2 justify-self-center sm:justify-self-end">
-					<div class="relative aspect-[4/5] w-56 overflow-hidden rounded-2xl border border-line bg-surface sm:w-64">
+				<!-- Regular widths: the portrait stays large. A face is content, not
+				     branding (design decision 3, June 2026). No caption, no chip. -->
+				<div class="reveal reveal-2 hidden justify-self-end sm:block">
+					<div class="aspect-[4/5] w-56 overflow-hidden rounded-2xl border border-line bg-surface sm:w-64">
 						<img src="/alec.webp" alt="Alec Layton" width="384" height="480"
 							decoding="async" fetchpriority="high"
 							class="h-full w-full object-cover" />
-						<div class="absolute inset-x-0 bottom-0 flex items-center gap-x-2 border-t border-line bg-canvas/70 px-3 py-2 font-mono t-caption text-muted backdrop-blur">
-							<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-							Currently building · agents + infra
-						</div>
 					</div>
-					<BookChip />
 				</div>
 			</div>
 		</section>
 
-		<!-- Timeline. Vertical rows rather than a horizontal rail: five short entries,
-		     all visible at once, oldest first so the story ends on now. The rail hid two
-		     of them on desktop and had no arrows on a phone. -->
+		<LiveStrip />
+
+		<!-- Work. Three cards, each showing a real thing: a spec block until the
+		     screenshots land, the receipt for the PR that shipped this page, and
+		     the pipeline with the live tag in its last node. -->
+		<section id="work" class="border-t border-line py-10">
+			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Work</h2>
+			<ul class="mt-6 grid gap-5 md:grid-cols-3">
+				<WorkCard
+					name="AI Gaming Assistant"
+					desc="Desktop gaming companion: AI chat with play-history context, session tracking, Discord without alt-tab."
+					meta="Tauri 2 · Rust · React · FastAPI · early access"
+					href="/gaming-assistant/">
+					<dl class="divide-y divide-line font-mono t-caption">
+						{gamingFacts.map(([k, v]) => (
+							<div class="flex items-baseline justify-between gap-x-3 py-1.5">
+								<dt class="text-muted">{k}</dt>
+								<dd class="text-ink">{v}</dd>
+							</div>
+						))}
+					</dl>
+				</WorkCard>
+				<WorkCard
+					name="Kowalski"
+					desc="Autonomous personal-ops agent: calendar, mail, vault, code. It opened the pull request that shipped this page."
+					meta="Claude Agent SDK · four MCP servers · Obsidian · in service"
+					href="/kowalski/">
+					<PrReceipt />
+				</WorkCard>
+				<WorkCard
+					name="Self-hosted platform"
+					desc="Mac mini behind a Cloudflare Tunnel: signature-gated releases, zero open ports, an agent that ships the pages."
+					meta="Astro · Caddy · Cloudflare Tunnel · signed-tag deploys"
+					href="/stack/">
+					<PipelineMini />
+				</WorkCard>
+			</ul>
+		</section>
+
+		<!-- Timeline. Vertical rows, oldest first so the story ends on now. -->
 		<section id="timeline" class="border-t border-line py-10">
-			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Timeline</h2>
+			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Timeline</h2>
 			<ol class="mt-4 divide-y divide-line">
 				{eras.map((e) => (
 					<li class="grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
-						<div class="font-mono t-caption uppercase tracking-wider text-muted">
-							{/* "now" in text: a coloured dot alone carried "current", which is colour-only. */}
-							<p>{e.years}{e.current && <span class="text-accent"> · now</span>}</p>
-							<p class="mt-1 t-caption">{e.tag}</p>
-						</div>
+						<p class="font-mono t-caption uppercase tracking-wider text-muted">
+							{/* "now" in text: a coloured dot alone carried "current", which is colour-only.
+							    Ink, not accent: the accent means interactive or live. */}
+							{e.years}{e.current && <span class="font-medium text-ink"> · now</span>}
+						</p>
 						<div>
-							<h3 class="font-serif text-xl text-ink">{e.title}</h3>
+							<h3 class="font-serif t-title3 text-ink">{e.title}</h3>
 							<p class="mt-0.5 font-mono t-caption text-muted">{e.org}</p>
-							<p class="mt-3 max-w-lg t-subhead leading-relaxed text-body">{e.desc}</p>
+							<p class="mt-3 max-w-lg t-subhead text-body">{e.desc}</p>
 							{e.href && (
 								<a href={e.href} class="link -mb-3 mt-1 inline-block py-3 font-mono t-footnote">{e.linkText ?? 'More →'}</a>
 							)}
@@ -145,28 +183,6 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 					</li>
 				))}
 			</ol>
-		</section>
-
-		<!-- Projects teaser strip -->
-		<section id="projects" class="border-t border-line py-10">
-			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Selected work</h2>
-			<ul class="mt-4 divide-y divide-line">
-				{projects.map((p) => (
-					<li class="group relative grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
-						<p class="font-mono t-caption uppercase tracking-wider text-muted">{p.tag}</p>
-						<div>
-							<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">
-								<a href={p.href} class="after:absolute after:inset-0">
-									{p.name}
-									<span aria-hidden="true" class="ml-1 inline-block font-mono t-subhead text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>
-								</a>
-							</h3>
-							<p class="mt-1.5 max-w-lg t-subhead leading-relaxed text-body">{p.desc}</p>
-							<p class="mt-2.5 font-mono t-caption text-muted">{p.meta}</p>
-						</div>
-					</li>
-				))}
-			</ul>
 		</section>
 	</main>
 </Base>

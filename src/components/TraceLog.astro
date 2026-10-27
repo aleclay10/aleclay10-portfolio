@@ -1,0 +1,73 @@
+---
+/**
+ * "A run, verbatim" on /kowalski: the trace of the agent shipping this page.
+ *
+ * Two kinds of row. The transcript rows are a short, static excerpt from the
+ * session that started the redesign (2026-10-26, Central time), quoted as said
+ * and approved by Alec. The pipeline rows carry real numbers from the repo: the
+ * pull request that shipped the page (newest merge commit; on the host, the
+ * tagged commit itself), its merge date from the ship log, the tag from git.
+ * The last row is live: status.json names the deployed tag and the minute it
+ * went live, and the only colour on the whole trace is that row's dot.
+ *
+ * Designed so a "Try it" entry can be added beneath it later without a layout
+ * change. data-search-skip because the last row rewrites itself after load.
+ */
+import { loadShipLog } from '../lib/ship-log-loader.mjs';
+import { currentRelease } from '../lib/release.mjs';
+
+const { tag, prNumber } = currentRelease();
+const { log } = await loadShipLog();
+const pr = (prNumber && log.recent.find((p) => p.number === prNumber)) || log.recent[0];
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const [, m, d] = pr.mergedAt.split('-');
+const merged = `${MONTHS[Number(m) - 1]} ${Number(d)}`;
+
+type Row = { at: string; who?: 'Alec' | 'Kowalski'; text: string; live?: boolean };
+
+const rows: Row[] = [
+	{ at: '18:41', who: 'Alec', text: 'Hey Kowalski, lets go ahead and implement the portfolio website redesign. Anything you need from me before getting started?' },
+	{ at: '18:44', who: 'Kowalski', text: 'The spec from 22 October is complete and still marked "awaiting Alec\'s decisions; no code changed". The dev repo is clean on main at v1.4.6, exactly where the spec was written. I\'ll move the session into the repo and put the open decisions to you.' },
+	{ at: '18:46', who: 'Alec', text: 'Four decisions, each the recommended option: five nav items, the portrait as a byline on phones, publish the release tag, drop the timeline tags.' },
+	{ at: 'branch', text: 'opened from main; npx astro check, 0 errors; SEARCH_STRICT=1 npm run build, 0 warnings' },
+	{ at: 'pull request', text: `#${pr.number} opened by Kowalski, with what was verified and how` },
+	{ at: merged, text: 'reviewed and merged by Alec' },
+	{ at: 'tag', text: tag ? `${tag}, signed by Alec with a key the agent has never held` : 'signed by Alec with a key the agent has never held' },
+	{ at: 'deploy', text: 'the poller verifies the signature, builds the tagged commit, and serves it', live: true },
+];
+---
+
+<ol data-search-skip class="mt-6 max-w-2xl divide-y divide-line border-y border-line font-mono t-caption tabular-nums">
+	{rows.map((r) => (
+		<li class="grid gap-x-4 py-2.5 sm:grid-cols-[6.5rem_1fr]" data-trace-live={r.live ? '' : undefined}>
+			<span class="flex items-baseline gap-x-2 text-muted">
+				{r.live && <span data-trace-dot class="h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full bg-accent" aria-hidden="true"></span>}
+				{r.at}
+			</span>
+			<span class="text-ink">
+				{r.who && <span class="text-muted">{r.who} · </span>}
+				<span data-trace-text>{r.text}</span>
+			</span>
+		</li>
+	))}
+</ol>
+
+<script>
+	import { deployedWhen, loadLiveRelease } from '../lib/status-client';
+
+	async function live() {
+		const row = document.querySelector<HTMLElement>('[data-trace-live]');
+		const text = row?.querySelector<HTMLElement>('[data-trace-text]');
+		if (!row || !text) return;
+		const rel = await loadLiveRelease();
+		if (!rel) return;
+		text.textContent = rel.deployedAt
+			? `${rel.tag} verified, built, and serving since ${deployedWhen(rel.deployedAt)}`
+			: `${rel.tag} verified, built, and serving`;
+		row.classList.add('live-in');
+		row.querySelector('[data-trace-dot]')?.classList.add('motion-safe:animate-breathe');
+	}
+
+	live();
+</script>

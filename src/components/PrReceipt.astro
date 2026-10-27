@@ -1,0 +1,36 @@
+---
+/**
+ * The receipt for the pull request that shipped the page being built: four
+ * mono rows, every one true at build time. The PR number comes from the newest
+ * merge commit in the checkout (on the host, the tagged commit itself) and its
+ * date from the ship log; the tag from git describe. The home page's live strip
+ * replaces [data-release-tag] with whatever the host reports once the page is
+ * open. No colour but ink and muted: the receipt is the artifact, not a chart.
+ */
+import { loadShipLog } from '../lib/ship-log-loader.mjs';
+import { currentRelease } from '../lib/release.mjs';
+
+const { tag, prNumber } = currentRelease();
+const { log } = await loadShipLog();
+const pr = (prNumber && log.recent.find((p) => p.number === prNumber)) || log.recent[0];
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const [, m, d] = pr.mergedAt.split('-');
+const merged = `${MONTHS[Number(m) - 1]} ${Number(d)}`;
+
+const rows: { k: string; v: string; live?: boolean }[] = [
+	{ k: `#${pr.number}`, v: 'opened by Kowalski' },
+	{ k: 'astro check · build', v: 'green' },
+	{ k: 'merged by Alec', v: merged },
+	{ k: 'released as', v: tag ?? 'a signed tag', live: Boolean(tag) },
+];
+---
+
+<dl class="divide-y divide-line font-mono t-caption">
+	{rows.map((r) => (
+		<div class="flex items-baseline justify-between gap-x-3 py-1.5">
+			<dt class="text-muted">{r.k}</dt>
+			<dd class="text-ink" data-release-tag={r.live ? '' : undefined}>{r.v}</dd>
+		</div>
+	))}
+</dl>

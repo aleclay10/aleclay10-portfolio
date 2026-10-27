@@ -1,0 +1,167 @@
+---
+// The live strip under the home hero: four facts, each a line of a log with a
+// verb, not a KPI tile. The site shows you its own machinery running.
+//
+// Every fact renders a static baseline at build time and degrades to it with no
+// JS, a 404 on either JSON file, or a stale feed - the same contract the footer
+// uptime chip and the book chip had before they were retired into this. The
+// script only ever replaces text inside the [data-v] / [data-n] / [data-r] spans
+// and adds .live-in, which cross-fades the new value over 240ms (none under
+// prefers-reduced-motion). Fetches land at different times, so the strip settles
+// left to right without any choreography code.
+//
+// Sources, all same-origin, none a build artifact:
+//   release  status.json → release.tag + deployedAt (health-check.sh on the host)
+//   uptime   status.json → uptime.7d, status, since (the old footer chip's rules)
+//   pr       ship-log at build time; no fetch
+//   book     prices.json → portfolio.dayChangePct via prices-client.ts
+//
+// data-search-skip: the script rewrites this text after load, so indexing it
+// would let deep-link highlighting race the rewrite. Disclosure contract on the
+// book fact matches /investing: percentages only, never values or share counts.
+import { vectorWeights } from '../data/portfolio';
+import { loadShipLog } from '../lib/ship-log-loader.mjs';
+import { currentRelease } from '../lib/release.mjs';
+
+const { tag } = currentRelease();
+const { log } = await loadShipLog();
+const pr = log.recent[0];
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dayMonth = (iso: string) => {
+	const [, m, d] = iso.split('-');
+	return `${MONTHS[Number(m) - 1]} ${Number(d)}`;
+};
+
+const top = vectorWeights().sort((a, b) => b.weight - a.weight)[0];
+
+const facts = [
+	{
+		id: 'release',
+		href: '/stack/#pipeline',
+		value: tag ?? 'This release',
+		rest: '· signed tag, verified on the machine',
+	},
+	{
+		id: 'uptime',
+		href: '/stack/#security',
+		value: 'Self-hosted',
+		rest: '· a Mac mini behind a Cloudflare Tunnel',
+	},
+	{
+		id: 'pr',
+		href: `https://github.com/${log.repo}/pull/${pr.number}`,
+		value: `#${pr.number}`,
+		rest: `· merged ${dayMonth(pr.mergedAt)}, opened by the agent`,
+	},
+	{
+		id: 'book',
+		href: '/investing/#performance',
+		value: 'The book',
+		rest: `· ${top.label} ${top.weight.toFixed(1)}%`,
+	},
+];
+---
+
+<section aria-label="Live" data-search-skip class="viz-root border-t border-line py-6">
+	<ul class="grid gap-x-10 gap-y-3 font-mono t-footnote text-muted sm:grid-cols-2">
+		{facts.map((f) => (
+			<li>
+				<a
+					href={f.href}
+					data-fact={f.id}
+					rel={f.href.startsWith('http') ? 'noopener' : undefined}
+					class="group -my-1.5 flex items-baseline gap-x-3 py-1.5 transition hover:text-ink">
+					<span data-dot class="h-1.5 w-1.5 shrink-0 translate-y-[-2px] rounded-full bg-accent" aria-hidden="true"></span>
+					<span class="leading-snug">
+						<span data-v class="text-ink">{f.value}</span>
+						{f.id === 'book' && <span data-n class="tabular-nums" hidden></span>}{' '}
+						<span data-r>{f.rest}</span>
+					</span>
+				</a>
+			</li>
+		))}
+	</ul>
+</section>
+
+<script>
+	import { closeDay, loadFreshPrices, signed } from '../lib/prices-client';
+	import { deployedWhen, loadFreshStatus } from '../lib/status-client';
+
+	function fact(id: string) {
+		return document.querySelector<HTMLElement>(`[data-fact="${id}"]`);
+	}
+
+	// One cross-fade per fact, the first time its live value lands.
+	function settle(el: HTMLElement, value: string | null, rest: string | null) {
+		const v = el.querySelector<HTMLElement>('[data-v]');
+		const r = el.querySelector<HTMLElement>('[data-r]');
+		if (v && value !== null) v.textContent = value;
+		if (r && rest !== null) r.textContent = rest;
+		el.classList.add('live-in');
+	}
+
+	const pct = (n: number) => `${n.toFixed(1).replace(/\.0$/, '')}%`;
+
+	async function status() {
+		const release = fact('release');
+		const uptime = fact('uptime');
+		if (!release && !uptime) return;
+		const fresh = await loadFreshStatus();
+		if (!fresh) return;
+		const { data, checkedAt } = fresh;
+
+		const week = data.uptime?.['7d'];
+		if (uptime && typeof week === 'number') {
+			// A 7d figure computed from fewer observed days than the window claims
+			// is not a measurement of that window; label it as partial.
+			const since = data.since ? Date.parse(data.since) : NaN;
+			const observed = Number.isFinite(since) ? (checkedAt - since) / 86_400_000 : Infinity;
+			const window = observed >= 7 ? 'over 7 days' : `over ${Math.max(1, Math.floor(observed))}d so far`;
+			const down = data.status === 'down';
+			settle(uptime, `${down ? 'Down' : 'Up'} ${pct(week)}`, `${window} · a Mac mini behind a Cloudflare Tunnel`);
+			const dot = uptime.querySelector('[data-dot]');
+			if (dot) {
+				if (down) {
+					dot.classList.remove('bg-accent');
+					dot.classList.add('bg-muted');
+				} else {
+					dot.classList.add('motion-safe:animate-breathe');
+				}
+			}
+		}
+
+		const rel = data.release;
+		if (release && rel && typeof rel.tag === 'string' && /^v\d+\.\d+\.\d+$/.test(rel.tag)) {
+			const t = typeof rel.deployedAt === 'string' ? Date.parse(rel.deployedAt) : NaN;
+			const when = Number.isFinite(t) ? deployedWhen(new Date(t)) : null;
+			settle(release, rel.tag, when ? `· signed, deployed ${when}` : '· signed tag, verified on the machine');
+			// The pipeline card's last node shows the same tag.
+			for (const el of document.querySelectorAll<HTMLElement>('[data-release-tag]')) el.textContent = rel.tag;
+		}
+	}
+
+	async function book() {
+		const el = fact('book');
+		if (!el) return;
+		const fresh = await loadFreshPrices();
+		if (!fresh) return;
+		const day = fresh.data.portfolio?.dayChangePct;
+		if (typeof day !== 'number') return;
+		const n = el.querySelector<HTMLElement>('[data-n]');
+		if (n) {
+			n.textContent = ` ${signed(day)}`;
+			// Sign is in the text, so colour is reinforcement rather than the only cue.
+			n.style.color = day >= 0 ? 'var(--viz-good)' : 'var(--viz-bad)';
+			n.hidden = false;
+		}
+		// "today" is only true while the market is open; closed means the figure is
+		// the last completed session, named by date so a stale close is visibly stale.
+		const open = fresh.data.marketState === 'market open';
+		const { closesAt } = fresh;
+		settle(el, null, open ? '· today' : closesAt ? `· ${closeDay(closesAt, 'short')} close` : '· at the last close');
+	}
+
+	status();
+	book();
+</script>

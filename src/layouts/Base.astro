@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import '../styles/global.css';
+import Mascot from '../components/Mascot.astro';
 
 interface Props {
 	title: string;
@@ -10,9 +11,12 @@ interface Props {
 	/** Keep a page out of search engines. For utility pages (form confirmations and
 	 *  the like) that are real routes but have no business ranking for anything. */
 	noindex?: boolean;
+	/** Kowalski, the feedback mascot, parks on every page by default. The /feedback
+	 *  pages turn him off: they are the form, so he would be offering itself. */
+	mascot?: boolean;
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, mascot = true } = Astro.props;
 // One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
 // Labels are names, not paths. Five items: Work is the home page's work section,
 // Résumé is in the bar because it is what a hiring manager is looking for, and
@@ -191,6 +195,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 					<a class="link -my-3 py-3" href="/resume/">Résumé</a>
 					<a class="link -my-3 py-3" href="/gaming-assistant/">Gaming Assistant</a>
 					<a class="link -my-3 py-3" href="/uses/">Uses</a>
+					<a class="link -my-3 py-3" href="/feedback/">Feedback</a>
 					<a class="link -my-3 py-3" href="https://github.com/aleclay10" rel="noopener">GitHub ↗</a>
 					<a class="link -my-3 py-3" href="https://linkedin.com/in/alec4" rel="noopener">LinkedIn ↗</a>
 					<a class="link -my-3 py-3" href="mailto:alec.layton100@gmail.com">Email ↗</a>
@@ -215,6 +220,10 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 					class="flex items-center border-t border-line px-4 py-2 font-mono t-caption text-muted"></div>
 			</div>
 		</div>
+
+		<!-- Kowalski, the feedback mascot. Outside <main> (never indexed), no-print
+		     (never in the résumé PDF), and a <details> so the form opens with no JS. -->
+		{mascot && <Mascot />}
 
 		<script>
 			const themeToggle = document.getElementById('theme-toggle');

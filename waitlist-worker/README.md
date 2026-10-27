@@ -1,10 +1,19 @@
 # waitlist-worker
 
-The early-access signup endpoint behind the form on `/gaming-assistant`.
+The site's two write endpoints, one Cloudflare Worker writing to one D1 (SQLite) database:
 
-A Cloudflare Worker on `POST /api/waitlist`, writing to a D1 (SQLite) database. It is a
-separate npm package from the site and **deploys through a different pipeline** — see
-[Deploying](#deploying).
+| | | Source |
+|---|---|---|
+| `POST /api/waitlist` | early access for the AI Gaming Assistant, the form on `/gaming-assistant` | `src/waitlist.ts` |
+| `POST /api/feedback` | tips about the site, the Kowalski mascot's panel and `/feedback` | `src/feedback.ts` |
+
+`src/index.ts` routes between them; `src/shared.ts` holds what both must agree on (the
+origin allow-list, body parsing, rate limiting, the response helpers). The package keeps its
+original name because renaming a deployed Worker creates a second one and orphans the
+first, routes and all.
+
+It is a separate npm package from the site and **deploys through a different pipeline** —
+see [Deploying](#deploying).
 
 ## Why it is not on the Mac mini
 
@@ -21,7 +30,7 @@ Being **same-origin** with the site is the other load-bearing property: it lets 
 
 ## Routes
 
-Registered on **both** `aleclay10.dev` and `www.aleclay10.dev`. `www` serves the site
+Both paths are registered on **both** `aleclay10.dev` and `www.aleclay10.dev`. `www` serves the site
 rather than redirecting to the apex — it answers 200 with its own `Origin` — so a route on
 the apex alone would leave the form 404ing for anyone who arrived via `www`. The Worker's
 origin allow-list matches.
@@ -31,15 +40,32 @@ origin allow-list matches.
 | | |
 |---|---|
 | `POST` + `application/json` | → `200 {ok:true}` / `400 {error}` — the enhanced path |
-| `POST` + form-encoded | → `303` to `/gaming-assistant/thanks` — the no-JS path |
+| `POST` + form-encoded | → `303` to `/gaming-assistant/thanks` or `/feedback/thanks/` — the no-JS path |
 | Any other method | `405` |
 | Any other path | `404` |
 | `Origin` not on the allow-list | `403` |
 
-The form works with **no JavaScript at all**; the page script only upgrades it to an inline
-result. Do not add anything that breaks the bare `<form>` POST.
+Both forms work with **no JavaScript at all**; the page scripts only upgrade them to an
+inline result. Do not add anything that breaks the bare `<form>` POST.
 
-## Notable behaviour
+## Feedback: notable behaviour
+
+- **One row per submission, no upsert.** Two tips from one person are two tips, and nothing
+  in this table is a list anyone gets emailed from.
+- **Honeypot** is `favorite_fish`: filled ⇒ report success, write nothing, `console.warn`
+  a PII-free line. Chosen because it is in no browser's autofill vocabulary.
+- **`page`** is the site-relative path the visitor was on. The Worker stores it only when
+  it is exactly that (one leading slash, no scheme, no host); anything else becomes NULL.
+- **`rating`** is optional, and 1 to 5 when present. **`message`** keeps its newlines;
+  every other field is squashed to one line.
+- **No-JS failures redirect** to `/feedback/?e=invalid|rate|server#fb-err-<code>`.
+- **Rate limit** is its own binding (`FEEDBACK_LIMITER`, 5 per minute per IP), so a burst
+  of tips cannot lock the waitlist and vice versa. Fails open like the waitlist's.
+- **`read_at`** is set by the nightly digest on the Mac mini
+  (`~/agent/feedback/feedback-digest.sh`), which copies unread rows into the vault. The
+  database is the cursor; there is no state file.
+
+## Waitlist: notable behaviour
 
 - **Duplicate submissions upsert.** `ON CONFLICT(email)` refreshes name and notes; the
   response is byte-identical whether or not the address was already present, because a
@@ -85,6 +111,10 @@ against the site's browser/Astro lib. Type-check it with `npm run typecheck` her
 curl -i -X POST http://127.0.0.1:8787/api/waitlist \
   -H 'origin: https://aleclay10.dev' -H 'content-type: application/json' \
   -d '{"first_name":"Ada","last_name":"Lovelace","email":"ada@example.com","notes":"hi"}'
+
+curl -i -X POST http://127.0.0.1:8787/api/feedback \
+  -H 'origin: https://aleclay10.dev' -H 'content-type: application/json' \
+  -d '{"name":"Ada Lovelace","email":"ada@example.com","rating":"4","message":"More of the investing page.","page":"/investing/"}'
 ```
 
 ## Deploying
@@ -106,6 +136,10 @@ npm run schema:remote
 npm run deploy
 ```
 
+Adding a table later (the `feedback` table was one) is `npm run schema:remote` again: the
+schema is all `CREATE ... IF NOT EXISTS`, so re-applying it is safe. Then `npm run deploy`
+picks up the new route and binding from `wrangler.toml`.
+
 The API token needs exactly: Account → **Workers Scripts : Edit**, Account → **D1 : Edit**,
 Zone → **Workers Routes : Edit** on `aleclay10.dev`. Nothing else — in particular no DNS
 rights. Store it in the macOS Keychain, following the `ELEVENLABS_API_KEY` precedent in
@@ -117,6 +151,16 @@ rights. Store it in the macOS Keychain, following the `ELEVENLABS_API_KEY` prece
 npx wrangler d1 execute aleclay10-waitlist --remote \
   --command "SELECT created_at, first_name, last_name, email, notes FROM waitlist ORDER BY id DESC LIMIT 50;"
 ```
+
+## Reading the feedback
+
+```sh
+npx wrangler d1 execute aleclay10-waitlist --remote \
+  --command "SELECT created_at, name, email, rating, page, message FROM feedback ORDER BY id DESC LIMIT 50;"
+```
+
+The nightly digest does this for you and files the result under `Inbox/agent/` in the
+vault; unread rows are the ones with `read_at IS NULL`.
 
 ## Emailing the list — read before you do
 

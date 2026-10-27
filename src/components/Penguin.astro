@@ -1,0 +1,48 @@
+---
+// Kowalski, the Butler: bow tie, monocle, and a tray carrying an envelope. The
+// envelope is the ask; he is here to carry a note to Alec. Drawn once, used by
+// the mascot, the /feedback page and its thanks page.
+//
+// The ink-and-paper colours are fixed on purpose. A penguin that re-themed with
+// the page would turn cream with a black belly in dark mode. The .pg-* rules in
+// global.css own the fills, and add a faint outline in dark so the body still
+// separates from the near-black canvas. Only the beak, feet and bow tie follow
+// the accent token.
+interface Props {
+	class?: string;
+	/** An accessible name makes it an image; without one it is decoration. */
+	label?: string;
+}
+
+const { class: className = '', label } = Astro.props;
+---
+
+<svg
+	viewBox="0 0 200 240"
+	class:list={['penguin', className]}
+	role={label ? 'img' : undefined}
+	aria-label={label}
+	aria-hidden={label ? undefined : 'true'}
+>
+	<ellipse class="pg-accent" cx="74" cy="226" rx="24" ry="9"></ellipse>
+	<ellipse class="pg-accent" cx="126" cy="226" rx="24" ry="9"></ellipse>
+	<path class="pg-ink pg-body" d="M100 48 C52 48 32 100 32 150 C32 200 62 224 100 224 C138 224 168 200 168 150 C168 100 148 48 100 48 Z"></path>
+	<path class="pg-paper" d="M100 96 C72 96 54 130 54 160 C54 196 76 214 100 214 C124 214 146 196 146 160 C146 130 128 96 100 96 Z"></path>
+	<path class="pg-ink" d="M40 120 C22 140 18 170 30 190 C40 184 48 160 50 140 Z"></path>
+	<path class="pg-ink" d="M152 120 C168 128 176 146 170 164 C158 160 148 146 146 134 Z"></path>
+	<ellipse class="pg-tray" cx="160" cy="150" rx="32" ry="8"></ellipse>
+	<rect class="pg-paper pg-outlined" x="144" y="126" width="32" height="22" rx="2"></rect>
+	<path class="pg-line" d="M144 126 L160 140 L176 126"></path>
+	<circle class="pg-ink pg-body" cx="100" cy="62" r="46"></circle>
+	<ellipse class="pg-paper" cx="82" cy="66" rx="19" ry="23"></ellipse>
+	<ellipse class="pg-paper" cx="118" cy="66" rx="19" ry="23"></ellipse>
+	<circle class="pg-ink" cx="86" cy="64" r="6"></circle>
+	<circle class="pg-ink" cx="114" cy="64" r="6"></circle>
+	<circle class="pg-paper" cx="88" cy="62" r="2"></circle>
+	<circle class="pg-paper" cx="116" cy="62" r="2"></circle>
+	<circle class="pg-gold" cx="114" cy="64" r="13"></circle>
+	<path class="pg-gold pg-thin" d="M125 72 Q136 86 130 102"></path>
+	<path class="pg-accent" d="M88 80 L112 80 L100 96 Z"></path>
+	<path class="pg-accent" d="M100 109 L84 100 L84 118 Z M100 109 L116 100 L116 118 Z"></path>
+	<circle class="pg-knot" cx="100" cy="109" r="4"></circle>
+</svg>

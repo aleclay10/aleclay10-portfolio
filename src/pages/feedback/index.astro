@@ -1,0 +1,65 @@
+---
+// The feedback form as a page. Three jobs: the no-JS failure target for the
+// mascot's panel (the Worker redirects here with ?e=<code>), the link in the
+// footer for anyone who hid him, and a form that does not depend on finding a
+// penguin. noindex: a utility page, not something to rank for, and noindex is
+// also what keeps it out of the sitemap and the ⌘K index.
+import Base from '../../layouts/Base.astro';
+import FeedbackForm from '../../components/FeedbackForm.astro';
+import Penguin from '../../components/Penguin.astro';
+
+const title = 'Feedback · a word with Kowalski';
+const description = 'Tips on this site go straight to Alec. What was hard to find, what was worth the visit, what is missing.';
+
+// One entry per no-JS failure class. The Worker redirects each failure to
+// /feedback/?e=<code>#fb-err-<code>; CSS :target reveals the matching block.
+// The copy must match failureMessages in src/scripts/feedback-form.ts.
+const failures = [
+	{ code: 'invalid', text: 'Something in that did not pass the checks. Look over the fields and try again.' },
+	{ code: 'rate', text: 'Too many in a row. Wait a minute, then try once more.' },
+	{ code: 'server', text: 'Something went wrong on my end. Nothing was saved. Try again in a moment.' },
+];
+---
+
+<Base title={title} description={description} noindex mascot={false}>
+	<main class="flex flex-1 flex-col py-16">
+		<div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_14rem]">
+			<div class="max-w-2xl">
+				<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Feedback</p>
+				<h1 class="mt-5 font-serif t-title1 font-medium tracking-tight text-ink">A word with Kowalski?</h1>
+				<p class="mt-7 t-body leading-relaxed text-body">
+					Tips on the site go straight to Alec: what was hard to find, what was worth the
+					visit, what is missing. Two minutes, tops.
+				</p>
+
+				{/* No-JS failure messages, one per class, revealed by CSS :target when the
+				    Worker's redirect fragment points at them. The Back-button line is real:
+				    session history still holds the submitted values on a plain form POST. */}
+				{failures.map((f) => (
+					<div
+						id={`fb-err-${f.code}`}
+						class="mt-6 hidden max-w-md rounded-md border border-accent/60 p-4 font-mono t-caption leading-relaxed target:block"
+					>
+						<p class="text-ink">{f.text}</p>
+						<p class="mt-2 text-muted">What you typed is still in the form if you use your browser's Back button.</p>
+					</div>
+				))}
+
+				<div class="mt-9 max-w-md">
+					<FeedbackForm page="/feedback/" idPrefix="fb" />
+				</div>
+			</div>
+			<div class="hidden lg:block">
+				<Penguin class="w-56 drop-shadow-md" label="Kowalski, a penguin in a bow tie and monocle, holding a tray with an envelope on it" />
+			</div>
+		</div>
+	</main>
+</Base>
+
+<!-- Bundled (not is:inline): the production CSP blocks inline scripts. -->
+<script>
+	import { enhanceFeedbackForm } from '../../scripts/feedback-form';
+
+	const form = document.querySelector<HTMLFormElement>('form[data-feedback-form]');
+	if (form) enhanceFeedbackForm(form, { arrival: true });
+</script>

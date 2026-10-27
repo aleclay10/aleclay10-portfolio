@@ -36,3 +36,23 @@ CREATE TABLE IF NOT EXISTS waitlist (
 
 CREATE INDEX IF NOT EXISTS idx_waitlist_status  ON waitlist(status);
 CREATE INDEX IF NOT EXISTS idx_waitlist_created ON waitlist(created_at);
+
+-- Site feedback, left through the Kowalski mascot or the /feedback page.
+--
+-- One row per submission, no upsert: two tips from one person are two tips.
+-- `page` is the site-relative path the visitor was on when they wrote it
+-- (validated by the Worker to be exactly that, never a full URL). `country`
+-- follows the waitlist's rule: request.cf.country, never the IP.
+CREATE TABLE IF NOT EXISTS feedback (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  name        TEXT NOT NULL,
+  email       TEXT NOT NULL,                     -- stored lowercased + trimmed
+  rating      INTEGER CHECK (rating BETWEEN 1 AND 5),
+  message     TEXT NOT NULL,
+  page        TEXT,
+  country     TEXT,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  read_at     TEXT                               -- set by the nightly digest
+);
+
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);

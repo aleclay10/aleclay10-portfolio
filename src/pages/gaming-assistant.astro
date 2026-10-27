@@ -1,5 +1,20 @@
 ---
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import Base from '../layouts/Base.astro';
+import DeviceFrame from '../components/DeviceFrame.astro';
+
+// The hero artifact is a real screenshot in a window frame, or nothing drawn at
+// all. The frame wires itself up the moment Alec's files land in
+// public/gaming-assistant/ (see DeviceFrame.astro for the four names); until
+// then the hero shows the four engineering facts as a quiet spec block. The
+// illustrative sketch that used to sit here was the one dishonest artifact on
+// the site and is gone for good.
+const shots = path.resolve(process.cwd(), 'public/gaming-assistant');
+const hasScreenshots = ['light.webp', 'light.png', 'dark.webp', 'dark.png'].every((f) => existsSync(path.join(shots, f)));
+// Alec writes the alt text when the screenshots land.
+const screenshotAlt = 'AI Gaming Assistant: the chat and session panes beside a running game';
 
 const title = 'AI Gaming Assistant · early access';
 const description =
@@ -57,11 +72,20 @@ const features = [
 	},
 ];
 
-const engineering = [
-	'Tauri 2 + Rust core: megabytes on disk, not an Electron heavyweight',
-	'Local-first SQLite; cloud sync is opt-in, with retry and token refresh',
-	'Inference chain: Groq → Together AI → your local Ollama, your choice',
-	'238 automated tests across Rust, Python, and TypeScript',
+// Reading sentences in Inter, with the product names inside them in mono.
+const engineering: { name: string; note: string }[] = [
+	{ name: 'Tauri 2 + Rust', note: 'core: megabytes on disk, not an Electron heavyweight' },
+	{ name: 'SQLite', note: 'local-first; cloud sync is opt-in, with retry and token refresh' },
+	{ name: 'Groq → Together AI → Ollama', note: 'the inference chain, cloud or your own machine, your choice' },
+	{ name: '238 tests', note: 'automated, across Rust, Python, and TypeScript' },
+];
+
+// The hero's spec block until the screenshots land: same four facts, as data.
+const specBlock = [
+	['core', 'Tauri 2 + Rust'],
+	['storage', 'local-first SQLite'],
+	['inference', 'Groq → Together → Ollama'],
+	['tests', '238 across Rust, Python, TS'],
 ];
 
 const tiers = [
@@ -83,57 +107,41 @@ const tiers = [
 
 <Base title={title} description={description}>
 	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16">
-		<!-- Hero -->
-		<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
-			<div class="reveal max-w-2xl">
-				<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
-					Product · Early access
-				</p>
-				<h1 class="mt-5 font-serif t-display font-medium tracking-tight text-ink">
-					Game on.<br /><span class="italic text-accent">Phone down.</span>
-				</h1>
-				<p class="mt-7 t-body leading-relaxed text-body">
-					AI Gaming Assistant is a lightweight desktop companion that lives alongside
-					your games. It learns what you play, keeps you connected, and handles
-					everything you'd otherwise reach for your phone to do mid-session.
-				</p>
-				<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono t-footnote">
-					<a href="#waitlist" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
-						Get early access
-					</a>{' '}
-					<span class="px-2 py-2.5 text-muted">Windows & macOS at launch · free tier included</span>
-				</div>
+		<!-- Hero. One column: title, intro, the one primary action, then the
+		     artifact, which shows on phones too (the old sketch was hidden there). -->
+		<div class="reveal max-w-2xl">
+			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
+				Product · Early access
+			</p>
+			<h1 class="mt-5 font-serif t-display font-medium tracking-tight text-ink">
+				Game on.<br /><span class="italic text-accent">Phone down.</span>
+			</h1>
+			<p class="mt-7 t-body text-body">
+				AI Gaming Assistant is a lightweight desktop companion that lives alongside
+				your games. It learns what you play, keeps you connected, and handles
+				everything you'd otherwise reach for your phone to do mid-session.
+			</p>
+			<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono t-footnote">
+				<a href="#waitlist" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
+					Get early access
+				</a>{' '}
+				<span class="px-2 py-2.5 text-muted">Windows & macOS at launch · free tier included</span>
 			</div>
+		</div>
 
-			<!-- Stylized app frame (illustrative, not a screenshot) -->
-			<div class="reveal reveal-2 hidden justify-self-end sm:block">
-				<div class="w-72 overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
-					<div class="flex items-center gap-x-1.5 border-b border-line px-3 py-2">
-						<span class="h-2 w-2 rounded-full bg-line"></span>
-						<span class="h-2 w-2 rounded-full bg-line"></span>
-						<span class="h-2 w-2 rounded-full bg-line"></span>
-						<span class="ml-2 font-mono text-[10px] text-muted">AI Gaming Assistant</span>
-					</div>
-					<div class="space-y-3 p-4">
-						<div class="flex items-center gap-x-2 font-mono t-caption text-muted">
-							<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-							Now playing · detected automatically
+		<div class="reveal reveal-2 mt-12">
+			{hasScreenshots ? (
+				<DeviceFrame base="/gaming-assistant/" alt={screenshotAlt} width={1600} height={1000} />
+			) : (
+				<dl class="max-w-md divide-y divide-line border-y border-line font-mono t-caption">
+					{specBlock.map(([k, v]) => (
+						<div class="flex items-baseline justify-between gap-x-3 py-2">
+							<dt class="text-muted">{k}</dt>
+							<dd class="text-ink">{v}</dd>
 						</div>
-						<div class="rounded-lg border border-line bg-canvas p-3">
-							<p class="font-mono text-[10px] uppercase tracking-wider text-muted">You</p>
-							<p class="mt-1 t-footnote text-ink">best loadout for tonight?</p>
-						</div>
-						<div class="rounded-lg border border-line bg-canvas p-3">
-							<p class="font-mono text-[10px] uppercase tracking-wider text-accent">Assistant</p>
-							<p class="mt-1 t-footnote leading-relaxed text-muted">Based on your last 12 sessions, try…</p>
-						</div>
-						<div class="flex items-center justify-between border-t border-line pt-3 font-mono text-[10px] text-muted">
-							<span>Discord · 2 unread</span>{' '}
-							<span>held until match ends</span>
-						</div>
-					</div>
-				</div>
-			</div>
+					))}
+				</dl>
+			)}
 		</div>
 
 		<!-- Features -->
@@ -142,7 +150,7 @@ const tiers = [
 			<div class="mt-5 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
 				{features.map((f) => (
 					<div class="bg-canvas p-5">
-						<h3 class="font-serif text-lg text-ink">{f.label}</h3>
+						<h3 class="font-serif t-title3 text-ink">{f.label}</h3>
 						<p class="mt-2 t-subhead leading-relaxed text-body">{f.desc}</p>
 					</div>
 				))}
@@ -158,11 +166,11 @@ const tiers = [
 					fast, local-first, and tested.
 				</p>
 			</div>
-			<ul class="space-y-2.5 font-mono t-footnote leading-relaxed text-muted sm:mt-1">
-				{engineering.map((s) => (
+			<ul class="space-y-2.5 t-subhead leading-relaxed text-body sm:mt-1">
+				{engineering.map((e) => (
 					<li class="flex items-baseline gap-x-2.5">
 						<span class="h-1.5 w-1.5 shrink-0 self-center rounded-full bg-muted"></span>
-						{s}
+						<span><span class="font-mono text-ink">{e.name}</span>{' '}{e.note}</span>
 					</li>
 				))}
 			</ul>

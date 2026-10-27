@@ -40,12 +40,12 @@ const sections: { id: string; heading: string; items: { name: string; note: stri
 	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col py-16 lg:grid lg:grid-cols-[minmax(0,1fr)_10rem] lg:gap-x-16">
 		<div class="min-w-0">
 		<div class="reveal max-w-2xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">Uses</p>
+			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Uses</p>
 			<!-- Quiet title, same reasoning as /now. -->
 			<h1 class="mt-5 font-serif text-4xl font-medium leading-[0.98] tracking-tight text-ink sm:text-5xl text-display-serif">
 				Tools of the trade.
 			</h1>
-			<p class="mt-7 font-mono text-[13px] text-muted">The <a href="https://uses.tech" class="link underline decoration-line underline-offset-4">/uses</a> convention · what's behind the work</p>
+			<p class="mt-7 font-mono t-footnote text-muted">The <a href="https://uses.tech" class="link underline decoration-line underline-offset-4">/uses</a> convention · what's behind the work</p>
 		</div>
 
 		{sections.map((s) => (
@@ -54,8 +54,8 @@ const sections: { id: string; heading: string; items: { name: string; note: stri
 				<ul class="mt-4 max-w-2xl divide-y divide-line">
 					{s.items.map((i) => (
 						<li class="grid gap-x-6 py-4 sm:grid-cols-[14rem_1fr]">
-							<h3 class="font-mono text-[13px] font-medium text-ink">{i.name}</h3>
-							<p class="mt-1 text-[14px] leading-relaxed text-body sm:mt-0">{i.note}</p>
+							<h3 class="font-mono t-footnote font-medium text-ink">{i.name}</h3>
+							<p class="mt-1 t-subhead leading-relaxed text-body sm:mt-0">{i.note}</p>
 						</li>
 					))}
 				</ul>

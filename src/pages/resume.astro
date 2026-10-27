@@ -111,15 +111,15 @@ const additional = [
 		<div class="min-w-0">
 		<!-- Masthead -->
 		<div class="reveal max-w-3xl">
-			<p class="font-mono text-[13px] uppercase tracking-[0.2em] text-muted">Résumé</p>
+			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Résumé</p>
 			<h1
 				class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
 				Alec <span class="italic text-accent">Layton.</span>
 			</h1>
-			<p class="mt-5 font-mono text-[13px] text-muted">
+			<p class="mt-5 font-mono t-footnote text-muted">
 				Software Engineer · Backend Systems · Automation · AI Agent Tooling
 			</p>
-			<ul class="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[12px] text-muted">
+			<ul class="mt-5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono t-caption text-muted">
 				{
 					contact.map((c) => (
 						<li>
@@ -137,11 +137,11 @@ const additional = [
 				}
 			</ul>
 
-			<p class="mt-7 max-w-2xl text-[16px] leading-relaxed text-body">{summary}</p>
+			<p class="mt-7 max-w-2xl t-body leading-relaxed text-body">{summary}</p>
 
 			<!-- Print/download affordance. `download` keeps the PDF out of the print view
 			     itself via the no-print class below. -->
-			<div class="no-print mt-8 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono text-[13px]">
+			<div class="no-print mt-8 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono t-footnote">
 				<a
 					href="/resume.pdf"
 					download
@@ -160,15 +160,15 @@ const additional = [
 					experience.map((job) => (
 						<article class="break-inside-avoid">
 							<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-								<h3 class="font-serif text-[21px] font-medium text-ink">{job.role}</h3>
-								<p class="font-mono text-[12px] text-muted">{job.dates}</p>
+								<h3 class="font-serif t-title3 font-medium text-ink">{job.role}</h3>
+								<p class="font-mono t-caption text-muted">{job.dates}</p>
 							</div>
-							<p class="mt-1 font-mono text-[13px] text-ink">
+							<p class="mt-1 font-mono t-footnote text-ink">
 								{job.org} <span class="text-muted">· {job.location}</span>
 							</p>
 							<ul class="mt-4 space-y-2.5">
 								{job.bullets.map((b) => (
-									<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
+									<li class="flex gap-x-3 t-subhead leading-relaxed text-body">
 										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 										<span>{b}</span>
 									</li>
@@ -188,19 +188,19 @@ const additional = [
 					projects.map((p) => (
 						<article class="break-inside-avoid">
 							<div class="flex flex-wrap items-baseline gap-x-3">
-								<h3 class="font-serif text-[21px] font-medium text-ink">{p.name}</h3>
-								<p class="font-mono text-[12px] text-muted">{p.kind}</p>
+								<h3 class="font-serif t-title3 font-medium text-ink">{p.name}</h3>
+								<p class="font-mono t-caption text-muted">{p.kind}</p>
 								{p.href && (
 									<a
 										href={p.href}
-										class="no-print font-mono text-[12px] text-accent underline decoration-line underline-offset-4 transition hover:decoration-accent">
+										class="no-print font-mono t-caption text-accent underline decoration-line underline-offset-4 transition hover:decoration-accent">
 										Read more →
 									</a>
 								)}
 							</div>
 							<ul class="mt-4 space-y-2.5">
 								{p.bullets.map((b) => (
-									<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
+									<li class="flex gap-x-3 t-subhead leading-relaxed text-body">
 										<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 										<span>{b}</span>
 									</li>
@@ -219,8 +219,8 @@ const additional = [
 				{
 					skills.map((s) => (
 						<div class="grid gap-x-6 py-3.5 sm:grid-cols-[9rem_1fr]">
-							<dt class="font-mono text-[12px] uppercase tracking-wider text-muted">{s.label}</dt>
-							<dd class="mt-1 text-[14px] leading-relaxed text-ink sm:mt-0">{s.value}</dd>
+							<dt class="font-mono t-caption uppercase tracking-wider text-muted">{s.label}</dt>
+							<dd class="mt-1 t-subhead leading-relaxed text-ink sm:mt-0">{s.value}</dd>
 						</div>
 					))
 				}
@@ -232,13 +232,13 @@ const additional = [
 			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Education</h2>
 			<div class="mt-6 max-w-3xl break-inside-avoid">
 				<div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-					<h3 class="font-serif text-[21px] font-medium text-ink">B.S. Computer Science</h3>
-					<p class="font-mono text-[12px] text-muted">Graduated December 2022</p>
+					<h3 class="font-serif t-title3 font-medium text-ink">B.S. Computer Science</h3>
+					<p class="font-mono t-caption text-muted">Graduated December 2022</p>
 				</div>
-				<p class="mt-1 font-mono text-[13px] text-ink">
+				<p class="mt-1 font-mono t-footnote text-ink">
 					The University of Texas at San Antonio
 				</p>
-				<p class="mt-3 text-[14px] leading-relaxed text-body">
+				<p class="mt-3 t-subhead leading-relaxed text-body">
 					Concentrations in Software Engineering &amp; Data Science.
 				</p>
 			</div>
@@ -250,7 +250,7 @@ const additional = [
 			<ul class="mt-6 max-w-3xl space-y-2.5">
 				{
 					additional.map((a) => (
-						<li class="flex gap-x-3 text-[14px] leading-relaxed text-body">
+						<li class="flex gap-x-3 t-subhead leading-relaxed text-body">
 							<span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-line" aria-hidden="true" />
 							<span>{a}</span>
 						</li>

@@ -57,6 +57,33 @@
   --accent-soft: #2a1a12;
 }
 
+/* Increased contrast (System Settings > Accessibility > Display > Increase
+   contrast; Chromium and Safari both expose it as prefers-contrast: more).
+   Muted text steps up to 8.4:1 light / 7.3:1 dark, and the hairline doubles its
+   visible weight (2.2:1 / 2.1:1; decorative, so no text floor applies). --faint
+   has no lower step left, so it joins --muted. The header's glass goes opaque
+   under the same query in Base.astro. */
+@media (prefers-contrast: more) {
+  :root {
+    --muted: #4f4942;
+    --faint: #4f4942;
+    --line: #b8a995;
+  }
+  .dark {
+    --muted: #a39d94;
+    --faint: #a39d94;
+    --line: #4a463f;
+  }
+}
+
+/* Glass fill for the functional layer (the sticky header; the search scrim is
+   the only other place). Canvas at 72% over a backdrop blur, so content reads
+   through it without competing with it. Content-layer elements (cards, chips,
+   frames) stay opaque. Resolved at use, so it follows --bg into dark mode. */
+:root {
+  --glass: color-mix(in srgb, var(--bg) 72%, transparent);
+}
+
 @theme {
   --font-serif: "Fraunces Variable", ui-serif, Georgia, serif;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
@@ -75,6 +102,82 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+}
+
+/* ---------------------------------------------------------------------------
+   Type scale. Ten named styles in rem, so the browser's text-size setting
+   scales the whole site together the way Dynamic Type scales an app. Each sets
+   size and leading only; the face stays an explicit font-* class beside it,
+   and an explicit leading-* class still wins (it sets fewer properties, so
+   Tailwind sorts it later). Nothing on the site goes below Caption. Caption is
+   the one style with a compact step: 12px is fine at a desk but under the
+   phone floor in the hand, so below sm it becomes 13px.
+
+   Style     Size (desktop / compact)   Carries
+   display   4rem / 3rem                home, product and substance h1s
+   title1    2.25rem / 2rem             utility-page h1s
+   title2    1.625rem / 1.5rem          section h2s
+   title3    1.25rem                    card and row h3s
+   headline  1.0625rem, 600             labels inside cards
+   body      1.0625rem                  intros, résumé, prose
+   callout   0.9375rem                  section prose, feature copy
+   subhead   0.875rem                   card descriptions, table text
+   footnote  0.8125rem                  nav, buttons, metadata rows, live facts
+   caption   0.75rem / 0.8125rem        eyebrows, table headers, chips
+   --------------------------------------------------------------------------- */
+@utility t-display {
+  font-size: 3rem;
+  line-height: 0.98;
+  font-optical-sizing: auto;
+  @media (width >= 40rem) {
+    font-size: 4rem;
+  }
+}
+@utility t-title1 {
+  font-size: 2rem;
+  line-height: 1.05;
+  @media (width >= 40rem) {
+    font-size: 2.25rem;
+  }
+}
+@utility t-title2 {
+  font-size: 1.5rem;
+  line-height: 1.15;
+  @media (width >= 40rem) {
+    font-size: 1.625rem;
+  }
+}
+@utility t-title3 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+@utility t-headline {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+@utility t-body {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+@utility t-callout {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+@utility t-subhead {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+@utility t-footnote {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+@utility t-caption {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  @media (width >= 40rem) {
+    font-size: 0.75rem;
+  }
 }
 
 html {
@@ -152,22 +255,6 @@ nav a[aria-current='page'] {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-/* Compact-width type step. Mono labels, captions and table text are 11 and 12px
-   on desktop, which is fine at a Mac's viewing distance but at or under the
-   iPhone floor (11pt) in the hand. Below sm every 11px becomes 12 and every
-   12px becomes 13, here rather than across ~70 class edits. Unlayered on
-   purpose: Tailwind's utilities live in @layer utilities and an unlayered rule
-   wins regardless of source order. The 10px lines in the /gaming-assistant
-   product mock are an illustration and are left alone. */
-@media (width < 40rem) {
-  .text-\[11px\] {
-    font-size: 12px;
-  }
-  .text-\[12px\] {
-    font-size: 13px;
-  }
 }
 
 .reveal {

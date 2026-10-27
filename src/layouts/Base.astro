@@ -110,7 +110,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
 		<a
 			href="#main-content"
-			class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-[13px] focus:font-medium focus:text-canvas">
+			class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:t-footnote focus:font-medium focus:text-canvas">
 			Skip to content
 		</a>
 		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
@@ -121,12 +121,12 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 					<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
 						AL<span class="text-accent">.</span>
 					</a>
-					<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono text-[13px] text-muted sm:flex">
+					<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono t-footnote text-muted sm:flex">
 						{nav.map((n) => <a class="link" href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
 					</nav>
 					<div class="flex items-center gap-x-3">
 						<button id="cmdk" type="button" aria-label="Search"
-							class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono text-[12px] text-muted transition hover:border-accent hover:text-ink sm:flex">
+							class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono t-caption text-muted transition hover:border-accent hover:text-ink sm:flex">
 							<span>Search</span>
 						</button>
 						<!-- aria-label is a placeholder: the script below rewrites it on load to
@@ -151,7 +151,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 				</div>
 
 				<nav id="mobile-nav" hidden aria-label="Site"
-					class="mt-4 flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface/40 font-mono text-[13px] sm:hidden">
+					class="mt-4 flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface/40 font-mono t-footnote sm:hidden">
 					{nav.map((n) => (
 						<a class="px-4 py-3 text-muted transition hover:bg-surface hover:text-accent" href={n.href} aria-current={current(n.href)}>{n.label}</a>
 					))}
@@ -165,7 +165,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 			<!-- Footer. The contact row is the one place every page offers GitHub,
 			     LinkedIn and email; before this, email lived only in the hero and
 			     LinkedIn only on the résumé. -->
-			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono text-[12px] text-muted">
+			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono t-caption text-muted">
 				<span class="flex flex-wrap items-center gap-x-4">
 					<span>© 2026 Alec Layton</span>
 					<a class="link -my-3 py-3" href="/resume/">Résumé</a>
@@ -184,11 +184,11 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 			<div class="mx-auto mt-16 w-[calc(100%-2rem)] max-w-2xl overflow-hidden rounded-xl border border-line bg-canvas shadow-xl sm:mt-24">
 				<input id="palette-input" type="text" placeholder="Find in pages…" autocomplete="off" spellcheck="false"
 					role="combobox" aria-expanded="true" aria-controls="palette-results" aria-autocomplete="list"
-					class="w-full border-b border-line bg-transparent px-4 py-3.5 font-mono text-[16px] text-ink placeholder:text-muted focus:outline-none sm:text-[14px]" />
+					class="w-full border-b border-line bg-transparent px-4 py-3.5 font-mono text-base text-ink placeholder:text-muted focus:outline-none sm:t-subhead" />
 				<div id="palette-results" role="listbox" aria-label="Search results"
 					class="max-h-[60vh] overflow-y-auto overscroll-contain"></div>
 				<div id="palette-status" aria-live="polite"
-					class="flex items-center border-t border-line px-4 py-2 font-mono text-[11px] text-muted"></div>
+					class="flex items-center border-t border-line px-4 py-2 font-mono t-caption text-muted"></div>
 			</div>
 		</div>
 

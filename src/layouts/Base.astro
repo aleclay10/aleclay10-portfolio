@@ -3,7 +3,6 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import '../styles/global.css';
-import UptimeChip from '../components/UptimeChip.astro';
 
 interface Props {
 	title: string;
@@ -196,7 +195,9 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 					<a class="link -my-3 py-3" href="https://linkedin.com/in/alec4" rel="noopener">LinkedIn ↗</a>
 					<a class="link -my-3 py-3" href="mailto:alec.layton100@gmail.com">Email ↗</a>
 				</span>
-				<UptimeChip />
+				<!-- The live uptime figure moved into the home page's strip; the footer
+				     keeps the plain line every page carried before the chip existed. -->
+				<span>Self-hosted · aleclay10.dev</span>
 			</footer>
 		</div>
 

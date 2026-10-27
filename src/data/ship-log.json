@@ -1,29 +1,29 @@
 {
 	"repo": "aleclay10/aleclay10-portfolio",
-	"mergedPrs": 49,
-	"releases": 15,
+	"mergedPrs": 57,
+	"releases": 17,
 	"since": "2026-06-17",
 	"recent": [
 		{
-			"number": 49,
-			"title": "Rename the Compute vector to AI stack and tag each holding's layer",
-			"mergedAt": "2026-09-04"
+			"number": 57,
+			"title": "Low items from the HIG review: lift the dark surface and line tokens, watching badge to 11px",
+			"mergedAt": "2026-10-22"
 		},
 		{
-			"number": 48,
-			"title": "Show the session date behind closed-market prices",
-			"mergedAt": "2026-09-03"
+			"number": 56,
+			"title": "Medium items from the HIG review: nav names and current-page marker, footer contacts, richer Selected work, one title pattern",
+			"mergedAt": "2026-10-22"
 		},
 		{
-			"number": 47,
-			"title": "Serve the built 404 page via handle_errors (QA N2)",
-			"mergedAt": "2026-08-29"
+			"number": 55,
+			"title": "Design pass from the HIG review: contrast token, serif headings, accent discipline, vertical timeline, page nav",
+			"mergedAt": "2026-10-22"
 		},
 		{
-			"number": 46,
-			"title": "Reprice /investing to 2026-08-29 brokerage marks",
-			"mergedAt": "2026-08-29"
+			"number": 54,
+			"title": "Audit Low items: reveal once per session, \"now\" on current eras, book chip wraps, hero actions in two groups",
+			"mergedAt": "2026-10-22"
 		}
 	],
-	"refreshed": "2026-09-06"
+	"refreshed": "2026-10-27"
 }

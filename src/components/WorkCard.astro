@@ -1,0 +1,32 @@
+---
+/**
+ * A work card on the home page. The whole card is the link; the slot is the
+ * artifact area, a 16:10 surface that must hold a real thing (a screenshot, a
+ * receipt, the pipeline), never an illustration or placeholder art. Below it:
+ * Title 3 name, one Subhead line, Caption meta. Border on hover, no shadow, no
+ * lift: a state change, not an animation.
+ */
+interface Props {
+	name: string;
+	desc: string;
+	meta: string;
+	href: string;
+}
+const { name, desc, meta, href } = Astro.props;
+---
+
+<li class="group relative flex flex-col overflow-hidden rounded-xl border border-line transition hover:border-accent/40">
+	<div class="aspect-[16/10] overflow-hidden border-b border-line bg-surface p-4" aria-hidden="true">
+		<slot />
+	</div>
+	<div class="flex flex-1 flex-col p-5">
+		<h3 class="font-serif t-title3 text-ink">
+			<a href={href} class="after:absolute after:inset-0 after:content-['']">
+				{name}
+				<span class="ml-1 inline-block font-mono t-subhead text-muted transition group-hover:translate-x-0.5 group-hover:text-accent" aria-hidden="true">→</span>
+			</a>
+		</h3>
+		<p class="mt-2 t-subhead text-body">{desc}</p>
+		<p class="mt-auto pt-4 font-mono t-caption text-muted">{meta}</p>
+	</div>
+</li>

@@ -15,22 +15,21 @@ interface Props {
 
 const { title, description, noindex = false } = Astro.props;
 // One list, rendered twice (desktop bar + mobile panel) so they cannot drift apart.
-// Labels are names, not paths: "/gaming-assistant" was a route standing in for a
-// product, and the mix of a word (Projects) beside five paths read as two rules.
-// Page titles use the same names as their first segment, so the tab, the bar
-// and the OG card all agree. Timeline is not in the bar: it is one scroll below
+// Labels are names, not paths. Five items: Work is the home page's work section,
+// Résumé is in the bar because it is what a hiring manager is looking for, and
+// Gaming Assistant (the first Work card) and Uses (linked from /stack and the
+// footer) are one click down. Timeline is not in the bar: it is one scroll below
 // the hero.
 const nav = [
-	{ href: '/#projects', label: 'Projects' },
-	{ href: '/gaming-assistant/', label: 'Gaming Assistant' },
+	{ href: '/#work', label: 'Work' },
 	{ href: '/investing/', label: 'Investing' },
 	{ href: '/stack/', label: 'Stack' },
 	{ href: '/now/', label: 'Now' },
-	{ href: '/uses/', label: 'Uses' },
+	{ href: '/resume/', label: 'Résumé' },
 ];
 
 // Current-page marker. aria-current="page" on the matching link, and global.css
-// draws it in ink. Only exact routes qualify: /#projects is a section of the
+// draws it in ink. Only exact routes qualify: /#work is a section of the
 // home page, not a page, so nothing is marked on /.
 const here = Astro.url.pathname;
 const current = (href: string) => (href === here ? 'page' : undefined);
@@ -107,68 +106,92 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 		     silently kills inline scripts - do not switch these back to is:inline. -->
 		<script is:inline src="/theme-init.js"></script>
 	</head>
-	<body class="min-h-screen bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
+	<body class="flex min-h-screen flex-col bg-canvas font-sans text-ink antialiased selection:bg-accent-soft">
 		<a
 			href="#main-content"
 			class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:t-footnote focus:font-medium focus:text-canvas">
 			Skip to content
 		</a>
-		<div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
-			<!-- Top bar. data-vt-header is the view-transition hook (global.css) -
-			     it holds the header steady instead of cross-fading it with itself. -->
-			<header data-vt-header class="py-6">
-				<div class="flex items-center justify-between">
-					<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
-						AL<span class="text-accent">.</span>
-					</a>
-					<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono t-footnote text-muted sm:flex">
-						{nav.map((n) => <a class="link" href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
-					</nav>
-					<div class="flex items-center gap-x-3">
-						<button id="cmdk" type="button" aria-label="Search"
-							class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono t-caption text-muted transition hover:border-accent hover:text-ink sm:flex">
-							<span>Search</span>
-						</button>
-						<!-- aria-label is a placeholder: the script below rewrites it on load to
-						     name the theme this button switches *to*, because the active theme is
-						     set by theme-init.js before paint and is conveyed only by an icon
-						     swap. A static "Toggle theme" told a screen-reader user nothing about
-						     which theme they were currently in. -->
-						<button id="theme-toggle" type="button" aria-label="Switch theme"
-							class="rounded-md border border-line p-2.5 text-muted transition hover:border-accent hover:text-ink sm:p-2">
-							<svg class="hidden h-5 w-5 sm:h-4 sm:w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-							<svg class="h-5 w-5 sm:h-4 sm:w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-						</button>
-						<!-- Mobile only: the bar above collapses below sm, so without this the
-						     nav and search are both unreachable on a phone (no keyboard, no Cmd-K). -->
-						<button id="nav-toggle" type="button" aria-label="Open menu"
-							aria-expanded="false" aria-controls="mobile-nav"
-							class="rounded-md border border-line p-2.5 text-muted transition hover:border-accent hover:text-ink sm:hidden">
-							<svg id="nav-icon-open" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-							<svg id="nav-icon-close" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-						</button>
-					</div>
-				</div>
-
-				<nav id="mobile-nav" hidden aria-label="Site"
-					class="mt-4 flex flex-col divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface/40 font-mono t-footnote sm:hidden">
-					{nav.map((n) => (
-						<a class="px-4 py-3 text-muted transition hover:bg-surface hover:text-accent" href={n.href} aria-current={current(n.href)}>{n.label}</a>
-					))}
-					<button id="cmdk-mobile" type="button"
-						class="px-4 py-3 text-left text-muted transition hover:bg-surface hover:text-accent">Search</button>
+		<!-- Top bar: sticky, full width, glass. The functional layer floats and the
+		     content scrolls beneath it; cards and chips below stay opaque. global.css
+		     makes it opaque under prefers-reduced-transparency and prefers-contrast,
+		     and sets scroll-padding-top so anchored sections clear it.
+		     data-vt-header is the view-transition hook (global.css) - it holds the
+		     header steady instead of cross-fading it with itself. -->
+		<header data-vt-header class="sticky top-0 z-40 border-b border-line bg-glass backdrop-blur-[20px] backdrop-saturate-[1.3]">
+			<div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-6 sm:px-10">
+				<a href="/" class="font-mono text-sm font-medium tracking-tight text-ink">
+					AL<span class="text-accent">.</span>
+				</a>
+				<nav aria-label="Site" class="hidden items-center gap-x-7 font-mono t-footnote text-muted sm:flex">
+					{nav.map((n) => <a class="link" href={n.href} aria-current={current(n.href)}>{n.label}</a>)}
 				</nav>
-			</header>
+				<div class="flex items-center gap-x-2 sm:gap-x-3">
+					<button id="cmdk" type="button" aria-label="Search"
+						class="hidden items-center rounded-md border border-line px-2.5 py-1.5 font-mono t-caption text-muted transition hover:border-accent hover:text-ink sm:flex">
+						<span>Search</span>
+					</button>
+					<!-- Compact: the same palette behind an icon, so search is one tap from the
+					     bar rather than two taps through the menu. Both ids are triggers in
+					     search-boot.ts. Buttons are 46px square below sm (Apple's 44pt floor). -->
+					<button id="cmdk-mobile" type="button" aria-label="Search"
+						class="rounded-md border border-line p-3 text-muted transition hover:border-accent hover:text-ink sm:hidden">
+						<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+					</button>
+					<!-- aria-label is a placeholder: the script below rewrites it on load to
+					     name the theme this button switches *to*, because the active theme is
+					     set by theme-init.js before paint and is conveyed only by an icon
+					     swap. A static "Toggle theme" told a screen-reader user nothing about
+					     which theme they were currently in. -->
+					<button id="theme-toggle" type="button" aria-label="Switch theme"
+						class="rounded-md border border-line p-3 text-muted transition hover:border-accent hover:text-ink sm:p-2">
+						<svg class="hidden h-5 w-5 sm:h-4 sm:w-4 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+						<svg class="h-5 w-5 sm:h-4 sm:w-4 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+					</button>
+					<!-- Mobile only: the bar above collapses below sm, so without this the
+					     nav is unreachable on a phone. -->
+					<button id="nav-toggle" type="button" aria-label="Open menu"
+						aria-expanded="false" aria-controls="mobile-nav"
+						class="rounded-md border border-line p-3 text-muted transition hover:border-accent hover:text-ink sm:hidden">
+						<svg id="nav-icon-open" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+						<svg id="nav-icon-close" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+					</button>
+				</div>
+			</div>
 
+			<!-- The panel is content-layer: opaque surface, no glass. -->
+			<nav id="mobile-nav" hidden aria-label="Site"
+				class="border-t border-line bg-surface font-mono t-footnote sm:hidden">
+				<div class="mx-auto flex max-w-5xl flex-col divide-y divide-line px-6">
+					{nav.map((n) => (
+						<a class="-mx-2 px-2 py-3.5 text-muted transition hover:text-accent" href={n.href} aria-current={current(n.href)}>{n.label}</a>
+					))}
+				</div>
+			</nav>
+		</header>
+		<div class="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 sm:px-10">
 			<slot />
 
-			<!-- Footer. The contact row is the one place every page offers GitHub,
-			     LinkedIn and email; before this, email lived only in the hero and
-			     LinkedIn only on the résumé. -->
+			<!-- Contact row. One line and three links above the footer on every page, so a
+			     hiring manager never has to find the footer to reach Alec. Outside <main>,
+			     so the search indexer never sees it; no-print keeps it out of the résumé PDF. -->
+			<aside aria-label="Contact" class="no-print border-t border-line py-10">
+				<p class="t-body text-ink">Hiring, or building something similar?</p>
+				<div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 font-mono t-footnote">
+					<a class="link -my-3 py-3" href="mailto:alec.layton100@gmail.com">Email ↗</a>
+					<a class="link -my-3 py-3" href="/resume.pdf" download>Résumé PDF</a>
+					<a class="link -my-3 py-3" href="https://linkedin.com/in/alec4" rel="noopener">LinkedIn ↗</a>
+				</div>
+			</aside>
+
+			<!-- Footer. Everything that left the five-item bar (Gaming Assistant, Uses) is
+			     linked here, so nothing is more than one click from any page. -->
 			<footer class="flex flex-wrap items-center justify-between gap-y-3 border-t border-line py-8 font-mono t-caption text-muted">
 				<span class="flex flex-wrap items-center gap-x-4">
 					<span>© 2026 Alec Layton</span>
 					<a class="link -my-3 py-3" href="/resume/">Résumé</a>
+					<a class="link -my-3 py-3" href="/gaming-assistant/">Gaming Assistant</a>
+					<a class="link -my-3 py-3" href="/uses/">Uses</a>
 					<a class="link -my-3 py-3" href="https://github.com/aleclay10" rel="noopener">GitHub ↗</a>
 					<a class="link -my-3 py-3" href="https://linkedin.com/in/alec4" rel="noopener">LinkedIn ↗</a>
 					<a class="link -my-3 py-3" href="mailto:alec.layton100@gmail.com">Email ↗</a>
@@ -253,7 +276,7 @@ const ogImageAlt = hasCard ? title : 'Alec Layton: I build autonomous agent syst
 
 			navToggle?.addEventListener('click', () => setNav(mobileNav?.hidden !== false));
 
-			// Same-page anchors (/#projects) do not reload, so the panel has to close itself.
+			// Same-page anchors (/#work) do not reload, so the panel has to close itself.
 			mobileNav?.addEventListener('click', (e) => {
 				if ((e.target as HTMLElement).closest('a, button')) setNav(false);
 			});

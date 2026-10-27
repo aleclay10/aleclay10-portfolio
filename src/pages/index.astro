@@ -76,7 +76,7 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 					<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
 						Software engineer · builder · investor
 					</p>
-					<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-7xl text-display-serif">
+					<h1 class="mt-5 font-serif t-display font-medium tracking-tight text-ink">
 						I build agents,<br />ship products,<br /><span class="italic text-accent">run the book.</span>
 					</h1>
 					<p class="mt-7 max-w-md t-body leading-relaxed text-body">
@@ -91,8 +91,8 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 					     the text links) rather than three items and an orphaned Email. -->
 					<div class="mt-9 flex flex-wrap items-center gap-x-3 gap-y-3 font-mono t-footnote">
 						<span class="flex items-center gap-x-3">
-							<a href="#projects" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
-								View projects
+							<a href="#work" class="rounded-md bg-accent px-4 py-2.5 font-medium text-canvas transition hover:opacity-90">
+								View work
 							</a>{' '}
 							<a href="/resume/" class="rounded-md border border-line px-4 py-2.5 font-medium text-ink transition hover:border-accent hover:text-accent">
 								Résumé
@@ -125,7 +125,7 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 		     all visible at once, oldest first so the story ends on now. The rail hid two
 		     of them on desktop and had no arrows on a phone. -->
 		<section id="timeline" class="border-t border-line py-10">
-			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Timeline</h2>
+			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Timeline</h2>
 			<ol class="mt-4 divide-y divide-line">
 				{eras.map((e) => (
 					<li class="grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
@@ -135,7 +135,7 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 							<p class="mt-1 t-caption">{e.tag}</p>
 						</div>
 						<div>
-							<h3 class="font-serif text-xl text-ink">{e.title}</h3>
+							<h3 class="font-serif t-title3 text-ink">{e.title}</h3>
 							<p class="mt-0.5 font-mono t-caption text-muted">{e.org}</p>
 							<p class="mt-3 max-w-lg t-subhead leading-relaxed text-body">{e.desc}</p>
 							{e.href && (
@@ -148,14 +148,14 @@ const projects: { name: string; desc: string; tag: string; meta: string; href: s
 		</section>
 
 		<!-- Projects teaser strip -->
-		<section id="projects" class="border-t border-line py-10">
-			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Selected work</h2>
+		<section id="work" class="border-t border-line py-10">
+			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Selected work</h2>
 			<ul class="mt-4 divide-y divide-line">
 				{projects.map((p) => (
 					<li class="group relative grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
 						<p class="font-mono t-caption uppercase tracking-wider text-muted">{p.tag}</p>
 						<div>
-							<h3 class="font-serif text-xl text-ink transition group-hover:text-accent">
+							<h3 class="font-serif t-title3 text-ink transition group-hover:text-accent">
 								<a href={p.href} class="after:absolute after:inset-0">
 									{p.name}
 									<span aria-hidden="true" class="ml-1 inline-block font-mono t-subhead text-muted transition group-hover:translate-x-0.5 group-hover:text-accent">→</span>

@@ -102,6 +102,7 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-glass: var(--glass);
 }
 
 /* ---------------------------------------------------------------------------
@@ -183,6 +184,22 @@
 html {
   background-color: var(--bg);
   color-scheme: light dark;
+  /* The header is sticky and 3.5rem tall; without this an anchored section
+     (/#work, the page nav, #waitlist) scrolls in underneath it. */
+  scroll-padding-top: 4.5rem;
+}
+
+/* The one glass surface goes opaque when the visitor has asked for less
+   transparency or more contrast. prefers-reduced-transparency is Chromium-only
+   today, which is why prefers-contrast is in the list too: Safari users get the
+   opaque bar through that one. Unlayered, so it wins over the bg-glass and
+   backdrop-blur utilities on the element. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  header[data-vt-header] {
+    background-color: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

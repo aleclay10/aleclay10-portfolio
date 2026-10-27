@@ -42,7 +42,7 @@ const sections: { id: string; heading: string; items: { name: string; note: stri
 		<div class="reveal max-w-2xl">
 			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Uses</p>
 			<!-- Quiet title, same reasoning as /now. -->
-			<h1 class="mt-5 font-serif text-4xl font-medium leading-[0.98] tracking-tight text-ink sm:text-5xl text-display-serif">
+			<h1 class="mt-5 font-serif t-title1 font-medium tracking-tight text-ink">
 				Tools of the trade.
 			</h1>
 			<p class="mt-7 font-mono t-footnote text-muted">The <a href="https://uses.tech" class="link underline decoration-line underline-offset-4">/uses</a> convention · what's behind the work</p>
@@ -50,7 +50,7 @@ const sections: { id: string; heading: string; items: { name: string; note: stri
 
 		{sections.map((s) => (
 			<section id={s.id} class="reveal reveal-2 mt-14">
-				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">{s.heading}</h2>
+				<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">{s.heading}</h2>
 				<ul class="mt-4 max-w-2xl divide-y divide-line">
 					{s.items.map((i) => (
 						<li class="grid gap-x-6 py-4 sm:grid-cols-[14rem_1fr]">

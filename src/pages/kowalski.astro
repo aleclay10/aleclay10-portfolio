@@ -57,7 +57,7 @@ const stack = [
 			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">
 				Project 01 · AI agents
 			</p>
-			<h1 class="mt-5 font-serif text-5xl font-medium leading-[0.98] tracking-tight text-ink sm:text-6xl text-display-serif">
+			<h1 class="mt-5 font-serif t-display font-medium tracking-tight text-ink">
 				Hello. I'm <span class="italic text-accent">Kowalski.</span>
 			</h1>
 			<p class="mt-7 t-body leading-relaxed text-body">
@@ -70,7 +70,7 @@ const stack = [
 
 		<!-- Duties -->
 		<section class="reveal reveal-2 mt-16">
-			<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">What I handle</h2>
+			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">What I handle</h2>
 			<div class="mt-6 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
 				{duties.map((d) => (
 					<div class="bg-canvas p-5">
@@ -84,7 +84,7 @@ const stack = [
 		<!-- House rules + stack -->
 		<section class="reveal reveal-2 mt-16 grid gap-12 sm:grid-cols-[1.5fr_1fr]">
 			<div>
-				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">House rules</h2>
+				<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">House rules</h2>
 				<ul class="mt-6 space-y-3.5">
 					{rules.map((r, i) => (
 						<li class="flex items-baseline gap-x-4">
@@ -95,7 +95,7 @@ const stack = [
 				</ul>
 			</div>
 			<div>
-				<h2 class="font-serif text-2xl font-medium tracking-tight text-ink">Under the hood</h2>
+				<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Under the hood</h2>
 				<ul class="mt-6 space-y-2.5 font-mono t-footnote leading-relaxed text-muted">
 					{stack.map((s) => (
 						<li class="flex items-baseline gap-x-2.5">

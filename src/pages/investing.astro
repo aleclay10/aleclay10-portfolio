@@ -14,8 +14,7 @@ const asOf = baselineAsOf;
 
 // Right-column section list. Ids must match the sections below.
 const onThisPage = [
-	{ href: '#performance', label: 'Book performance' },
-	{ href: '#allocation', label: 'Allocation' },
+	{ href: '#performance', label: 'Performance' },
 	{ href: '#theses', label: 'The theses' },
 	{ href: '#positions', label: 'Positions' },
 	{ href: '#watchlist', label: 'Watchlist' },
@@ -50,15 +49,16 @@ const tickerLine = (hs: typeof holdings) => {
 		<!-- Hero -->
 		<div class="reveal max-w-2xl">
 			<p class="font-mono t-footnote uppercase tracking-[0.2em] text-muted">Investing</p>
-			<!-- The `max-[359px]` step is not decoration. "Concentration," is one
-			     unbreakable 14-character word, and at Display's 3rem compact size it
-			     measures wider than a 320px viewport, so it pushed the whole document
-			     31px sideways on an iPhone SE class screen: the page gained a
-			     horizontal scrollbar and the word was visibly clipped. Every other h1
-			     on the site has a short enough first word to fit, which is why this
-			     step is here and not in the shared heading style. -->
+			<!-- The compact cap is not decoration. "Concentration," is one unbreakable
+			     14-character word; at Display's 3rem it measures wider than a 320px
+			     viewport, and wider than 390px once the visitor's text size is at 150%,
+			     so it pushed the whole document sideways. Below sm the size is the
+			     smaller of 3rem and 11.25vw: 36px at 320, 44px at 390, 48px from 427 up,
+			     and the vw half cannot grow with the text-size setting. Every other h1
+			     on the site has a short enough first word to fit, which is why this is
+			     here and not in the shared style. -->
 			<h1
-				class="mt-5 font-serif t-display font-medium leading-[0.98] tracking-tight text-ink max-[359px]:text-4xl">
+				class="mt-5 font-serif t-display font-medium tracking-tight text-ink max-sm:[font-size:min(3rem,11.25vw)]">
 				Concentration, <span class="italic text-accent">on purpose.</span>
 			</h1>
 			<p class="mt-7 t-body leading-relaxed text-body">
@@ -69,20 +69,22 @@ const tickerLine = (hs: typeof holdings) => {
 			</p>
 		</div>
 
-		<!-- Day performance - a stat tile, not a chart. Status colour always ships
-		     with an explicit sign so it never depends on hue alone. -->
+		<!-- Performance and allocation in one band: the stat tile at left, the
+		     donut and legend at right, stacked on compact. The two live elements on
+		     the page sit together. Status colour always ships with an explicit sign
+		     so it never depends on hue alone. -->
 		<section id="performance" class="reveal reveal-2 mt-12 border-t border-line pt-10">
-			<div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+			<h2 id="perf-heading" class="font-serif t-title2 font-medium tracking-tight text-ink">
+				Book performance
+			</h2>
+			<div class="mt-6 grid items-start gap-x-14 gap-y-10 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]">
 				<div>
 					<!-- Deliberately not "today": outside market hours the figure is the last
-					     session's close, and the label beside the number says which. -->
-					<h2 id="perf-heading" class="font-serif t-title2 font-medium tracking-tight text-ink">
-						Book performance
-					</h2>
-					<!-- Empty state is deliberately faint: a full-weight em-dash at this size
-					     reads as a redaction bar rather than "no data yet". JS sets the real
-					     value and colour once /prices.json resolves. -->
-					<p class="mt-4 flex items-baseline gap-x-3">
+					     session's close, and the label beside the number says which. Empty
+					     state is faint on purpose: a full-weight dash at this size reads as a
+					     redaction bar rather than "no data yet". JS sets the value and colour
+					     once /prices.json resolves. -->
+					<p class="flex items-baseline gap-x-3">
 						<span
 							id="day-change"
 							class="font-sans text-5xl font-medium tabular-nums leading-none text-muted/30"
@@ -92,29 +94,25 @@ const tickerLine = (hs: typeof holdings) => {
 							>awaiting live prices</span
 						>
 					</p>
-					<p class="mt-3 max-w-md font-mono t-caption leading-relaxed text-muted">
+					<p class="mt-3 max-w-xs font-mono t-caption leading-relaxed text-muted">
 						Allocation-weighted move across every position below, measured against the
 						previous close. A percentage of the book, not a dollar figure.
 					</p>
+					<p id="price-asof" class="mt-3 font-mono t-caption text-muted">
+						Allocation as of {asOf}
+					</p>
 				</div>
-				<p id="price-asof" class="font-mono t-caption text-muted">
-					Allocation as of {asOf}
-				</p>
-			</div>
-		</section>
-
-		<!-- Allocation -->
-		<section id="allocation" class="mt-10 border-t border-line pt-10">
-			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">
-				Allocation by thesis vector
-			</h2>
-			<p class="mt-3 max-w-2xl t-callout leading-relaxed text-body">
-				Eighteen positions grouped into six vectors. Grouped rather than sliced per-ticker
-				because eighteen slices is an unreadable chart; the exact per-asset percentages are
-				in the table below.
-			</p>
-			<div class="mt-8 max-w-2xl">
-				<AllocationDonut />
+				<div id="allocation">
+					<h3 class="font-serif t-title3 text-ink">Allocation by thesis vector</h3>
+					<div class="mt-5">
+						<AllocationDonut />
+					</div>
+					<p class="mt-5 max-w-2xl t-subhead text-body">
+						Eighteen positions grouped into six vectors. Grouped rather than sliced per-ticker
+						because eighteen slices is an unreadable chart; the exact per-asset percentages are
+						in the table below.
+					</p>
+				</div>
 			</div>
 		</section>
 

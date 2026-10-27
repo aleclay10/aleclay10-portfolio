@@ -12,7 +12,7 @@
 //
 // Sources, all same-origin, none a build artifact:
 //   release  status.json → release.tag + deployedAt (health-check.sh on the host)
-//   uptime   status.json → uptime.7d, status, since (UptimeChip's rules, reused)
+//   uptime   status.json → uptime.7d, status, since (the old footer chip's rules)
 //   pr       ship-log at build time; no fetch
 //   book     prices.json → portfolio.dayChangePct via prices-client.ts
 //
@@ -86,18 +86,7 @@ const facts = [
 
 <script>
 	import { closeDay, loadFreshPrices, signed } from '../lib/prices-client';
-
-	type Status = {
-		status?: 'up' | 'down';
-		checked?: string;
-		uptime?: { '7d'?: number; '30d'?: number };
-		since?: string | null;
-		release?: { tag?: string; deployedAt?: string } | null;
-	};
-
-	// A status file that stopped being written (host asleep, launchd job
-	// unloaded) is treated as unknown rather than reported as fact.
-	const MAX_AGE_MS = 30 * 60 * 1000;
+	import { deployedWhen, loadFreshStatus } from '../lib/status-client';
 
 	function fact(id: string) {
 		return document.querySelector<HTMLElement>(`[data-fact="${id}"]`);
@@ -114,59 +103,41 @@ const facts = [
 
 	const pct = (n: number) => `${n.toFixed(1).replace(/\.0$/, '')}%`;
 
-	function deployedWhen(iso: string) {
-		const t = Date.parse(iso);
-		if (!Number.isFinite(t)) return null;
-		const d = new Date(t);
-		const recent = Date.now() - t < 7 * 86_400_000;
-		return recent
-			? `${d.toLocaleDateString(undefined, { weekday: 'short' })} ${d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`
-			: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-	}
-
 	async function status() {
 		const release = fact('release');
 		const uptime = fact('uptime');
 		if (!release && !uptime) return;
-		try {
-			const res = await fetch('/status.json', { cache: 'no-store' });
-			if (!res.ok) return;
-			const data: Status = await res.json();
-			const checked = data.checked ? Date.parse(data.checked) : NaN;
-			if (!Number.isFinite(checked) || Date.now() - checked > MAX_AGE_MS) return;
+		const fresh = await loadFreshStatus();
+		if (!fresh) return;
+		const { data, checkedAt } = fresh;
 
-			const week = data.uptime?.['7d'];
-			if (uptime && typeof week === 'number') {
-				// A 7d figure computed from fewer observed days than the window claims
-				// is not a measurement of that window; label it as partial.
-				const since = data.since ? Date.parse(data.since) : NaN;
-				const observed = Number.isFinite(since) ? (checked - since) / 86_400_000 : Infinity;
-				const window = observed >= 7 ? 'over 7 days' : `over ${Math.max(1, Math.floor(observed))}d so far`;
-				const down = data.status === 'down';
-				settle(uptime, `${down ? 'Down' : 'Up'} ${pct(week)}`, `${window} · a Mac mini behind a Cloudflare Tunnel`);
-				const dot = uptime.querySelector('[data-dot]');
-				if (dot) {
-					if (down) {
-						dot.classList.remove('bg-accent');
-						dot.classList.add('bg-muted');
-					} else {
-						dot.classList.add('motion-safe:animate-breathe');
-					}
+		const week = data.uptime?.['7d'];
+		if (uptime && typeof week === 'number') {
+			// A 7d figure computed from fewer observed days than the window claims
+			// is not a measurement of that window; label it as partial.
+			const since = data.since ? Date.parse(data.since) : NaN;
+			const observed = Number.isFinite(since) ? (checkedAt - since) / 86_400_000 : Infinity;
+			const window = observed >= 7 ? 'over 7 days' : `over ${Math.max(1, Math.floor(observed))}d so far`;
+			const down = data.status === 'down';
+			settle(uptime, `${down ? 'Down' : 'Up'} ${pct(week)}`, `${window} · a Mac mini behind a Cloudflare Tunnel`);
+			const dot = uptime.querySelector('[data-dot]');
+			if (dot) {
+				if (down) {
+					dot.classList.remove('bg-accent');
+					dot.classList.add('bg-muted');
+				} else {
+					dot.classList.add('motion-safe:animate-breathe');
 				}
 			}
+		}
 
-			const rel = data.release;
-			if (release && rel && typeof rel.tag === 'string' && /^v\d+\.\d+\.\d+$/.test(rel.tag)) {
-				const when = typeof rel.deployedAt === 'string' ? deployedWhen(rel.deployedAt) : null;
-				settle(release, rel.tag, when ? `· signed, deployed ${when}` : '· signed tag, verified on the machine');
-				// The pipeline card's last node shows the same tag.
-				for (const el of document.querySelectorAll<HTMLElement>('[data-release-tag]')) el.textContent = rel.tag;
-			}
-		} catch (err) {
-			// Offline, blocked, or malformed JSON: the baselines stand. The expected
-			// dev-time 404 returns earlier via !res.ok, so anything logged here is
-			// genuinely unexpected.
-			console.debug('[live-strip] status disabled:', err);
+		const rel = data.release;
+		if (release && rel && typeof rel.tag === 'string' && /^v\d+\.\d+\.\d+$/.test(rel.tag)) {
+			const t = typeof rel.deployedAt === 'string' ? Date.parse(rel.deployedAt) : NaN;
+			const when = Number.isFinite(t) ? deployedWhen(new Date(t)) : null;
+			settle(release, rel.tag, when ? `· signed, deployed ${when}` : '· signed tag, verified on the machine');
+			// The pipeline card's last node shows the same tag.
+			for (const el of document.querySelectorAll<HTMLElement>('[data-release-tag]')) el.textContent = rel.tag;
 		}
 	}
 

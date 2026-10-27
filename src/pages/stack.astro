@@ -2,12 +2,17 @@
 import Base from '../layouts/Base.astro';
 import ShipLog from '../components/ShipLog.astro';
 import PageNav from '../components/PageNav.astro';
+import { currentRelease } from '../lib/release.mjs';
+
+// The last node is a receipt: the tag this build belongs to, replaced by the
+// host's deployed tag and time once /status.json resolves (see the script).
+const { tag } = currentRelease();
 
 const title = 'Stack · how this site works';
 const description =
 	'The full stack behind aleclay10.dev: Astro on a Mac mini in an apartment, zero open ports, signature-gated deploys, and an AI agent that ships the pages.';
 
-const pipeline = [
+const pipeline: { step: string; note: string; live?: boolean }[] = [
 	{ step: 'git tag -s', note: 'a signed tag is the release; merging to main publishes nothing' },
 	{ step: 'launchd poller', note: 'every 60s, looks for the newest tag whose signature verifies against an allow-list on the machine' },
 	{ step: 'detached checkout', note: 'at the exact tagged commit, never at whatever a branch happens to point to' },
@@ -15,7 +20,7 @@ const pipeline = [
 	{ step: 'rsync → Caddy', note: 'atomic swap into the web root, loopback-only server' },
 	{ step: 'Cloudflare Tunnel', note: 'outbound-only connection, zero open inbound ports' },
 	{ step: 'edge cache purge', note: 'scoped API token, purge-only, auto after deploy' },
-	{ step: 'you', note: 'TLS at the edge, HTML always fresh' },
+	{ step: 'you', note: tag ? `${tag} · TLS at the edge, HTML always fresh` : 'TLS at the edge, HTML always fresh', live: true },
 ];
 
 // Right-column section list. Ids must match the sections below (and ShipLog's).
@@ -62,12 +67,12 @@ const stack = [
 				{pipeline.map((p, i) => (
 					<li class="flex gap-x-4">
 						<div class="flex flex-col items-center">
-							<span class={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${i === pipeline.length - 1 ? 'bg-accent' : 'border border-line bg-surface'}`}></span>
+							<span data-pipeline-dot={p.live ? '' : undefined} class={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${p.live ? 'bg-accent' : 'border border-line bg-surface'}`}></span>
 							{i < pipeline.length - 1 && <span class="w-px flex-1 bg-line"></span>}
 						</div>
 						<div class="pb-6">
 							<p class="font-mono t-footnote font-medium text-ink">{p.step}</p>
-							<p class="mt-0.5 t-footnote leading-relaxed text-body">{p.note}</p>
+							<p data-pipeline-live={p.live ? '' : undefined} class="mt-0.5 t-footnote leading-relaxed text-body">{p.note}</p>
 						</div>
 					</li>
 				))}
@@ -135,3 +140,23 @@ const stack = [
 		<PageNav items={onThisPage} />
 	</main>
 </Base>
+
+<script>
+	// The pipeline's last node names the deployed release once /status.json is
+	// fresh; otherwise the build-time tag stands. Same client as the home strip.
+	import { deployedWhen, loadLiveRelease } from '../lib/status-client';
+
+	async function live() {
+		const node = document.querySelector<HTMLElement>('[data-pipeline-live]');
+		if (!node) return;
+		const rel = await loadLiveRelease();
+		if (!rel) return;
+		node.textContent = rel.deployedAt
+			? `${rel.tag} · deployed ${deployedWhen(rel.deployedAt)} · TLS at the edge, HTML always fresh`
+			: `${rel.tag} · TLS at the edge, HTML always fresh`;
+		node.classList.add('live-in');
+		document.querySelector('[data-pipeline-dot]')?.classList.add('motion-safe:animate-breathe');
+	}
+
+	live();
+</script>

@@ -1,0 +1,51 @@
+---
+// Kowalski, parked on the edge of every page. Click him and he offers the feedback
+// form; drag him and he stays where he was put.
+//
+// It is a <details> element on purpose: the panel opens and closes with no
+// JavaScript at all, the summary is a real button in the tab order, and the form
+// inside is the same native POST as /feedback. src/scripts/mascot.ts adds what
+// only a script can: dragging, remembering his spot, Escape and outside-click to
+// close, the 30-day quiet after a send, and the inline result.
+//
+// Outside <main>, so the search indexer never sees him; no-print keeps him out of
+// the résumé PDF. Styles are the .mascot rules in global.css: a scoped <style>
+// here would not reach the summary's hover and open states cleanly, and the
+// print and reduced-motion overrides belong beside the site's other ones.
+import FeedbackForm from './FeedbackForm.astro';
+import Penguin from './Penguin.astro';
+
+const page = Astro.url.pathname;
+---
+
+<details id="mascot" class="mascot no-print" data-side="right" data-anchor="bottom">
+	<summary class="mascot-summary" aria-label="Leave feedback for Alec">
+		<span class="mascot-bubble font-mono t-caption" aria-hidden="true">Got a tip for Alec?</span>
+		<Penguin class="mascot-penguin" />
+	</summary>
+	<div class="mascot-panel" tabindex="-1">
+		<div class="flex items-start justify-between gap-4">
+			<div>
+				<h2 class="font-serif t-title3 font-medium tracking-tight text-ink">A word with Kowalski?</h2>
+				<p class="mt-1 t-footnote leading-relaxed text-body">Tips on the site go straight to Alec. Two minutes, tops.</p>
+			</div>
+			<button type="button" data-mascot-close aria-label="Close"
+				class="-mr-2 -mt-2 shrink-0 rounded-md p-2 text-muted transition hover:text-ink">
+				<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+			</button>
+		</div>
+		<div class="mt-4">
+			<FeedbackForm page={page} idPrefix="mascot" />
+		</div>
+		<p class="mt-4 border-t border-line pt-3 font-mono t-caption text-muted">
+			<a class="link" href="/feedback/">Open this as a page</a>
+			<span aria-hidden="true"> · </span>
+			<button type="button" data-mascot-hide class="link">Hide him for now</button>
+		</p>
+	</div>
+</details>
+
+<!-- Bundled (not is:inline): the production CSP blocks inline scripts. -->
+<script>
+	import '../scripts/mascot';
+</script>

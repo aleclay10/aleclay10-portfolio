@@ -1,0 +1,95 @@
+---
+// The feedback form, rendered twice: inside the mascot's panel on every page, and
+// as the body of /feedback. Same fields, same Worker (/api/feedback), same rules
+// as the waitlist form: it is a native <form> POST that works with no JavaScript,
+// and src/scripts/feedback-form.ts only upgrades it to an inline result.
+//
+// The rating is five radio buttons drawn as fish. They sit in the DOM as 5..1 and
+// are flipped back with flex-row-reverse, which is what lets plain CSS fill every
+// fish up to the chosen one (`input:checked ~ label`) with no script at all.
+// The .fish-rating rules live in global.css.
+interface Props {
+	/** The path the visitor is on, so a tip can be matched to a page. */
+	page: string;
+	/** Keeps ids unique when the form appears more than once on a page. */
+	idPrefix: string;
+}
+
+const { page, idPrefix } = Astro.props;
+const id = (name: string) => `${idPrefix}-${name}`;
+
+const labelClass = 'mb-1.5 block font-mono t-caption uppercase tracking-[0.14em] text-muted';
+const fieldClass =
+	'w-full rounded-md border border-line bg-canvas px-3.5 py-2.5 font-mono text-base text-ink placeholder:text-muted focus:border-accent sm:t-footnote';
+---
+
+<form method="post" action="/api/feedback" data-feedback-form class="space-y-4">
+	<div class="grid gap-4 sm:grid-cols-2">
+		<div>
+			<label for={id('name')} class={labelClass}>Name</label>
+			<input id={id('name')} name="name" type="text" required maxlength="80" autocomplete="name" class={fieldClass} />
+		</div>
+		<div>
+			<label for={id('email')} class={labelClass}>Email</label>
+			<input id={id('email')} name="email" type="email" required maxlength="254" autocomplete="email"
+				placeholder="you@example.com" class={fieldClass} />
+		</div>
+	</div>
+
+	<fieldset class="fish-rating">
+		<legend class={labelClass}>
+			How is the site? <span class="normal-case tracking-normal text-faint">optional</span>
+		</legend>
+		<div class="flex flex-row-reverse justify-end">
+			{[5, 4, 3, 2, 1].map((n) => (
+				<>
+					<input class="sr-only" type="radio" id={id(`rating-${n}`)} name="rating" value={n} />
+					<label for={id(`rating-${n}`)}>
+						<svg viewBox="0 0 24 24" class="h-7 w-7" aria-hidden="true">
+							<path d="M2 12 C6 5 15 5 19 12 C15 19 6 19 2 12 Z M19 12 L23 7 L23 17 Z"></path>
+							<circle cx="7" cy="11" r="1.3"></circle>
+						</svg>
+						<span class="sr-only">{n} of 5</span>
+					</label>
+				</>
+			))}
+		</div>
+	</fieldset>
+
+	<div>
+		<label for={id('message')} class={labelClass}>What would you change?</label>
+		<textarea id={id('message')} name="message" rows="3" required maxlength="2000"
+			placeholder="What was hard to find, what was worth the visit, what is missing…"
+			class={`${fieldClass} resize-y`}></textarea>
+	</div>
+
+	{/* Where the visitor was when they wrote it. The Worker stores it only when it
+	    is a plain site-relative path. */}
+	<input type="hidden" name="page" value={page} />
+
+	{/* Honeypot. Hidden from sight, the a11y tree and the tab order; anything that
+	    fills it in is automated, and the Worker discards the submission while
+	    still reporting success. Named favorite_fish because it is in no browser's
+	    autofill vocabulary (the waitlist's `company` was, and Chrome ignores
+	    autocomplete="off"). Keep in step with HONEYPOT_FIELDS in feedback.ts. */}
+	<div class="hidden" aria-hidden="true">
+		<label for={id('favorite_fish')}>Leave this field empty</label>
+		<input id={id('favorite_fish')} name="favorite_fish" type="text" tabindex="-1" autocomplete="off" />
+	</div>
+
+	<div class="flex flex-wrap items-center gap-x-4 gap-y-2 pt-1">
+		<button type="submit" data-feedback-submit
+			class="rounded-md bg-accent px-4 py-2.5 font-mono t-footnote font-medium text-canvas transition hover:opacity-90 disabled:opacity-60">
+			Send it to Alec
+		</button>
+		<p data-feedback-message role="status" aria-live="polite" class="font-mono t-caption leading-relaxed text-muted"></p>
+	</div>
+	<p class="font-mono t-caption leading-relaxed text-faint">
+		Kowalski files it for Alec. No newsletter, no tracking; the email is only for a reply.
+	</p>
+</form>
+
+{/* Success announcements land here, not in the status line inside the form: the
+    success path replaces the form wholesale, which would destroy a live region
+    mid-announcement. */}
+<p data-feedback-announce role="status" aria-live="polite" class="sr-only"></p>

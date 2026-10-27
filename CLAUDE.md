@@ -40,14 +40,14 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 
 ## Repository layout
 
-- `src/pages/` — routes (`.astro`). Nine today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`, and `gaming-assistant/thanks` (the no-JS confirmation for the waitlist form — `noindex`, and excluded from the sitemap and the ⌘K index).
+- `src/pages/` — routes (`.astro`). Eleven today: `index`, `kowalski`, `stack`, `investing`, `resume`, `now`, `uses`, `gaming-assistant`, `gaming-assistant/thanks` (the no-JS confirmation for the waitlist form), `feedback` (the mascot's form as a page, and the no-JS failure target) and `feedback/thanks`. The three utility routes are `noindex`, which also keeps them out of the sitemap and the ⌘K index.
 - `src/layouts/Base.astro` — the shared shell every page renders through (head, nav, footer, theme init, `global.css` import).
-- `src/components/` — reusable UI (`AllocationDonut.astro`, `ShipLog.astro`, `PageNav.astro`, and the home page's `LiveStrip.astro`, `WorkCard.astro`, `PrReceipt.astro`, `PipelineMini.astro`). `LiveStrip` is where `/status.json` and `/prices.json` are read on the home page; it replaced the footer `UptimeChip` and the hero `BookChip` in the 2026-10 redesign and keeps their contract: static baseline in the markup, live values only when the feed is fresh. `src/lib/release.mjs` reads the release tag and the shipping PR from git at build time; `src/lib/ship-log-loader.mjs` is the one ship-log fetch per build. `PageNav` is the sticky "On this page" list in the right column of `/stack`, `/investing`, `/resume` and `/uses`; it is hidden below `lg`, hidden in print, and `data-search-skip`, so adding it to a page costs nothing in the PDF or the search index. Its `href`s must match the section `id`s on that page.
+- `src/components/` — reusable UI (`AllocationDonut.astro`, `ShipLog.astro`, `PageNav.astro`, the home page's `LiveStrip.astro`, `WorkCard.astro`, `PrReceipt.astro`, `PipelineMini.astro`, and the feedback trio `Mascot.astro`, `FeedbackForm.astro`, `Penguin.astro`; see [Mascot](#mascot)). `LiveStrip` is where `/status.json` and `/prices.json` are read on the home page; it replaced the footer `UptimeChip` and the hero `BookChip` in the 2026-10 redesign and keeps their contract: static baseline in the markup, live values only when the feed is fresh. `src/lib/release.mjs` reads the release tag and the shipping PR from git at build time; `src/lib/ship-log-loader.mjs` is the one ship-log fetch per build. `PageNav` is the sticky "On this page" list in the right column of `/stack`, `/investing`, `/resume` and `/uses`; it is hidden below `lg`, hidden in print, and `data-search-skip`, so adding it to a page costs nothing in the PDF or the search index. Its `href`s must match the section `id`s on that page.
 - `src/data/portfolio.ts` — holdings/watchlist data behind `/investing`.
 - `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
 - `public/` — static assets served as-is (e.g. `favicon.svg`, `theme-init.js`). Note `/status.json` is **not** here and **not** a build artifact — `health-check.sh` writes it on the host, so it 404s in dev and `LiveStrip` degrades quietly. That 404 is expected, not a bug.
 - `scripts/` — repo tooling not part of the build (e.g. `build-resume-pdf.sh`).
-- `waitlist-worker/` — the `/api/waitlist` Cloudflare Worker + D1 schema behind the early-access form. A **separate npm package with its own deploy pipeline**; see [Waitlist API](#waitlist-api). Excluded from the root `tsconfig.json`, because Workers globals (`D1Database`) do not type-check against the site's browser lib.
+- `waitlist-worker/` — the Cloudflare Worker + D1 schema behind both forms: `/api/waitlist` (early access) and `/api/feedback` (the mascot). A **separate npm package with its own deploy pipeline**; see [API Worker](#api-worker). Excluded from the root `tsconfig.json`, because Workers globals (`D1Database`) do not type-check against the site's browser lib.
 - `astro.config.mjs`, `tsconfig.json` — config.
 
 ### Résumé
@@ -61,7 +61,7 @@ When adding structure, follow Astro conventions: shared markup → `src/layouts/
 - **Components:** `.astro` by default — static, zero JS. Only reach for a `client:*` directive (`client:load` / `client:idle` / `client:visible`) when a piece genuinely needs interactivity, and pick the laziest one that works.
 - **Content collections (Projects, blog):** when added, use the Content Layer API — define schemas in `src/content.config.ts` (not the legacy `src/content/config.ts`) with a `glob()` loader and Zod schemas (`z.coerce.date()` for frontmatter dates). Query via `getCollection()` / `getEntry()`. Match the existing config file's `z` import path if one already exists.
 - **Styling:** use Tailwind utilities and `@theme` tokens rather than raw hex values or one-off inline `<style>`. Keep class lists readable.
-- **No em dashes in visitor-facing copy.** Reword, or use a colon, a full stop, or a comma. Page titles use a middle dot as the separator and one pattern, `<Name> · <lowercase descriptor>` (`'Stack · how this site works'`), where the name is the nav label; `build-og-images.mjs` parses that separator, so a title using ` — ` also breaks its OG card. This applies to anything that reaches the page: prose, labels, placeholders, `aria-label`s, tooltips, and UI strings in bundled scripts **and in the waitlist Worker's error responses**, which render in the form. **Source comments are exempt** — nothing they say reaches the page.
+- **No em dashes in visitor-facing copy.** Reword, or use a colon, a full stop, or a comma. Page titles use a middle dot as the separator and one pattern, `<Name> · <lowercase descriptor>` (`'Stack · how this site works'`), where the name is the nav label; `build-og-images.mjs` parses that separator, so a title using ` — ` also breaks its OG card. This applies to anything that reaches the page: prose, labels, placeholders, `aria-label`s, tooltips, and UI strings in bundled scripts **and in the Worker's error responses**, which render in the forms. **Source comments are exempt** — nothing they say reaches the page.
 - **Self-host assets** (fonts included) rather than adding third-party `<link>` tags — it's better for the performance bar and the "fully self-hosted" goal.
 
 ## Search
@@ -122,22 +122,55 @@ The `Ship log` section on `/stack` (`src/components/ShipLog.astro`) shows releas
 - **Motion:** restrained — fade-up reveals, page transitions, subtle hover. Always gate on `prefers-reduced-motion`. No heavy animation libs until earned.
 - **Layout:** asymmetric editorial grids over the predictable centered column; oversized serif type does the work. References: Paco Coursey, Rauno Freiberg, Brittany Chiang (craft bar) + thesephist, Simon Willison (substance bar). Favor whitespace and typography over chrome.
 
-## Waitlist API
+## Mascot
 
-The early-access form on `/gaming-assistant` POSTs to `/api/waitlist`, which is **not part
-of this build**. It is a Cloudflare Worker backed by D1, living in `waitlist-worker/` and
-deployed with `wrangler` — see that directory's README.
+Kowalski, drawn as a penguin in a bow tie and monocle, parks on the right edge of every
+page (`src/components/Mascot.astro`, mounted from `Base.astro`; pages pass `mascot={false}`
+to opt out, which only the two `/feedback` routes do). Click him and he offers the feedback
+form; drag him and he stays where he was put.
+
+- **He is a `<details>` element**, so the panel opens with no JavaScript and the summary is
+  a real button in the tab order. `src/scripts/mascot.ts` adds only what a script can:
+  dragging (desktop only; below `sm` he is a fixed corner button and the panel is a bottom
+  sheet), his remembered spot (`localStorage`, `mascot-pos`), Escape and outside-click to
+  close, a 30-day quiet after a send (`mascot-quiet-until`), "hide him for now" for the tab
+  (`sessionStorage`), and the inline result.
+- **The form is `FeedbackForm.astro`**, rendered in his panel and again as the body of
+  `/feedback`. Same rules as the waitlist form: a native POST to `/api/feedback` that works
+  with JavaScript off (303 to `/feedback/thanks/`, or to `/feedback/?e=<code>` with a
+  `#fb-err-*` block revealed by `:target`); `src/scripts/feedback-form.ts` upgrades it.
+  The honeypot is `favorite_fish`; keep it in step with `HONEYPOT_FIELDS` in
+  `waitlist-worker/src/feedback.ts`. The 1 to 5 rating is five radios drawn as fish and
+  filled by CSS alone (`.fish-rating` in `global.css`; the DOM order is reversed on
+  purpose, read the comment before touching it).
+- **Styles are the `.mascot` and `.penguin` blocks in `global.css`**, beside the site's
+  other print and reduced-motion overrides. He is `no-print` (never in the résumé PDF),
+  outside `<main>` (never in the search index), and carries `view-transition-name:
+  site-mascot` so he holds steady across page transitions like the header does. The
+  penguin's ink and paper are fixed hex on purpose: a penguin that re-themed would turn
+  cream with a black belly in dark mode.
+- **Feedback lands in the `feedback` table** of the Worker's D1 database. A nightly job on
+  the host (`~/agent/feedback/feedback-digest.sh`) writes unread rows to the vault and
+  stamps `read_at`; it is not part of this repo.
+
+## API Worker
+
+The early-access form on `/gaming-assistant` POSTs to `/api/waitlist` and the feedback
+form POSTs to `/api/feedback`. Neither is **part of this build**. Both are routes on one
+Cloudflare Worker backed by D1, living in `waitlist-worker/` (the name predates the second
+route; renaming a deployed Worker orphans the first) and deployed with `wrangler` — see
+that directory's README.
 
 Three things worth knowing before touching either half:
 
 - **There are now two deploy pipelines.** The site ships only on a signed tag (below); the
   Worker ships instantly via `npx wrangler deploy`. They are independent. **Deploy the
-  Worker before the frontend reaches production**, or the form is live against a 404.
-- **The form must keep working with JavaScript disabled.** It is a native `<form>` POST;
-  the Worker answers a no-JS submission with a 303 to `/gaming-assistant/thanks`. The page
-  script only upgrades that to an inline result.
-- **Same-origin is load-bearing.** `/api/waitlist` on the site's own hostnames is what lets
-  the `fetch` satisfy `default-src 'self'` with no `connect-src` amendment. A dedicated
+  Worker before the frontend reaches production**, or a form is live against a 404.
+- **The forms must keep working with JavaScript disabled.** They are native `<form>`
+  POSTs; the Worker answers a no-JS submission with a 303 to `/gaming-assistant/thanks` or
+  `/feedback/thanks/`. The page scripts only upgrade that to an inline result.
+- **Same-origin is load-bearing.** `/api/*` on the site's own hostnames is what lets the
+  `fetch` satisfy `default-src 'self'` with no `connect-src` amendment. A dedicated
   subdomain would require loosening the CSP; don't.
 
 Note that `www.aleclay10.dev` serves the site rather than redirecting to the apex, so the

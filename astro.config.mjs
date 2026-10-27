@@ -14,9 +14,12 @@ export default defineConfig({
   // describe. See the header comment in scripts/search-index-integration.mjs.
   integrations: [
     // /gaming-assistant/thanks is a form-confirmation route reached only by a 303
-    // from the waitlist Worker. It is a real page, but it should not rank for
-    // anything — see the noindex prop on Base.astro.
-    sitemap({ filter: (page) => !page.includes('/gaming-assistant/thanks') }),
+    // from the waitlist Worker, and /feedback and /feedback/thanks are the
+    // mascot's form as a page and its no-JS confirmation. Real pages, but none
+    // should rank for anything — see the noindex prop on Base.astro.
+    sitemap({
+      filter: (page) => !page.includes('/gaming-assistant/thanks') && !page.includes('/feedback')
+    }),
     searchIndex()
   ],
   vite: {

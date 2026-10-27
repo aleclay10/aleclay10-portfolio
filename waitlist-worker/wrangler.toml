@@ -18,7 +18,9 @@ compatibility_date = "2026-08-21"
 # to the apex. A route on the apex alone would leave the form 404ing on www.
 routes = [
   { pattern = "aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" },
-  { pattern = "www.aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" }
+  { pattern = "www.aleclay10.dev/api/waitlist*", zone_name = "aleclay10.dev" },
+  { pattern = "aleclay10.dev/api/feedback*", zone_name = "aleclay10.dev" },
+  { pattern = "www.aleclay10.dev/api/feedback*", zone_name = "aleclay10.dev" }
 ]
 
 [[d1_databases]]
@@ -51,4 +53,14 @@ namespace_id = "1001"
 
 [ratelimits.simple]
 limit = 10
+period = 60
+
+# The feedback form's own bucket, so a burst of tips cannot lock the waitlist and
+# vice versa. Tighter than the waitlist: nobody has five tips a minute.
+[[ratelimits]]
+name = "FEEDBACK_LIMITER"
+namespace_id = "1002"
+
+[ratelimits.simple]
+limit = 5
 period = 60

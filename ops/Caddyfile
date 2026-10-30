@@ -90,3 +90,36 @@
 		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log
 	}
 }
+
+# Add to /opt/homebrew/etc/Caddyfile below the existing `:8080` block, then:
+#   cp /opt/homebrew/etc/Caddyfile /opt/homebrew/etc/Caddyfile.backup.$(date +%Y%m%d)
+#   caddy validate --config /opt/homebrew/etc/Caddyfile
+#   caddy reload --config /opt/homebrew/etc/Caddyfile --address unix//Users/agent.kowalski/portfolio/caddy-admin.sock
+#
+# Caddy on the mini listens on loopback :8080 only, plain HTTP: Cloudflare terminates
+# TLS and the tunnel forwards the original Host header. The existing port-only `:8080`
+# block matches any Host and keeps serving the portfolio; these two blocks name their
+# hosts on the same port and take precedence for them. Keep `bind` so the hub is never
+# reachable from the LAN.
+
+# App and API: behind Cloudflare Access. Everything except the webhook path.
+http://budget.aleclay10.dev:8080 {
+	bind 127.0.0.1 ::1
+	@webhooks path /webhooks/*
+	respond @webhooks 404
+	reverse_proxy 127.0.0.1:8787 {
+		flush_interval -1
+	}
+}
+
+# Webhook receiver: outside Access. Only the Plaid webhook path is served.
+http://budget-hooks.aleclay10.dev:8080 {
+	bind 127.0.0.1 ::1
+	@hook path /webhooks/plaid
+	handle @hook {
+		reverse_proxy 127.0.0.1:8787
+	}
+	handle {
+		respond 404
+	}
+}

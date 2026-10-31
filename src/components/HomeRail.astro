@@ -1,0 +1,227 @@
+---
+/**
+ * The home page's wide-screen rail: a section list, then the machine room.
+ *
+ * The content column is 64rem wide, so from 2xl (1536px) up each side of the
+ * home page carried a third of the viewport as empty margin. This fixes a
+ * narrow column into the right-hand margin, anchored to the content column
+ * rather than the viewport edge (.home-rail in global.css), so it reads as part
+ * of the page and never drifts away from the text on an ultrawide. Hidden
+ * below 2xl, on short viewports (where it would meet the mascot parked at the
+ * bottom right), and in print. Phones and laptops never download a byte for it
+ * beyond the markup.
+ *
+ * Section list: the same markup as PageNav, with a scroll-spy that marks the
+ * section in view with aria-current="location". Works as plain anchors with no
+ * JS. The hrefs must match the ids on the home page and the layout's contact
+ * row.
+ *
+ * Machine room: the tail of the host's log, in the voice of the live strip and
+ * the /kowalski trace. Every row renders a static baseline at build time and
+ * only the health, uptime, deploy and prices rows rewrite themselves, from the
+ * same two same-origin feeds the strip reads (status.json, prices.json) through
+ * the same clients, so freshness rules cannot drift. The shipped rows come from
+ * the ship log at build time; the commit row from git. Disclosure contract as
+ * everywhere else: percentages and dates, never values; the health check's
+ * minute is already public in status.json.
+ *
+ * data-search-skip: the labels repeat headings and the rows rewrite after load.
+ */
+import { loadShipLog } from '../lib/ship-log-loader.mjs';
+import { currentCommit, currentRelease } from '../lib/release.mjs';
+
+const sections = [
+	{ href: '#intro', label: 'Intro' },
+	{ href: '#live', label: 'Live' },
+	{ href: '#work', label: 'Work' },
+	{ href: '#timeline', label: 'Timeline' },
+	{ href: '#contact', label: 'Contact' },
+];
+
+const { tag } = currentRelease();
+const commit = currentCommit();
+const { log } = await loadShipLog();
+const shipped = log.recent.slice(0, 3);
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dayMonth = (iso: string) => {
+	const [, m, d] = iso.split('-');
+	return `${MONTHS[Number(m) - 1]} ${Number(d)}`;
+};
+
+type Row = { id: string; label: string; text: string; dot?: boolean };
+
+const rows: Row[] = [
+	{ id: 'health', label: 'health', text: 'checked from the edge every 5 min', dot: true },
+	{ id: 'uptime', label: 'uptime', text: '7d and 30d, from the health log' },
+	{ id: 'deploy', label: 'deploy', text: tag ? `${tag} · signed tag, verified here` : 'signed tag, verified here' },
+	{ id: 'prices', label: 'prices', text: 'closes fetched on the host, every 30 min' },
+];
+---
+
+<aside aria-label="Page rail" data-search-skip class="home-rail no-print reveal reveal-2 hidden 2xl:block">
+	<nav aria-label="On this page" data-rail-nav>
+		<p class="font-mono t-caption uppercase tracking-wider text-muted">On this page</p>
+		<ul class="mt-3 border-l border-line">
+			{sections.map((s) => (
+				<li>
+					<a
+						href={s.href}
+						class="link -ml-px block border-l border-transparent py-1.5 pl-4 font-mono t-caption transition hover:border-accent">
+						{s.label}
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+
+	<section aria-label="Machine room" class="mt-10">
+		<p class="font-mono t-caption uppercase tracking-wider text-muted">Machine room</p>
+		<ol class="mt-3 divide-y divide-line border-y border-line font-mono t-caption tabular-nums">
+			{rows.map((r) => (
+				<li class="py-2.5" data-rail={r.id}>
+					<span class="flex items-baseline gap-x-2 text-muted">
+						{r.dot && <span data-rail-dot class="h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full bg-accent" aria-hidden="true"></span>}
+						{r.label}
+					</span>
+					<span data-rail-text class="mt-0.5 block text-ink">{r.text}</span>
+				</li>
+			))}
+			<li class="py-2.5">
+				<span class="text-muted">shipped</span>
+				<ul class="mt-0.5">
+					{shipped.map((p) => (
+						<li>
+							<a
+								href={`https://github.com/${log.repo}/pull/${p.number}`}
+								rel="noopener"
+								aria-label={`#${p.number}, merged ${dayMonth(p.mergedAt)}: ${p.title}`}
+								class="link -my-1 inline-block py-1 text-ink hover:text-accent">
+								#{p.number}{' '}<span class="text-muted">· merged {dayMonth(p.mergedAt)}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			</li>
+			{commit && (
+				<li class="py-2.5">
+					<span class="text-muted">commit</span>
+					<span class="mt-0.5 block">
+						<a href={`https://github.com/${log.repo}/commit/${commit}`} rel="noopener" class="link text-ink hover:text-accent">{commit}</a>
+						{' '}<span class="text-muted">· this build</span>
+					</span>
+				</li>
+			)}
+		</ol>
+	</section>
+</aside>
+
+<script>
+	import { closeDay, loadFreshPrices } from '../lib/prices-client';
+	import { deployedWhen, loadFreshStatus } from '../lib/status-client';
+
+	const row = (id: string) => document.querySelector<HTMLElement>(`[data-rail="${id}"]`);
+
+	function settle(el: HTMLElement | null, text: string) {
+		const t = el?.querySelector<HTMLElement>('[data-rail-text]');
+		if (!el || !t) return;
+		t.textContent = text;
+		el.classList.add('live-in');
+	}
+
+	const clock = (d: Date) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+	const pct = (n: number) => `${n.toFixed(2).replace(/\.?0+$/, '')}%`;
+
+	// Scroll-spy for the section list. The last section whose top has passed the
+	// sticky header is current; at the foot of the page the final one wins even
+	// though the contact row is shorter than a viewport. rAF-throttled, passive.
+	function spy() {
+		const nav = document.querySelector<HTMLElement>('[data-rail-nav]');
+		if (!nav) return;
+		const pairs = Array.from(nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'))
+			.map((a) => ({ a, el: document.getElementById(decodeURIComponent(a.hash.slice(1))) }))
+			.filter((p): p is { a: HTMLAnchorElement; el: HTMLElement } => p.el !== null);
+		if (!pairs.length) return;
+		const OFFSET = 96; // header (3.5rem) plus scroll-padding-top's clearance
+		let queued = false;
+		const update = () => {
+			queued = false;
+			const y = window.scrollY + OFFSET;
+			let current = pairs[0];
+			for (const p of pairs) if (p.el.getBoundingClientRect().top + window.scrollY <= y) current = p;
+			const foot = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+			if (foot) current = pairs[pairs.length - 1];
+			for (const p of pairs) {
+				if (p === current) p.a.setAttribute('aria-current', 'location');
+				else p.a.removeAttribute('aria-current');
+			}
+		};
+		const schedule = () => {
+			if (queued) return;
+			queued = true;
+			requestAnimationFrame(update);
+		};
+		addEventListener('scroll', schedule, { passive: true });
+		addEventListener('resize', schedule);
+		update();
+	}
+
+	async function status() {
+		const health = row('health');
+		const uptime = row('uptime');
+		const deploy = row('deploy');
+		if (!health && !uptime && !deploy) return;
+		const fresh = await loadFreshStatus();
+		if (!fresh) return;
+		const { data, checkedAt } = fresh;
+		const down = data.status === 'down';
+
+		settle(health, `${down ? 'down' : 'up'} · checked ${clock(new Date(checkedAt))}`);
+		const dot = health?.querySelector('[data-rail-dot]');
+		if (dot) {
+			if (down) {
+				dot.classList.remove('bg-accent');
+				dot.classList.add('bg-muted');
+			} else {
+				dot.classList.add('motion-safe:animate-breathe');
+			}
+		}
+
+		const week = data.uptime?.['7d'];
+		const month = data.uptime?.['30d'];
+		if (typeof week === 'number') {
+			// Same rule as the strip: a window computed from fewer observed days than
+			// it claims is labelled as partial rather than reported as the window.
+			const since = data.since ? Date.parse(data.since) : NaN;
+			const observed = Number.isFinite(since) ? (checkedAt - since) / 86_400_000 : Infinity;
+			const days = Math.max(1, Math.floor(observed));
+			if (observed >= 30 && typeof month === 'number') settle(uptime, `${pct(week)} over 7d · ${pct(month)} over 30d`);
+			else if (observed >= 7 && typeof month === 'number') settle(uptime, `${pct(week)} over 7d · ${pct(month)} over ${days}d so far`);
+			else settle(uptime, `${pct(week)} over ${days}d so far`);
+		}
+
+		const rel = data.release;
+		if (rel && typeof rel.tag === 'string' && /^v\d+\.\d+\.\d+$/.test(rel.tag)) {
+			const t = typeof rel.deployedAt === 'string' ? Date.parse(rel.deployedAt) : NaN;
+			const when = Number.isFinite(t) ? deployedWhen(new Date(t)) : null;
+			settle(deploy, when ? `${rel.tag} · serving since ${when}` : `${rel.tag} · verified, built, serving`);
+		}
+	}
+
+	async function prices() {
+		const el = row('prices');
+		if (!el) return;
+		const fresh = await loadFreshPrices();
+		if (!fresh) return;
+		const { data, generatedAt, closesAt } = fresh;
+		const state = typeof data.marketState === 'string' ? data.marketState.toLowerCase() : null;
+		const parts = [closesAt ? `${closeDay(closesAt, 'short')} close` : 'last close'];
+		if (state) parts.push(state);
+		parts.push(`refreshed ${clock(generatedAt)}`);
+		settle(el, parts.join(' · '));
+	}
+
+	spy();
+	status();
+	prices();
+</script>

@@ -39,3 +39,14 @@ export function currentRelease() {
 		prNumber: m ? Number(m[1]) : null,
 	};
 }
+
+/**
+ * Short hash of the commit this build was made from, for the home rail's
+ * "commit" row. On the host it is the tagged commit; locally, the branch head.
+ * Deterministic per commit, so it does not disturb the build's reproducibility
+ * the way a build timestamp would. Null without git.
+ */
+export function currentCommit() {
+	const sha = git('rev-parse --short=7 HEAD');
+	return /^[0-9a-f]{7,40}$/.test(sha) ? sha : null;
+}

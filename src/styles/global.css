@@ -644,6 +644,37 @@ mark[data-search-hit='current'] {
   outline-offset: 2px;
 }
 
+/* The home page's wide-screen rail (HomeRail.astro). Fixed, and anchored to
+   the 64rem content column rather than the viewport edge, so it sits in the
+   margin the column leaves at 2xl and stays beside the text on an ultrawide.
+   Unlayered on purpose: the display rule below has to beat the 2xl:block
+   utility. Short viewports hide it, because the mascot parks at the bottom
+   right and the two would meet. The current section is marked the way the
+   header marks the current page: ink, plus the accent on the hairline. */
+.home-rail {
+  position: fixed;
+  top: 5.5rem;
+  left: calc(50% + 32rem + 2rem);
+  width: 13.5rem;
+  z-index: 20;
+}
+/* Two height tiers. Under 58rem the machine room would reach the mascot, so
+   only the section list stays; under 36rem not even that fits. */
+@media (height < 58rem) {
+  .home-rail section {
+    display: none;
+  }
+}
+@media (height < 36rem) {
+  .home-rail {
+    display: none;
+  }
+}
+.home-rail nav a[aria-current='location'] {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
 /* The mascot. Fixed to the right edge, a third tucked off-screen until hovered,
    focused or open. After a drag, mascot.ts sets top as an inline style, flips
    data-side when he is dropped on the left, and sets data-anchor to whichever

@@ -644,13 +644,15 @@ mark[data-search-hit='current'] {
   outline-offset: 2px;
 }
 
-/* The home page's wide-screen rail (HomeRail.astro). Fixed, and anchored to
-   the 64rem content column rather than the viewport edge, so it sits in the
-   margin the column leaves at 2xl and stays beside the text on an ultrawide.
-   Unlayered on purpose: the display rule below has to beat the 2xl:block
-   utility. Short viewports hide it, because the mascot parks at the bottom
-   right and the two would meet. The current section is marked the way the
-   header marks the current page: ink, plus the accent on the hairline. */
+/* The home page's wide-screen margins (HomeRail.astro): the section list on
+   the left, the machine room on the right. Both fixed, and anchored to the
+   64rem content column rather than the viewport edge, so they sit in the
+   margin the column leaves and stay beside the text on an ultrawide.
+   Unlayered on purpose: the display rules below have to beat the 2xl:block
+   utility. Short viewports hide them, because the mascot parks at the bottom
+   and can be dragged to either edge, so the two would meet. The current
+   section is marked the way the header marks the current page: ink, plus the
+   accent on the hairline. */
 .home-rail {
   position: fixed;
   top: 5.5rem;
@@ -658,19 +660,53 @@ mark[data-search-hit='current'] {
   width: 13.5rem;
   z-index: 20;
 }
-/* Two height tiers. Under 58rem the machine room would reach the mascot, so
-   only the section list stays; under 36rem not even that fits. */
+/* The machine room is a column of rows and would reach the mascot under
+   58rem; the list is five lines and fits down to 36rem. */
 @media (height < 58rem) {
-  .home-rail section {
-    display: none;
-  }
-}
-@media (height < 36rem) {
   .home-rail {
     display: none;
   }
 }
-.home-rail nav a[aria-current='location'] {
+/* The section list is narrow (its labels end well inside 8rem), so it shows
+   from 88rem, where the 12rem margin holds it with a hand's width to spare;
+   the machine room at 13.5rem waits for 2xl. From 110rem the list steps out
+   by one date column so the timeline's dates can hang in the band nearest the
+   column; between the two widths they stay in the column, since a 16rem
+   margin cannot hold both. */
+.home-rail-nav {
+  display: none;
+  position: fixed;
+  top: 5.5rem;
+  right: calc(50% + 32rem + 2rem);
+  width: 8rem;
+  z-index: 20;
+}
+@media (min-width: 88rem) {
+  .home-rail-nav {
+    display: block;
+  }
+}
+@media (min-width: 110rem) {
+  .home-rail-nav {
+    right: calc(50% + 32rem + 2rem + 9rem + 2rem);
+  }
+  .era {
+    grid-template-columns: 1fr;
+  }
+  .era-when {
+    position: absolute;
+    top: 1.5rem; /* the row's py-6 */
+    right: calc(100% + 2rem);
+    width: 9rem;
+    text-align: right;
+  }
+}
+@media (height < 36rem) {
+  .home-rail-nav {
+    display: none;
+  }
+}
+.home-rail-nav a[aria-current='location'] {
   color: var(--ink);
   border-color: var(--accent);
 }

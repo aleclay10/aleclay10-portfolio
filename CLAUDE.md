@@ -21,6 +21,7 @@ Use `npm ci` (not `npm install`) when installing — the deploy pipeline does, a
 
 - **Astro 7**, static output, **no SSR adapter** — keep it that way; this is a static site.
   - Requires **Node ≥ 22.12**. `deploy.sh` picks the highest installed nvm version; if that ever resolves below 22.12 the deploy breaks.
+  - **`astro` is pinned to `~7.3.3` on purpose** (2026-11-01). Astro 7.4 raised its floor to Node 22.23.4 and refuses to run below it (a hard exit, not a warning), and the host's newest nvm Node was 22.22.3 at the time, so a tag built against 7.4 would fail closed. Widen the range only after the mini has `nvm install 22.23.4` (or newer) with the global `claude` package reinstalled, since `claude-rc.sh` and `deploy-signed.sh` both resolve the newest installed Node.
   - Astro 7 ships **Vite 8** and the Rust compiler is now mandatory, so unclosed or semantically invalid HTML is a build **error** rather than being silently auto-corrected.
   - `compressHTML` now defaults to `'jsx'` rather than `true` (JSX whitespace rules, not HTML).
     - **This eats the space around inline links.** Under JSX rules a whitespace-only run containing a newline is dropped entirely, so a paragraph that ends a line on a word and starts the next line with `<a>` renders as `includingKowalski`. Write an explicit `{' '}` at the line break, or keep the link on the same line as the text. It does **not** reproduce under `astro dev` (no compression) — only in a production build, so after touching prose, scan `dist/` for `text<a` and `</a>text` rather than trusting the dev server.

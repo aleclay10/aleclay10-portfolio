@@ -1,0 +1,10 @@
+# gitleaks configuration: default rules, plus the one path that legitimately holds
+# high-entropy strings (npm integrity hashes).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Lockfile integrity hashes"
+paths = [
+  '''package-lock\.json''',
+]

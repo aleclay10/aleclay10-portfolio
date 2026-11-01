@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Pre-commit: refuse to commit anything that looks like a secret. This repo is public,
+# so the check runs before the commit exists rather than relying on GitHub's push protection.
+# Install gitleaks with: brew install gitleaks
+set -euo pipefail
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --no-banner
+else
+  echo "pre-commit: gitleaks not installed, secret check skipped (brew install gitleaks)" >&2
+fi

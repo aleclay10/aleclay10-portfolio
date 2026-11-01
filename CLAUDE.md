@@ -150,7 +150,7 @@ form; drag him and he stays where he was put.
   penguin's ink and paper are fixed hex on purpose: a penguin that re-themed would turn
   cream with a black belly in dark mode.
 - **Feedback lands in the `feedback` table** of the Worker's D1 database. A nightly job on
-  the host (`~/agent/feedback/feedback-digest.sh`) writes unread rows to the vault and
+  the host (a scheduled job) writes unread rows to the vault and
   stamps `read_at`; it is not part of this repo.
 
 ## API Worker

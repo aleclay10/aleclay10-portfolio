@@ -162,13 +162,15 @@ const gamingFacts = [
 			</ul>
 		</section>
 
-		<!-- Timeline. Vertical rows, oldest first so the story ends on now. -->
+		<!-- Timeline. Vertical rows, oldest first so the story ends on now. From
+		     110rem the date hangs in the left margin (.era-when in global.css) so
+		     the era text starts at the column edge. -->
 		<section id="timeline" class="border-t border-line py-10">
 			<h2 class="font-serif t-title2 font-medium tracking-tight text-ink">Timeline</h2>
 			<ol class="mt-4 divide-y divide-line">
 				{eras.map((e) => (
-					<li class="grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
-						<p class="font-mono t-caption uppercase tracking-wider text-muted">
+					<li class="era relative grid gap-x-8 gap-y-2 py-6 sm:grid-cols-[9rem_1fr]">
+						<p class="era-when font-mono t-caption uppercase tracking-wider text-muted">
 							{/* "now" in text: a coloured dot alone carried "current", which is colour-only.
 							    Ink, not accent: the accent means interactive or live. */}
 							{e.years}{e.current && <span class="font-medium text-ink"> · now</span>}
@@ -187,7 +189,7 @@ const gamingFacts = [
 		</section>
 	</main>
 
-	<!-- Wide screens only: the section list and the machine room in the right
-	     margin. Outside <main> (never indexed) and fixed, so it escapes the column. -->
+	<!-- Wide screens only: the section list in the left margin, the machine room
+	     in the right. Outside <main> (never indexed) and fixed, so they escape the column. -->
 	<HomeRail />
 </Base>

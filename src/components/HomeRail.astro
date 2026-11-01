@@ -1,20 +1,23 @@
 ---
 /**
- * The home page's wide-screen rail: a section list, then the machine room.
+ * The home page's wide-screen margins: a section list on the left, the machine
+ * room on the right.
  *
- * The content column is 64rem wide, so from 2xl (1536px) up each side of the
- * home page carried a third of the viewport as empty margin. This fixes a
- * narrow column into the right-hand margin, anchored to the content column
- * rather than the viewport edge (.home-rail in global.css), so it reads as part
- * of the page and never drifts away from the text on an ultrawide. Hidden
- * below 2xl, on short viewports (where it would meet the mascot parked at the
- * bottom right), and in print. Phones and laptops never download a byte for it
- * beyond the markup.
+ * The content column is 64rem wide, so on a desktop each side of the home page
+ * carries a wide empty margin. Both pieces are fixed and anchored to the
+ * content column rather than the viewport edge (.home-rail-nav and .home-rail
+ * in global.css), so they read as part of the page and never drift away from
+ * the text on an ultrawide. The section list is narrow and shows from 88rem
+ * (1408px), so laptops get it too; the machine room needs 2xl (1536px). Both
+ * hide on short viewports (where they would meet the mascot, which parks at
+ * the bottom and can be dragged to either edge) and in print. Phones never
+ * download a byte for either beyond the markup.
  *
  * Section list: the same markup as PageNav, with a scroll-spy that marks the
  * section in view with aria-current="location". Works as plain anchors with no
  * JS. The hrefs must match the ids on the home page and the layout's contact
- * row.
+ * row. From 110rem it steps outward to make room for the timeline's hanging
+ * dates (.era-when), which take the band nearest the column.
  *
  * Machine room: the tail of the host's log, in the voice of the live strip and
  * the /kowalski trace. Every row renders a static baseline at build time and
@@ -59,61 +62,59 @@ const rows: Row[] = [
 ];
 ---
 
-<aside aria-label="Page rail" data-search-skip class="home-rail no-print reveal reveal-2 hidden 2xl:block">
-	<nav aria-label="On this page" data-rail-nav>
-		<p class="font-mono t-caption uppercase tracking-wider text-muted">On this page</p>
-		<ul class="mt-3 border-l border-line">
-			{sections.map((s) => (
-				<li>
-					<a
-						href={s.href}
-						class="link -ml-px block border-l border-transparent py-1.5 pl-4 font-mono t-caption transition hover:border-accent">
-						{s.label}
-					</a>
-				</li>
-			))}
-		</ul>
-	</nav>
-
-	<section aria-label="Machine room" class="mt-10">
-		<p class="font-mono t-caption uppercase tracking-wider text-muted">Machine room</p>
-		<ol class="mt-3 divide-y divide-line border-y border-line font-mono t-caption tabular-nums">
-			{rows.map((r) => (
-				<li class="py-2.5" data-rail={r.id}>
-					<span class="flex items-baseline gap-x-2 text-muted">
-						{r.dot && <span data-rail-dot class="h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full bg-accent" aria-hidden="true"></span>}
-						{r.label}
-					</span>
-					<span data-rail-text class="mt-0.5 block text-ink">{r.text}</span>
-				</li>
-			))}
-			<li class="py-2.5">
-				<span class="text-muted">shipped</span>
-				<ul class="mt-0.5">
-					{shipped.map((p) => (
-						<li>
-							<a
-								href={`https://github.com/${log.repo}/pull/${p.number}`}
-								rel="noopener"
-								aria-label={`#${p.number}, merged ${dayMonth(p.mergedAt)}: ${p.title}`}
-								class="link -my-1 inline-block py-1 text-ink hover:text-accent">
-								#{p.number}{' '}<span class="text-muted">· merged {dayMonth(p.mergedAt)}</span>
-							</a>
-						</li>
-					))}
-				</ul>
+<nav aria-label="On this page" data-rail-nav data-search-skip class="home-rail-nav no-print reveal reveal-2">
+	<p class="font-mono t-caption uppercase tracking-wider text-muted">On this page</p>
+	<ul class="mt-3 border-l border-line">
+		{sections.map((s) => (
+			<li>
+				<a
+					href={s.href}
+					class="link -ml-px block border-l border-transparent py-1.5 pl-4 font-mono t-caption transition hover:border-accent">
+					{s.label}
+				</a>
 			</li>
-			{commit && (
-				<li class="py-2.5">
-					<span class="text-muted">commit</span>
-					<span class="mt-0.5 block">
-						<a href={`https://github.com/${log.repo}/commit/${commit}`} rel="noopener" class="link text-ink hover:text-accent">{commit}</a>
-						{' '}<span class="text-muted">· this build</span>
-					</span>
-				</li>
-			)}
-		</ol>
-	</section>
+		))}
+	</ul>
+</nav>
+
+<aside aria-label="Machine room" data-search-skip class="home-rail no-print reveal reveal-2 hidden 2xl:block">
+	<p class="font-mono t-caption uppercase tracking-wider text-muted">Machine room</p>
+	<ol class="mt-3 divide-y divide-line border-y border-line font-mono t-caption tabular-nums">
+		{rows.map((r) => (
+			<li class="py-2.5" data-rail={r.id}>
+				<span class="flex items-baseline gap-x-2 text-muted">
+					{r.dot && <span data-rail-dot class="h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full bg-accent" aria-hidden="true"></span>}
+					{r.label}
+				</span>
+				<span data-rail-text class="mt-0.5 block text-ink">{r.text}</span>
+			</li>
+		))}
+		<li class="py-2.5">
+			<span class="text-muted">shipped</span>
+			<ul class="mt-0.5">
+				{shipped.map((p) => (
+					<li>
+						<a
+							href={`https://github.com/${log.repo}/pull/${p.number}`}
+							rel="noopener"
+							aria-label={`#${p.number}, merged ${dayMonth(p.mergedAt)}: ${p.title}`}
+							class="link -my-1 inline-block py-1 text-ink hover:text-accent">
+							#{p.number}{' '}<span class="text-muted">· merged {dayMonth(p.mergedAt)}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</li>
+		{commit && (
+			<li class="py-2.5">
+				<span class="text-muted">commit</span>
+				<span class="mt-0.5 block">
+					<a href={`https://github.com/${log.repo}/commit/${commit}`} rel="noopener" class="link text-ink hover:text-accent">{commit}</a>
+					{' '}<span class="text-muted">· this build</span>
+				</span>
+			</li>
+		)}
+	</ol>
 </aside>
 
 <script>

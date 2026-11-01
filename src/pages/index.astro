@@ -4,6 +4,7 @@ import LiveStrip from '../components/LiveStrip.astro';
 import WorkCard from '../components/WorkCard.astro';
 import PrReceipt from '../components/PrReceipt.astro';
 import PipelineMini from '../components/PipelineMini.astro';
+import HomeRail from '../components/HomeRail.astro';
 
 const title = 'Alec Layton · agents, products, and the book';
 const description =
@@ -73,7 +74,7 @@ const gamingFacts = [
 	<main id="main-content" tabindex="-1" class="flex flex-1 flex-col">
 		<!-- Hero. No eyebrow (the title says it), two sentences, three actions. -->
 		<!-- No eyebrow and no h2 here, so the search indexer is told the label. -->
-		<section data-search-section="Intro" class="py-12 sm:py-20">
+		<section id="intro" data-search-section="Intro" class="py-12 sm:py-20">
 			<div class="grid items-center gap-12 sm:grid-cols-[1.5fr_1fr]">
 				<div class="reveal">
 					<!-- Compact only: the portrait as a byline, so the title and the primary
@@ -185,4 +186,8 @@ const gamingFacts = [
 			</ol>
 		</section>
 	</main>
+
+	<!-- Wide screens only: the section list and the machine room in the right
+	     margin. Outside <main> (never indexed) and fixed, so it escapes the column. -->
+	<HomeRail />
 </Base>

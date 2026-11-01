@@ -90,3 +90,11 @@
 		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log
 	}
 }
+
+# Site blocks owned by other projects on this host do not live in this file.
+# Each project ships its own file into /opt/homebrew/etc/Caddyfile.d/ (the A&H
+# Budgeting hub installs infra/Caddyfile.snippet from its own repository as
+# ah-budgeting.caddy) and the private mac-mini-config repository mirrors that
+# directory, so those blocks are reviewed there, not here. A glob that matches
+# nothing is valid, so this mirror validates on its own.
+import /opt/homebrew/etc/Caddyfile.d/*.caddy

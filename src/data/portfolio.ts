@@ -109,9 +109,9 @@ export type Holding = {
 	note?: string;
 };
 
-// Baseline as of 2026-08-29 brokerage marks. Excludes $8 of uninvested brokerage
-// cash and everything outside the taxable book (retirement, savings) - the page
-// is explicitly scoped to brokerage + crypto.
+// Baseline as of 2026-08-29 brokerage marks. Excludes uninvested brokerage cash
+// and everything outside the taxable book (retirement, savings) - the page is
+// explicitly scoped to brokerage + crypto.
 export const holdings: Holding[] = [
 	{ ticker: 'NVDA', name: 'NVIDIA', vector: 'compute', layer: 'silicon', weight: 14.83, kind: 'stock', note: 'The compute layer itself. Largest position.' },
 	{ ticker: 'SPCX', name: 'SpaceX', vector: 'space', weight: 13.78, kind: 'stock', note: 'Bought post-IPO on launch cadence, added through the unwind. Now the second-largest position.' },

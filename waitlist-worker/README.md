@@ -21,9 +21,8 @@ The site is static Astro with no SSR adapter, and `../CLAUDE.md` is emphatic tha
 that way. So the form needs a backend outside the Astro build. It could have been a local
 service behind Caddy — that is the shape the deferred *Ask Kowalski* chat gateway plan
 uses — but this one stores a table of real people's names and email addresses, and the Mac
-mini also holds Google OAuth tokens, a GitHub PAT, the Cloudflare tunnel credentials and
-`holdings.json`. A Worker route is evaluated at the edge, so the request never reaches the
-tunnel.
+mini holds credentials the edge never needs. A Worker route is evaluated at the edge, so
+the request never reaches the tunnel.
 
 Being **same-origin** with the site is the other load-bearing property: it lets the browser
 `fetch` satisfy the production CSP (`default-src 'self'`) with no `connect-src` amendment.
@@ -62,7 +61,7 @@ inline result. Do not add anything that breaks the bare `<form>` POST.
 - **Rate limit** is its own binding (`FEEDBACK_LIMITER`, 5 per minute per IP), so a burst
   of tips cannot lock the waitlist and vice versa. Fails open like the waitlist's.
 - **`read_at`** is set by the nightly digest on the Mac mini
-  (`~/agent/feedback/feedback-digest.sh`), which copies unread rows into the vault. The
+  (a scheduled job on the host), which copies unread rows into the vault. The
   database is the cursor; there is no state file.
 
 ## Waitlist: notable behaviour
@@ -130,7 +129,7 @@ First time:
 
 ```sh
 export CLOUDFLARE_ACCOUNT_ID=…                       # not committed: this repo is public
-export CLOUDFLARE_API_TOKEN="$(security find-generic-password -a "$USER" -s CLOUDFLARE_API_TOKEN -w)"
+export CLOUDFLARE_API_TOKEN=…                        # from your secret store, never a file
 npx wrangler d1 create aleclay10-waitlist            # paste database_id into wrangler.toml
 npm run schema:remote
 npm run deploy
@@ -142,8 +141,7 @@ picks up the new route and binding from `wrangler.toml`.
 
 The API token needs exactly: Account → **Workers Scripts : Edit**, Account → **D1 : Edit**,
 Zone → **Workers Routes : Edit** on `aleclay10.dev`. Nothing else — in particular no DNS
-rights. Store it in the macOS Keychain, following the `ELEVENLABS_API_KEY` precedent in
-`~/agent/tools.md`.
+rights. Keep it in a secret store (the macOS Keychain, say), never in a file or this repo.
 
 ## Reading the list
 

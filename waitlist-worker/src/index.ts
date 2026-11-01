@@ -5,8 +5,8 @@
  *   POST /api/feedback   tips about the site, via the mascot        → feedback.ts
  *
  * Both run at the edge so a public write endpoint and a table of real people's
- * names and email addresses never touch the Mac mini — the host that also holds
- * Google OAuth tokens, the tunnel credentials and holdings.json.
+ * names and email addresses never touch the Mac mini, which holds credentials the
+ * edge never needs.
  *
  * Same-origin with the site by design. That is what lets the browser `fetch`
  * satisfy the production CSP (`default-src 'self'`) with no `connect-src`

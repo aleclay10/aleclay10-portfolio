@@ -46,6 +46,7 @@ This project uses Tailwind **v4** with the CSS-first config. It does **not** use
 - `src/data/portfolio.ts` — holdings/watchlist data behind `/investing`.
 - `src/styles/global.css` — Tailwind entry + theme config, plus the `@media print` block.
 - `public/` — static assets served as-is (e.g. `favicon.svg`, `theme-init.js`). Note `/status.json` is **not** here and **not** a build artifact — `health-check.sh` writes it on the host, so it 404s in dev and `LiveStrip` degrades quietly. That 404 is expected, not a bug.
+- `public/security.txt` — the RFC 9116 security contact. Caddy also serves it at `/.well-known/security.txt` through a rewrite in `ops/Caddyfile`, because `file_server` hides every dot-directory. **Its `Expires` line is 2027-11-01**; a file past that date is treated as stale, so move the date forward before then.
 - `scripts/` — repo tooling not part of the build (e.g. `build-resume-pdf.sh`).
 - `waitlist-worker/` — the Cloudflare Worker + D1 schema behind both forms: `/api/waitlist` (early access) and `/api/feedback` (the mascot). A **separate npm package with its own deploy pipeline**; see [API Worker](#api-worker). Excluded from the root `tsconfig.json`, because Workers globals (`D1Database`) do not type-check against the site's browser lib.
 - `astro.config.mjs`, `tsconfig.json` — config.

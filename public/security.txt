@@ -1,0 +1,6 @@
+# Security contact for aleclay10.dev (RFC 9116).
+# Report a vulnerability in this site or its forms to the address below.
+Contact: mailto:alec.layton100@gmail.com
+Expires: 2027-11-01T00:00:00Z
+Preferred-Languages: en
+Canonical: https://aleclay10.dev/.well-known/security.txt

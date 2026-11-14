@@ -57,6 +57,9 @@
 	#   form-action 'self': pentest LOW-2. The waitlist form posts to /api/waitlist
 	#     (same origin).
 	#   object-src 'none': pentest LOW-2.
+	#   Permissions-Policy (2026-11-14, security analysis L-8): the site uses none
+	#     of these device features, so every one is denied to this origin and to
+	#     any frame.
 	# Cloudflare's inline challenge snippets remain blocked by script-src (they carry
 	# per-request hashes, so they cannot be allowlisted without 'unsafe-inline').
 	# Deliberate: the site never depends on them.
@@ -65,6 +68,7 @@
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
 		Content-Security-Policy "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
 		-Server
 	}
@@ -77,6 +81,12 @@
 	@runtime path /status.json /prices.json
 	header @runtime Cache-Control "no-store"
 
+	# security.txt (RFC 9116, security analysis L-8). The file is built to
+	# /security.txt because `hide .*` above refuses every dot-directory, which
+	# would include /.well-known/. This serves the same file at the path the RFC
+	# prefers; the top-level path is the RFC's permitted fallback.
+	rewrite /.well-known/security.txt /security.txt
+
 	# Serve the built 404 page (QA 2026-08-22, finding N2). Without this,
 	# file_server emits a bare 404 with an empty body and visitors get the
 	# browser's native error screen while dist/404.html sits deployed and unused.
@@ -86,8 +96,16 @@
 		file_server
 	}
 
+	# Retention (security analysis L-8): this log carries real client IPs. The
+	# default was 100 MiB per file with ten kept and no time cap, roughly two
+	# years of addresses at current traffic. Rotated files are now deleted after
+	# 30 days, and the live file rolls at 25 MiB (about two weeks) so it cannot
+	# hold much more than that itself.
 	log {
-		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log
+		output file /Users/agent.kowalski/portfolio/logs/caddy-access.log {
+			roll_size 25MiB
+			roll_keep_for 720h
+		}
 	}
 }
 
